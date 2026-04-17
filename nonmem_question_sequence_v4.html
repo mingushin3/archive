@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NONMEM-Ready: 67-Step Question Sequence v4.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAF9F6;--card:#fff;--surf:#F0EFEB;--code-bg:#EFEEE8;
+  --t1:#1A1917;--t2:#4A4843;--t3:#8A8780;
+  --bdr:rgba(0,0,0,.07);--bdr-h:rgba(0,0,0,.14);
+  --p0:#1B7A5A;--p0b:#E0F3EB;
+  --p1:#6D28D9;--p1b:#EDE9FE;
+  --p2:#C0392B;--p2b:#FDECEB;
+  --p3:#B45309;--p3b:#FEF3C7;
+  --p4:#1D4ED8;--p4b:#DBEAFE;
+  --p5:#047857;--p5b:#D1FAE5;
+  --p6:#9D174D;--p6b:#FCE7F3;
+  --acc:#7E22CE;--accb:#F3E8FF;
+  --r:10px;--rs:6px;
+  --f:'Newsreader','Noto Sans KR',Georgia,serif;
+  --fs:'Noto Sans KR','Newsreader',-apple-system,sans-serif;
+  --mono:'JetBrains Mono','SF Mono',monospace;
+  --sh:0 1px 3px rgba(0,0,0,.04),0 0 0 1px rgba(0,0,0,.04);
+  --shh:0 4px 12px rgba(0,0,0,.07),0 0 0 1px rgba(0,0,0,.06);
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#141311;--card:#1C1B18;--surf:#222120;--code-bg:#2A2926;
+  --t1:#E8E6E1;--t2:#A8A49D;--t3:#706C66;
+  --bdr:rgba(255,255,255,.07);--bdr-h:rgba(255,255,255,.14);
+  --p0b:#0D2E22;--p1b:#1E1545;--p2b:#2D0F0F;--p3b:#2D1F05;--p4b:#0F1D3D;--p5b:#052E1E;--p6b:#2D0F22;--accb:#2E1065;
+  --sh:0 1px 3px rgba(0,0,0,.3),0 0 0 1px rgba(255,255,255,.04);
+  --shh:0 4px 12px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.06);
+}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--fs);background:var(--bg);color:var(--t1);line-height:1.75;font-size:14.5px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:880px;margin:0 auto;padding:2rem 1.5rem 5rem}
+
+/* Hero */
+.hero{padding:3.5rem 0 2.5rem;border-bottom:2px solid var(--bdr);margin-bottom:2rem}
+.hero-ey{font-family:var(--fs);font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--p0);margin-bottom:.75rem}
+.hero h1{font-family:var(--f);font-size:32px;font-weight:600;line-height:1.25;letter-spacing:-.01em;margin-bottom:.75rem}
+.hero h1 em{font-style:normal;background:linear-gradient(135deg,var(--p0),var(--acc));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-d{font-size:15px;color:var(--t2);max-width:700px;line-height:1.85}
+
+/* Stats */
+.stats{display:flex;flex-wrap:wrap;gap:8px;margin:1.5rem 0 2rem}
+.stat{background:var(--card);border:1px solid var(--bdr);border-radius:100px;padding:6px 16px;font-size:13px;display:flex;align-items:center;gap:6px}
+.stat b{font-weight:600}
+.stat .dot{width:8px;height:8px;border-radius:50%}
+
+/* Info boxes */
+.info-box{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:24px 28px;margin-bottom:2rem}
+.info-box-title{font-family:var(--f);font-size:16px;font-weight:600;margin-bottom:10px}
+.info-box p{color:var(--t2);font-size:13.5px;margin-bottom:8px}
+.info-box code{font-family:var(--mono);font-size:12px;background:var(--code-bg);padding:2px 7px;border-radius:4px}
+
+/* Version badge */
+.vb{display:inline-block;background:linear-gradient(135deg,var(--p0),var(--acc));color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px;letter-spacing:.04em;margin-left:8px;vertical-align:middle}
+
+/* Phase sections */
+.ps{margin-bottom:2.5rem}
+.pb{display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:var(--r);cursor:pointer;user-select:none;position:sticky;top:0;z-index:20;transition:box-shadow .2s}
+.pb:hover{box-shadow:var(--shh)}
+.pb .n{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.pb .inf{flex:1}
+.pb .tt{font-family:var(--f);font-weight:600;font-size:16px}
+.pb .st{font-size:12px;opacity:.7}
+.pb .qc{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;background:rgba(0,0,0,.06)}
+@media(prefers-color-scheme:dark){.pb .qc{background:rgba(255,255,255,.08)}}
+.pb .chv{width:18px;height:18px;transition:transform .25s ease;flex-shrink:0}
+.ps.open .chv{transform:rotate(90deg)}
+.pbd{display:none;padding-top:6px}
+.ps.open .pbd{display:block}
+
+/* Question cards */
+.qc{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);margin:10px 0;overflow:hidden;transition:box-shadow .15s;border-left:4px solid transparent}
+.qc:hover{box-shadow:var(--shh)}
+.qh{display:flex;align-items:center;gap:10px;padding:14px 18px;cursor:pointer;user-select:none}
+.qn{font-family:var(--mono);font-size:13px;font-weight:600;min-width:36px;text-align:center;padding:2px 8px;border-radius:6px;flex-shrink:0}
+.qt{font-family:var(--f);font-weight:500;font-size:14.5px;flex:1;line-height:1.45}
+.qbg{display:flex;gap:5px;flex-shrink:0;flex-wrap:wrap}
+.bd{font-size:10px;font-weight:600;padding:2px 8px;border-radius:100px;letter-spacing:.02em;white-space:nowrap}
+.b-m{background:#FEE2E2;color:#991B1B}
+.b-c{background:#FEF3C7;color:#92400E}
+.b-a{background:#D1FAE5;color:#065F46}
+.b-v{background:#DBEAFE;color:#1E40AF}
+@media(prefers-color-scheme:dark){.b-m{background:#450A0A;color:#FCA5A5}.b-c{background:#451A03;color:#FCD34D}.b-a{background:#052E16;color:#6EE7B7}.b-v{background:#172554;color:#93C5FD}}
+.qa{width:14px;height:14px;color:var(--t3);transition:transform .2s;flex-shrink:0}
+.qc.open .qa{transform:rotate(90deg)}
+.qb{display:none;padding:0 18px 20px}
+.qc.open .qb{display:block}
+
+/* Inside question body */
+.sig{background:linear-gradient(135deg,rgba(126,34,206,.04),rgba(27,122,90,.04));border:1px solid rgba(126,34,206,.12);border-radius:var(--rs);padding:14px 16px;margin:8px 0 14px;font-size:13px;line-height:1.85;color:var(--t2)}
+.sig-t{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--acc);margin-bottom:4px}
+
+.prm{background:var(--code-bg);border-radius:var(--rs);padding:14px 16px;margin:8px 0 12px;font-size:13.5px;line-height:1.75;color:var(--t1);border-left:3px solid var(--acc)}
+.prm strong{font-weight:600}
+.prm-t{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--acc);margin-bottom:4px}
+
+.done{background:var(--p5b);border:1px solid rgba(4,120,87,.15);border-radius:var(--rs);padding:12px 16px;margin:10px 0;font-size:12.5px;line-height:1.75}
+.done-t{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--p5);margin-bottom:4px}
+
+.out{background:linear-gradient(135deg,rgba(13,165,117,.06),rgba(124,58,237,.06));border:1px dashed rgba(13,165,117,.3);border-radius:var(--rs);padding:12px 16px;margin:10px 0;font-size:12.5px;line-height:1.75}
+.out-t{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--p0);margin-bottom:4px}
+@media(prefers-color-scheme:dark){.out{background:linear-gradient(135deg,rgba(13,165,117,.08),rgba(124,58,237,.08));border-color:rgba(13,165,117,.2)}}
+
+.skip{background:var(--p3b);border:1px solid rgba(180,83,9,.12);border-radius:var(--rs);padding:10px 14px;margin:10px 0;font-size:12.5px;line-height:1.75}
+.skip-t{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--p3);margin-bottom:4px}
+
+.craft{background:linear-gradient(135deg,rgba(126,34,206,.05),rgba(45,122,97,.05));border:1px solid rgba(126,34,206,.12);border-radius:var(--rs);padding:14px 16px;margin:10px 0;font-size:12.5px;line-height:1.85;color:var(--t2)}
+.craft-t{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--acc);margin-bottom:4px}
+
+.detail{font-size:13px;color:var(--t2);line-height:1.8;margin:6px 0}
+.detail code{font-family:var(--mono);font-size:11.5px;background:var(--code-bg);padding:1px 6px;border-radius:3px}
+
+.ref{display:inline-block;font-size:10px;font-weight:600;padding:1px 7px;border-radius:100px;margin-top:8px}
+
+/* Flow */
+.flow{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:24px;margin-bottom:2rem;overflow-x:auto}
+.flow-t{font-family:var(--f);font-size:15px;font-weight:600;margin-bottom:14px}
+.flow-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.flow-nd{padding:5px 12px;border-radius:6px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.flow-ar{color:var(--t3);font-size:14px}
+
+/* Controls */
+.ctrls{display:flex;gap:8px;margin-bottom:1.5rem;flex-wrap:wrap}
+.btn{font-family:var(--fs);font-size:12px;font-weight:500;padding:7px 16px;border-radius:100px;border:1px solid var(--bdr);background:var(--card);color:var(--t2);cursor:pointer;transition:all .15s}
+.btn:hover{border-color:var(--bdr-h);color:var(--t1)}
+
+/* Tables */
+.stbl{width:100%;border-collapse:collapse;font-size:12.5px;margin:12px 0}
+.stbl th{text-align:left;padding:6px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--t3);border-bottom:2px solid var(--bdr)}
+.stbl td{padding:6px 10px;border-bottom:1px solid var(--bdr);vertical-align:top}
+.stbl tr:last-child td{border-bottom:none}
+
+.footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--bdr);font-size:11.5px;color:var(--t3);text-align:center}
+
+@media print{.pbd,.qb{display:block!important}.pb{position:static}.ctrls{display:none}.qc{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="hero-ey">Pharmacometrics · LLM-Driven Data Wrangling Protocol</div>
+  <h1>NONMEM-Ready <em>67-Step</em> Question Sequence <span class="vb">v4.0</span></h1>
+  <p class="hero-d">
+    Q01부터 순서대로, 각 질문의 <strong>R 코드 요청 프롬프트</strong>를 LLM에게 던지면서 데이터를 한 단계씩 가공해 나간다.<br>
+    각 질문은 (1) <strong>이걸 왜 해야 하는지</strong> 의의를 설명하고, (2) LLM에게 <strong>어떤 R 코드를 짜달라고 해야 하는지</strong> 프롬프트를 제공하고, (3) <strong>언제 완료인지</strong> 체크리스트를 명시하고, (4) 특정 조건이면 <strong>어디로 건너뛸 수 있는지</strong> 가이드한다.<br>
+    건너뛴 이후에도 <strong>그 다음 번호부터 순차적으로</strong> 진행하면 반드시 NONMEM-ready에 도달한다.
+  </p>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="dot" style="background:var(--acc)"></div>총 질문 <b>67</b>개</div>
+  <div class="stat"><div class="dot" style="background:var(--p2)"></div>필수(MUST) <b>45</b>개</div>
+  <div class="stat"><div class="dot" style="background:var(--p3)"></div>조건부(COND) <b>17</b>개</div>
+  <div class="stat"><div class="dot" style="background:var(--p5)"></div>자동화(AUTO) <b>11</b>개</div>
+  <div class="stat"><div class="dot" style="background:var(--p6)"></div>Phase <b>8</b>개</div>
+</div>
+
+<div class="info-box">
+  <div class="info-box-title">이 프로토콜의 사용법</div>
+  <p><strong>원칙:</strong> 각 질문의 <span style="color:var(--acc);font-weight:600">📋 R 코드 요청 프롬프트</span>를 LLM에 복사해서 붙여넣고, 자신의 변수명만 교체한다. LLM이 R 코드를 짜주면 실행하고, <span style="color:var(--p5);font-weight:600">✅ 완료 조건</span>을 모두 충족하면 다음 질문으로 넘어간다.</p>
+  <p><strong>건너뛰기:</strong> <span style="color:var(--p3);font-weight:600">⏭ 건너뛰기</span> 조건이 맞으면 지정된 Q번호로 바로 이동. 이동한 Q 이후는 순차 진행.</p>
+  <p><strong>조기 완료:</strong> 깔끔한 SDTM은 ~Q42에서, 기존 NONMEM 수정은 ~Q35에서 조기 완료 가능. Raw Excel은 Q67까지 풀코스.</p>
+</div>
+
+<div class="flow">
+  <div class="flow-t">전체 흐름</div>
+  <div class="flow-row">
+    <div class="flow-nd" style="background:var(--p0b);color:var(--p0)">P0 역설계&파악</div><div class="flow-ar">→</div>
+    <div class="flow-nd" style="background:var(--p1b);color:var(--p1)">P1a Dosing</div><div class="flow-ar">→</div>
+    <div class="flow-nd" style="background:var(--p1b);color:var(--p1)">P1b Obs</div><div class="flow-ar">→</div>
+    <div class="flow-nd" style="background:var(--p2b);color:var(--p2)">P2 TIME</div><div class="flow-ar">→</div>
+    <div class="flow-nd" style="background:var(--p3b);color:var(--p3)">P3 BLQ&Merge</div><div class="flow-ar">→</div>
+    <div class="flow-nd" style="background:var(--p4b);color:var(--p4)">P4 Cov</div><div class="flow-ar">→</div>
+    <div class="flow-nd" style="background:var(--p5b);color:var(--p5)">P5 구조완성</div><div class="flow-ar">→</div>
+    <div class="flow-nd" style="background:var(--p6b);color:var(--p6)">P6 QC</div>
+  </div>
+  <div style="font-size:11.5px;color:var(--t3);margin-top:4px">Q01–07 → Q08–19 → Q20–26 → Q27–35 → Q36–42 → Q43–50 → Q51–57 → Q58–67</div>
+</div>
+
+<div class="ctrls">
+  <button class="btn" onclick="toggleAll(true)">모두 펼치기</button>
+  <button class="btn" onclick="toggleAll(false)">모두 접기</button>
+  <button class="btn" onclick="showOnly('MUST')">필수만</button>
+  <button class="btn" onclick="showOnly('ALL')">전체</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- PHASE 0: Q01–Q07                                         -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="ps" id="p0">
+<div class="pb" style="background:var(--p0b);color:var(--p0)" onclick="tp(this)">
+  <div class="n" style="background:var(--p0);color:#fff">0</div>
+  <div class="inf"><div class="tt">시작 전: 머릿속에 Control Stream을 먼저 그려라</div><div class="st">R을 열기 전에 protocol과 데이터 지형을 파악하는 단계</div></div>
+  <span class="qc">Q01–Q07</span>
+  <svg class="chv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+</div>
+<div class="pbd">
+
+<!-- ─── Q01 ─── -->
+<div class="qc" style="border-left-color:var(--acc)" data-type="MUST">
+<div class="qh" onclick="tq(this)">
+  <span class="qn" style="background:var(--accb);color:var(--acc)">Q01</span>
+  <span class="qt">내가 짜야 할 NONMEM Control Stream은 어떤 구조인가?</span>
+  <div class="qbg"><span class="bd b-m">MUST</span></div>
+  <svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+</div>
+<div class="qb">
+  <div class="sig">
+    <div class="sig-t">🔍 이 질문의 의의 — 왜 이걸 가장 먼저 해야 하는가</div>
+    장인은 R 스크립트를 열기 전에 <strong>NONMEM Control Stream을 머릿속에 먼저 그린다</strong>. 왜냐하면 <code>CMT</code> 번호 체계, <code>EVID</code> 사용 패턴, 필수 공변량 목록이 모두 <strong>내가 구축할 모델 구조</strong>에 의해 결정되기 때문이다.<br><br>
+    • 경구 1-comp 모델이면 → CMT=1(depot), CMT=2(central), 흡수 파라미터 KA 필요<br>
+    • IV 2-comp 모델이면 → CMT=1(central), RATE/-2 세팅, 분포 파라미터 Q/V2 필요<br>
+    • PK+PD 통합이면 → PD endpoint용 별도 CMT 또는 DVID 할당 필요<br><br>
+    이 단계를 건너뛰면 나중에 CMT를 재할당하고, 컬럼을 추가하고, 데이터를 재구성하는 <strong>재작업이 반드시 발생</strong>한다.
+  </div>
+  <div class="prm">
+    <div class="prm-t">📋 R 코드 요청 프롬프트 (LLM에 복사해서 붙여넣기)</div>
+    이 연구의 protocol/SAP 정보를 기반으로 다음을 정리해줘:<br>
+    <strong>(1)</strong> 투여 설계 요약: single/multiple dose, dose levels, 투여 경로, 투여 간격, 채혈 스케줄<br>
+    <strong>(2)</strong> 구축할 Base Model 구조 제안: compartment 수, 흡수 모델, 예상 <code>$SUBROUTINES</code>/<code>$PK</code> 구조<br>
+    <strong>(3)</strong> CMT 번호 사전 할당 테이블: dose CMT, obs CMT, PD CMT(해당시)<br>
+    <strong>(4)</strong> EVID 사용 패턴 예상: EVID=0,1만 쓸 건지, 2/3/4도 필요한지<br>
+    <strong>(5)</strong> 필수 공변량 사전 목록: protocol/SAP에서 지정된 것 + 일반적으로 필요한 것<br>
+    R 코드가 아니라 <strong>분석 계획 요약 테이블</strong>로 정리해줘.
+  </div>
+  <div class="done">
+    <div class="done-t">✅ 완료 조건</div>
+    □ CMT 번호 매핑 테이블이 확정되었다 (dose CMT, obs CMT)<br>
+    □ EVID 사용 패턴이 결정되었다 (0/1만? 2/3/4도 필요?)<br>
+    □ 필수 공변량 목록이 나열되었다<br>
+    □ 예상 모델 구조가 선언되었다 (1-comp? 2-comp? 흡수 모델?)
+  </div>
+  <div class="out">
+    <div class="out-t">🎯 LLM이 산출해야 할 결과물</div>
+    ① 연구 설계 요약표<br>
+    ② Target Model 구조 선언<br>
+    ③ CMT 번호 사전 할당 테이블<br>
+    ④ EVID 사용 패턴 예상<br>
+    ⑤ 필수 공변량 사전 목록
+  </div>
+  <div class="craft">
+    <div class="craft-t">🔨 장인 노트 — 의사결정 트리</div>
+    <strong>경구 투여인가?</strong><br>
+    → Yes: depot compartment(CMT=1) + central compartment(CMT=2). <code>$SUBROUTINES ADVAN2 TRANS2</code> (1-comp) 또는 <code>ADVAN4 TRANS4</code> (2-comp). KA가 $PK에 필요.<br>
+    → No, IV bolus: central만. <code>ADVAN1 TRANS2</code>. RATE=0.<br>
+    → No, IV infusion: central만. <code>ADVAN1 TRANS2</code>. RATE=-2 + DUR 컬럼 필요.<br><br>
+    <strong>PD endpoint도 함께 분석하는가?</strong><br>
+    → Yes: PD endpoint용 별도 CMT 할당 또는 DVID 컬럼으로 구분. $ERROR에서 DVID 분기.<br>
+    → No: CMT는 dosing/obs 2개면 충분.<br><br>
+    <strong>이것이 전처리의 첫 단추다.</strong> 여기서 결정된 CMT 체계가 Q13(dose CMT), Q23(obs CMT)에서 그대로 적용된다.
+  </div>
+</div>
+</div>
+
+<!-- ─── Q02 ─── -->
+<div class="qc" style="border-left-color:var(--p0)" data-type="MUST">
+<div class="qh" onclick="tq(this)">
+  <span class="qn" style="background:var(--p0b);color:var(--p0)">Q02</span>
+  <span class="qt">내가 받은 파일은 무엇이고, 어떤 형태인가?</span>
+  <div class="qbg"><span class="bd b-m">MUST</span></div>
+  <svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+</div>
+<div class="qb">
+  <div class="sig">
+    <div class="sig-t">🔍 의의</div>
+    받은 데이터가 SDTM인지, Raw Excel인지, 기존 NONMEM 데이터셋인지에 따라 <strong>전체 작업량과 경로가 완전히 달라진다</strong>. SDTM이면 변수명이 표준화되어 있어 빠르고, Raw Excel이면 DDT(Data Definition Table)부터 만들어야 해서 풀코스다. 이 단계에서 "지금부터 내가 얼마나 많은 일을 해야 하는지"의 지도가 그려진다.
+  </div>
+  <div class="prm">
+    <div class="prm-t">📋 R 코드 요청 프롬프트</div>
+    업로드한 데이터 파일들을 <strong>R로 읽어서</strong> 다음을 정리해줘:<br>
+    <strong>(1)</strong> 파일 인벤토리 테이블: 파일명 / 형식(xpt/csv/xlsx) / 데이터 유형(SDTM/ADaM/Raw/Excel/기존NM) / 행수 / 열수 / 핵심 변수 목록<br>
+    <strong>(2)</strong> SDTM이면: <code>haven::read_xpt()</code>로 읽고, 도메인명(DM, EX, PC 등)과 SDTM version 식별<br>
+    <strong>(3)</strong> CSV/Excel이면: <code>readr::read_csv()</code> 또는 <code>readxl::read_excel()</code>로 읽고, col_types 자동 추론 결과 보여줘<br>
+    <strong>(4)</strong> 각 파일의 <code>head(5)</code>와 <code>str()</code> 출력<br>
+    모든 R 코드를 제공해줘.
+  </div>
+  <div class="done">
+    <div class="done-t">✅ 완료 조건</div>
+    □ 모든 파일이 R에 성공적으로 로드되었다<br>
+    □ 데이터 유형(SDTM/ADaM/Raw/Excel/기존NM)이 판정되었다<br>
+    □ 각 파일의 행·열·변수 목록이 정리되었다
+  </div>
+  <div class="out">
+    <div class="out-t">🎯 LLM 출력물</div>
+    ① 파일 인벤토리 테이블<br>② R 코드 (데이터 로딩)<br>③ 데이터 유형 판정 결과<br>④ 건너뛸 수 있는 COND 질문 사전 식별
+  </div>
+  <div class="skip">
+    <div class="skip-t">⏭ 건너뛰기 로직</div>
+    • 기존 NONMEM 데이터셋이면 → <strong>Q06 필수 진행</strong>, 이후 Q07로<br>
+    • 여러 study를 합쳐야 하면 → <strong>Q07 필수 진행</strong><br>
+    • 어떤 경우든 Q08 이후는 순차 진행
+  </div>
+</div>
+</div>
+
+<!-- ─── Q03 ─── -->
+<div class="qc" style="border-left-color:var(--p0)" data-type="MUST">
+<div class="qh" onclick="tq(this)">
+  <span class="qn" style="background:var(--p0b);color:var(--p0)">Q03</span>
+  <span class="qt">대상자는 몇 명이고, ID를 숫자로 변환할 수 있는가?</span>
+  <div class="qbg"><span class="bd b-m">MUST</span></div>
+  <svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+</div>
+<div class="qb">
+  <div class="sig"><div class="sig-t">🔍 의의</div>NONMEM의 <code>ID</code>는 반드시 양의 정수여야 한다. 원본의 "S-001", "ABC-0042" 같은 문자열 ID를 숫자로 재코딩해야 하며, 여러 파일에서 ID가 일치하는지(교집합/차집합) 확인해야 한다. 여기서 ID 매핑이 틀리면 <strong>전체 데이터가 뒤섞인다</strong>.</div>
+  <div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>
+    다음 R 코드를 짜줘:<br>
+    <strong>(1)</strong> 모든 파일에서 대상자 식별 변수(USUBJID, SUBJID, PTNO 등)를 찾아서 <code>distinct()</code>로 고유 대상자 수를 세줘<br>
+    <strong>(2)</strong> ID가 문자열이면 숫자 ID로 매핑: <code>id_map &lt;- dm %>% distinct(USUBJID) %>% mutate(ID = row_number())</code><br>
+    <strong>(3)</strong> 여러 파일의 ID 교집합/차집합: <code>anti_join()</code>으로 파일 A에만 있는 ID, 파일 B에만 있는 ID 목록<br>
+    <strong>(4)</strong> ID 매핑 테이블을 <code>id_map</code>으로 저장
+  </div>
+  <div class="done"><div class="done-t">✅ 완료 조건</div>□ 총 고유 대상자 수가 확정되었다<br>□ 원본ID → 숫자ID 매핑 테이블(<code>id_map</code>)이 생성되었다<br>□ 파일 간 ID 불일치가 0건이거나, 불일치 원인이 파악되었다</div>
+  <div class="out"><div class="out-t">🎯 LLM 출력물</div>① id_map 테이블<br>② 파일 간 ID Venn 정보<br>③ R 코드 전문</div>
+</div>
+</div>
+
+<!-- ─── Q04 ─── -->
+<div class="qc" style="border-left-color:var(--p0)" data-type="MUST">
+<div class="qh" onclick="tq(this)">
+  <span class="qn" style="background:var(--p0b);color:var(--p0)">Q04</span>
+  <span class="qt">날짜/시간은 어디에, 어떤 형식으로 기록되어 있는가?</span>
+  <div class="qbg"><span class="bd b-m">MUST</span></div>
+  <svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+</div>
+<div class="qb">
+  <div class="sig"><div class="sig-t">🔍 의의</div>PK 분석에서 <strong>시간 정밀도 = 분석 정밀도</strong>다. 날짜만 있고 시간이 없으면 TIME 계산 자체가 불가능하다. AM/PM 형식, locale 혼재, 날짜+시간 분리 등을 이 단계에서 미리 파악해야 Phase 2(TIME 계산)에서 사고를 방지한다.</div>
+  <div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>
+    모든 파일에서 <strong>날짜/시간 관련 변수</strong>를 찾아서 다음 테이블을 R로 만들어줘:<br>
+    <strong>(1)</strong> 변수명 / 형식(ISO 8601? AM/PM? 날짜만?) / 시간 정밀도(분? 초?) / 결측률(%) / <code>lubridate</code>로 파싱 가능 여부<br>
+    <strong>(2)</strong> 파싱 테스트: 대표 값 5개를 <code>lubridate::ymd_hms()</code> 등으로 파싱 시도, 성공/실패 보고<br>
+    <strong>(3)</strong> 날짜와 시간이 별도 컬럼이면 합치는 코드 제안
+  </div>
+  <div class="done"><div class="done-t">✅ 완료 조건</div>□ 모든 날짜/시간 변수의 형식이 파악되었다<br>□ 파싱 전략이 결정되었다 (어떤 lubridate 함수를 쓸 것인가)<br>□ 시간이 결측인 변수가 있다면 목록이 정리되었다</div>
+  <div class="out"><div class="out-t">🎯 LLM 출력물</div>① 날짜/시간 인벤토리 테이블<br>② 파싱 테스트 결과<br>③ R 코드</div>
+</div>
+</div>
+
+<!-- ─── Q05 ─── -->
+<div class="qc" style="border-left-color:var(--p0)" data-type="MUST">
+<div class="qh" onclick="tq(this)">
+  <span class="qn" style="background:var(--p0b);color:var(--p0)">Q05</span>
+  <span class="qt">Dosing·Observation·Covariate의 소스는 각각 어느 파일/변수인가?</span>
+  <div class="qbg"><span class="bd b-m">MUST</span></div>
+  <svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+</div>
+<div class="qb">
+  <div class="sig"><div class="sig-t">🔍 의의</div>NONMEM 데이터셋은 3개의 building block으로 조립된다: <strong>Dosing(EVID=1)</strong>, <strong>Observation(EVID=0)</strong>, <strong>Covariates</strong>. 각각의 소스가 어느 파일의 어느 변수인지 매핑해야 Q08~Q50까지의 전체 경로가 결정된다. Raw CRF/Excel이면 DDT(Data Definition Table)를 여기서 작성해야 한다.</div>
+  <div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>
+    NONMEM 3대 building block의 소스를 매핑하는 테이블을 만들어줘:<br>
+    • <strong>Dosing</strong>: 어떤 파일의 어떤 변수가 투여 시간, 투여량, 투여 경로를 담고 있는가?<br>
+    • <strong>Observation</strong>: PK 농도(DV)는 어디에? 단위는? BLQ 표시 방법은?<br>
+    • <strong>Covariate</strong>: demographics, lab, vitals는 어디에?<br>
+    [소스파일 → 소스변수 → NONMEM변수 → 변환규칙] 4열 매핑 테이블을 R <code>tribble()</code>로 만들어줘.
+  </div>
+  <div class="done"><div class="done-t">✅ 완료 조건</div>□ 3-block 매핑 테이블이 완성되었다<br>□ 누락된 핵심 변수가 없다 (있다면 대처 방안이 결정되었다)</div>
+  <div class="out"><div class="out-t">🎯 LLM 출력물</div>① 3-block 매핑 테이블<br>② DDT 초안(Raw CRF/Excel시)<br>③ 누락 변수 경고</div>
+</div>
+</div>
+
+<!-- ─── Q06 ─── -->
+<div class="qc" style="border-left-color:var(--p0)" data-type="COND">
+<div class="qh" onclick="tq(this)">
+  <span class="qn" style="background:var(--p0b);color:var(--p0)">Q06</span>
+  <span class="qt">기존 NONMEM 데이터셋을 이어 쓰는 것인가?</span>
+  <div class="qbg"><span class="bd b-c">COND</span></div>
+  <svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+</div>
+<div class="qb">
+  <div class="sig"><div class="sig-t">🔍 의의</div>이전 분석자의 데이터셋을 인수인계 받거나 새 코호트를 추가할 때는, 기존 데이터의 TIME 기준점, FLAG convention, $INPUT 순서를 먼저 파악해야 한다. 기준점이 다르면 모든 TIME이 어긋난다.</div>
+  <div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>
+    기존 NONMEM 데이터셋(<code>기존파일명.csv</code>)을 R로 읽고 다음을 분석해줘:<br>
+    <strong>(1)</strong> TIME 기준점 역추적: 각 ID의 첫 TIME=0인 record가 첫 dosing인지 확인<br>
+    <strong>(2)</strong> FLAG/IGNORE/EXCL 컬럼 convention: <code>names(df) %>% str_subset("FLAG|EXCL|IGNORE|SKIP")</code><br>
+    <strong>(3)</strong> $INPUT 변수 순서 vs 데이터 컬럼 순서 대조: <code>paste(names(df), collapse=" ")</code>로 $INPUT 문자열 재구성<br>
+    <strong>(4)</strong> 기존 max ID + offset으로 새 ID 충돌 방지 코드
+  </div>
+  <div class="done"><div class="done-t">✅ 완료 조건</div>□ TIME reference가 역추적되었다<br>□ $INPUT 순서가 파악되었다<br>□ ID offset 전략이 결정되었다</div>
+  <div class="skip"><div class="skip-t">⏭ 건너뛰기</div>새로 만드는 경우 → <strong>Q07로 바로 이동</strong> (multi-study가 아니면 Q08로)</div>
+</div>
+</div>
+
+<!-- ─── Q07 ─── -->
+<div class="qc" style="border-left-color:var(--p0)" data-type="COND">
+<div class="qh" onclick="tq(this)">
+  <span class="qn" style="background:var(--p0b);color:var(--p0)">Q07</span>
+  <span class="qt">여러 Study를 합쳐야 하는가?</span>
+  <div class="qbg"><span class="bd b-c">COND</span></div>
+  <svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+</div>
+<div class="qb">
+  <div class="sig"><div class="sig-t">🔍 의의</div>Multi-study pooling은 AMT/DV 단위 불일치, assay(분석법) 차이에 의한 LLOQ 차이, ID 충돌이라는 3대 함정이 있다. STUDYID 컬럼은 모델에서 study effect를 넣을 수 있게 해주는 핵심 변수다.</div>
+  <div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>
+    2개 이상 study를 pooling하는 R 코드를 짜줘:<br>
+    <strong>(1)</strong> STUDYID 컬럼 생성: <code>mutate(STUDYID = case_when(...))</code><br>
+    <strong>(2)</strong> AMT/DV 단위 일치 확인: study별 AMT/DV 범위 비교 테이블<br>
+    <strong>(3)</strong> LLOQ 차이: study별 LLOQ 값 비교<br>
+    <strong>(4)</strong> ID offset: Study B의 ID = Study A max ID + 1000<br>
+    <strong>(5)</strong> Study별 요약: 대상자수, 투여횟수, obs수
+  </div>
+  <div class="done"><div class="done-t">✅ 완료 조건</div>□ STUDYID가 숫자로 코딩되었다<br>□ 단위 일치가 확인/변환되었다<br>□ ID가 study 간 충돌하지 않는다</div>
+  <div class="skip"><div class="skip-t">⏭ 건너뛰기</div>단일 study → <strong>Q08로 바로 이동</strong>. STUDYID=1로 고정.</div>
+</div>
+</div>
+
+</div></div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- PHASE 1a: Q08–Q19 — Dosing Records                       -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="ps" id="p1a">
+<div class="pb" style="background:var(--p1b);color:var(--p1)" onclick="tp(this)">
+  <div class="n" style="background:var(--p1);color:#fff">1a</div>
+  <div class="inf"><div class="tt">Dosing Records를 조립하라 (EVID=1)</div><div class="st">전체 작업의 가장 중요한 블록 — 여기가 틀리면 모델이 돌아도 결과가 의미 없다</div></div>
+  <span class="qc">Q08–Q19</span>
+  <svg class="chv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+</div>
+<div class="pbd">
+
+<!-- Q08 -->
+<div class="qc" style="border-left-color:var(--p1)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p1b);color:var(--p1)">Q08</span><span class="qt">실제로 약이 투여된 기록만 골라낼 수 있는가?</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+<div class="qb">
+  <div class="sig"><div class="sig-t">🔍 의의</div>EX 도메인이나 투여 기록에는 <code>EXSTAT="NOT DONE"</code>(투여 안 됨), screening failure, protocol deviation 등 <strong>실제로 투여되지 않은 기록</strong>이 섞여 있다. 이것들이 들어가면 NONMEM이 없는 투여를 있다고 계산한다. 장인은 제외할 때 <strong>모든 제외 사유를 R 코드로 명시적으로 기록</strong>한다.</div>
+  <div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>
+    dosing 소스(<code>[파일/테이블명]</code>)에서 투여 기록을 추출하는 R 코드를 짜줘:<br>
+    <strong>(1)</strong> 다음 컬럼을 가진 <code>dose_df</code> 데이터프레임 생성: <code>ID, DATETIME, AMT, CMT, EVID=1, MDV=1, DV=0</code><br>
+    <strong>(2)</strong> 제외 기준 적용: <code>EXSTAT=="NOT DONE"</code>, screening failure, protocol deviation으로 투여 무효 건 제외<br>
+    <strong>(3)</strong> 제외 사유별 record 수 보고: <code>count(제외사유)</code><br>
+    <strong>(4)</strong> ID별 투여 횟수 요약: <code>dose_df %>% count(ID) %>% summary()</code>
+  </div>
+  <div class="done"><div class="done-t">✅ 완료 조건</div>□ <code>dose_df</code>가 생성되었다<br>□ 제외된 record 수와 사유가 보고되었다<br>□ 모든 ID에 최소 1개 투여 기록이 있다</div>
+  <div class="craft"><div class="craft-t">🔨 장인 노트</div>장인은 단순히 "NOT DONE"만 필터링하지 않는다. <strong>부분 주입이 중단된 경우</strong>(예: IV infusion 중 알레르기 반응) → actual dose가 planned dose보다 적음. <strong>투여 후 구토</strong> → dose가 불완전하게 흡수됨. 이런 경우 제외가 아니라 <strong>AMT를 actual dose로 조정</strong>해야 한다. 이것은 Q09에서 처리한다.</div>
+</div></div>
+
+<!-- Q09 -->
+<div class="qc" style="border-left-color:var(--p1)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p1b);color:var(--p1)">Q09</span><span class="qt">AMT가 실제 투여량(actual)인가, 계획 투여량(planned)인가?</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+<div class="qb">
+  <div class="sig"><div class="sig-t">🔍 의의</div>AMT에 planned dose가 들어가면 CL/V 추정이 체계적으로 편향된다. 100mg을 투여할 예정이었지만 실제 80mg만 투여된 환자의 AMT가 100이면, NONMEM은 "100mg에 비해 농도가 너무 낮다" → CL을 과대추정한다. <strong>Top 3 실무 실수 중 하나</strong>다.</div>
+  <div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>
+    <code>dose_df</code>에서 actual vs planned dose를 비교하는 R 코드를 짜줘:<br>
+    <strong>(1)</strong> actual dose 변수와 planned dose 변수를 식별하여 불일치 record 목록: <code>filter(EXDOSE != EXDOSE_PLANNED)</code><br>
+    <strong>(2)</strong> AMT를 actual dose로 확정: <code>mutate(AMT = 실제투여량변수)</code><br>
+    <strong>(3)</strong> planned dose를 별도 <code>PDOSE</code> 컬럼으로 보존: <code>mutate(PDOSE = 계획투여량변수)</code><br>
+    <strong>(4)</strong> 불일치 비율(%) 보고
+  </div>
+  <div class="done"><div class="done-t">✅ 완료 조건</div>□ AMT가 actual dose임이 확인/수정되었다<br>□ PDOSE 컬럼이 생성되어 planned dose가 보존되었다<br>□ 불일치 record 수와 비율이 보고되었다</div>
+</div></div>
+
+<!-- Q10 -->
+<div class="qc" style="border-left-color:var(--p1)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p1b);color:var(--p1)">Q10</span><span class="qt">투여 경로는 무엇이고, RATE/DUR을 어떻게 세팅하는가?</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+<div class="qb">
+  <div class="sig"><div class="sig-t">🔍 의의</div>NONMEM은 <code>RATE=0</code>이면 bolus(순간 투입), <code>RATE>0</code> 또는 <code>RATE=-2</code>이면 zero-order infusion으로 해석한다. IV infusion인데 RATE=0이면 약이 순간적으로 들어간 것으로 계산되어 Cmax가 비현실적으로 높아진다.</div>
+  <div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>
+    <code>dose_df</code>에 투여 경로별 RATE/DUR을 세팅하는 R 코드를 짜줘:<br>
+    <strong>(1)</strong> 투여 경로 분포: <code>count(투여경로변수)</code><br>
+    <strong>(2)</strong> 경로별 RATE/DUR 설정:<br>
+    &nbsp;&nbsp;• 경구/SC/IM → <code>RATE=0</code><br>
+    &nbsp;&nbsp;• IV bolus → <code>RATE=0</code><br>
+    &nbsp;&nbsp;• IV infusion → <code>RATE=-2</code>, <code>DUR = as.numeric(difftime(EXENDTC, EXSTDTC, units="hours"))</code><br>
+    <strong>(3)</strong> DUR이 0이거나 음수인 건 경고
+  </div>
+  <div class="done"><div class="done-t">✅ 완료 조건</div>□ 모든 dosing record에 RATE/DUR이 적절히 세팅되었다<br>□ IV infusion의 DUR이 양수임이 확인되었다<br>□ 투여경로 분포가 보고되었다</div>
+  <div class="craft"><div class="craft-t">🔨 장인 노트</div><strong>혼합 경로(예: PO + IV)가 있으면</strong> 각 경로에 다른 CMT를 할당해야 할 수 있다. PO→CMT=1(depot), IV→CMT=2(central). 이것은 Q13에서 처리하지만 여기서 미리 인지해둬야 한다.</div>
+</div></div>
+
+<!-- Q11 -->
+<div class="qc" style="border-left-color:var(--p1)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p1b);color:var(--p1)">Q11</span><span class="qt">AMT 단위와 DV 단위의 조합이 PK 파라미터 단위를 결정한다 — 확정했는가?</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+<div class="qb">
+  <div class="sig"><div class="sig-t">🔍 의의</div><code>CL = AMT/AUC</code>이므로, AMT(mg)÷DV(ng/mL)이면 CL의 단위는 L/hr이 되고, AMT(μg)÷DV(μg/L)이면 CL=L/hr이 된다. 단위를 모르고 모델을 돌리면 CL이 1000배 차이나는 결과가 나와도 <strong>아무 에러 없이 돌아간다</strong>. Top 5 실무 실수.</div>
+  <div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>
+    AMT와 DV의 단위 관계를 정리하고 확인하는 R 코드를 짜줘:<br>
+    <strong>(1)</strong> AMT 범위 요약: <code>summary(dose_df$AMT)</code>, unique values<br>
+    <strong>(2)</strong> 단위 관계식 명시: "AMT(___) / DV(___) → CL(___), V(___)"<br>
+    <strong>(3)</strong> 단위 변환이 필요하면: <code>mutate(AMT = AMT * 변환계수)</code> + 변환 전후 비교
+  </div>
+  <div class="done"><div class="done-t">✅ 완료 조건</div>□ AMT 단위가 확정되었다 (mg? μg? cells?)<br>□ 단위 관계식이 명시되었다<br>□ 단위 변환이 필요했다면 완료되었다</div>
+</div></div>
+
+<!-- Q12 -->
+<div class="qc" style="border-left-color:var(--p1)" data-type="COND"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p1b);color:var(--p1)">Q12</span><span class="qt">mg/kg 투여라면, absolute dose(mg)로 변환했는가?</span><div class="qbg"><span class="bd b-c">COND</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+<div class="qb">
+  <div class="sig"><div class="sig-t">🔍 의의</div>NONMEM의 AMT는 absolute dose여야 한다. 10mg/kg × 70kg = <code>AMT=700</code>(mg). mg/kg 그대로 넣으면 NONMEM이 모든 환자에게 같은 양을 투여한 것으로 계산한다. 체중은 별도 covariate(WT)로 보존한다.</div>
+  <div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>
+    mg/kg 투여를 absolute dose(mg)로 변환하는 R 코드:<br>
+    <code>dose_df <- dose_df %>% mutate(AMT = AMT_MGKG * WT)</code><br>
+    WT가 결측인 ID 경고: <code>filter(is.na(WT))</code><br>
+    변환 전후 AMT 비교: <code>summary()</code>
+  </div>
+  <div class="done"><div class="done-t">✅ 완료 조건</div>□ AMT가 mg(absolute)로 변환되었다<br>□ WT 결측 ID가 0건이거나 대처되었다</div>
+  <div class="skip"><div class="skip-t">⏭ 건너뛰기</div>Flat dose(mg 기반) 투여 → <strong>Q13으로 바로 이동</strong></div>
+</div></div>
+
+<!-- Q13 -->
+<div class="qc" style="border-left-color:var(--p1)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p1b);color:var(--p1)">Q13</span><span class="qt">약이 들어갈 Compartment(CMT) 번호는 몇 번인가?</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+<div class="qb">
+  <div class="sig"><div class="sig-t">🔍 의의</div>Q01에서 사전 결정한 CMT 체계를 실제 데이터에 적용하는 단계. 경구→CMT=1(depot), IV→CMT=2(central)이 가장 표준적. 혼합 경로면 경로별 CMT 매핑이 필수.</div>
+  <div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>
+    Q01에서 결정한 CMT 체계에 따라 dosing record에 CMT를 할당하는 R 코드:<br>
+    <code>dose_df <- dose_df %>% mutate(CMT = case_when(경로 == "PO" ~ 1, 경로 == "IV" ~ 2, TRUE ~ NA_real_))</code><br>
+    CMT별 record 수: <code>count(CMT)</code><br>
+    CMT가 NA인 건 경고
+  </div>
+  <div class="done"><div class="done-t">✅ 완료 조건</div>□ 모든 dosing record에 CMT가 할당되었다 (NA 없음)<br>□ CMT 매핑이 Q01의 사전 결정과 일치한다</div>
+</div></div>
+
+<!-- Q14 -->
+<div class="qc" style="border-left-color:var(--p1)" data-type="COND"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p1b);color:var(--p1)">Q14</span><span class="qt">같은 용량 반복 투여를 ADDL/II로 압축할 수 있는가?</span><div class="qbg"><span class="bd b-c">COND</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+<div class="qb">
+  <div class="sig"><div class="sig-t">🔍 의의</div>매일 100mg × 28일 투여이면 28개 행 대신 1개 행으로 <code>AMT=100, ADDL=27, II=24</code>. 행 수가 대폭 줄어든다. 단, <strong>용량이 변경되는 시점에서 ADDL을 끊고 새 행을 시작</strong>해야 한다. 이걸 틀리면 NONMEM이 변경 전 용량으로 계속 투여한다.</div>
+  <div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>
+    반복 투여를 ADDL/II로 압축하는 R 코드를 짜줘:<br>
+    <strong>반드시</strong> 먼저 <strong>가상 환자 1명</strong>(예: ID=999, 100mg QD 7일 → 200mg QD 7일)의 테스트 데이터를 만들어서 코드가 정확히 작동하는지 <strong>unit test</strong>를 한 후, 전체 데이터에 적용해줘.<br>
+    <strong>(1)</strong> 같은 용량 구간 식별: <code>group_by(ID)</code> → 용량 변경 시점에서 그룹 분리<br>
+    <strong>(2)</strong> ADDL = 해당 구간 투여 횟수 - 1, II = 투여 간격(hr)<br>
+    <strong>(3)</strong> 압축 전후 총 투여 횟수 동일성 검증: <code>sum(ADDL+1)</code> == 원래 record 수
+  </div>
+  <div class="done"><div class="done-t">✅ 완료 조건</div>□ ADDL/II가 적용되었다<br>□ 총 투여 횟수가 압축 전후 동일하다<br>□ 용량 변경 시점에서 ADDL이 올바르게 끊겼다<br>□ Unit test가 PASS했다</div>
+  <div class="skip"><div class="skip-t">⏭ 건너뛰기</div>Single dose study → <strong>Q15로 바로 이동</strong></div>
+  <div class="craft"><div class="craft-t">🔨 장인 노트</div>장인은 복잡한 ADDL/II 로직을 짤 때 <strong>가상 환자 1~2명의 테스트 데이터를 먼저 만들어</strong> 코드를 검증한다. 이것이 "단위 테스트(Unit Testing)"이며, 방어적 프로그래밍의 핵심이다. 전체 데이터에 적용하기 전에 항상 소규모로 먼저 테스트하라.</div>
+</div></div>
+
+<!-- Q15 -->
+<div class="qc" style="border-left-color:var(--p1)" data-type="COND"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p1b);color:var(--p1)">Q15</span><span class="qt">투여 중단·재시작이 있는가? Reset(EVID=3/4)이 필요한가?</span><div class="qbg"><span class="bd b-c">COND</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+<div class="qb">
+  <div class="sig"><div class="sig-t">🔍 의의</div>Washout 후 재투여 시, 체내 잔류 약물을 0으로 초기화해야 하면 <strong>EVID=4</strong>(reset+dose)를 사용한다. EVID=3은 초기화만 하고 투여는 안 하는 경우(드묾). Reset은 <strong>모든 compartment</strong>를 0으로 만들므로 주의.</div>
+  <div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>
+    투여 중단·재시작 패턴을 식별하고 EVID=4를 적용하는 R 코드:<br>
+    <strong>(1)</strong> ID별 투여 간 gap 계산: <code>group_by(ID) %>% mutate(gap = DATETIME - lag(DATETIME))</code><br>
+    <strong>(2)</strong> gap이 비정상적으로 큰(예: >5 반감기) ID 목록<br>
+    <strong>(3)</strong> 해당 재투여 record에 <code>EVID=4</code> 설정: <code>mutate(EVID = ifelse(조건, 4, EVID))</code>
+  </div>
+  <div class="done"><div class="done-t">✅ 완료 조건</div>□ 투여 gap이 큰 ID가 식별되었다<br>□ Reset 필요 여부가 판정되었다<br>□ 필요시 EVID=4가 적용되었다</div>
+  <div class="skip"><div class="skip-t">⏭ 건너뛰기</div>연속 투여, 중단 없음 → <strong>Q16으로 바로 이동</strong></div>
+</div></div>
+
+<!-- Q16 -->
+<div class="qc" style="border-left-color:var(--p1)" data-type="COND"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p1b);color:var(--p1)">Q16</span><span class="qt">이전 투여 이력이 불완전하여 SS(Steady-State)가 필요한가?</span><div class="qbg"><span class="bd b-c">COND</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+<div class="qb">
+  <div class="sig"><div class="sig-t">🔍 의의</div>외래환자가 매일 약을 복용하지만 clinic visit 기록만 있는 경우, 이전 투여 이력이 없다. <code>SS=1</code>과 <code>II=투여간격(hr)</code>을 설정하면 NONMEM이 내부적으로 SS에 도달할 때까지 시뮬레이션한 후 해당 dose를 적용한다.</div>
+  <div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>
+    SS가 필요한 대상자를 식별하고 SS/II를 세팅하는 R 코드:<br>
+    <code>dose_df <- dose_df %>% mutate(SS = ifelse(조건, 1, 0), II = ifelse(SS==1, 투여간격_hr, 0))</code><br>
+    SS=1이면 II>0인지 확인: <code>filter(SS==1 & II<=0)</code> → 0건이어야 함
+  </div>
+  <div class="done"><div class="done-t">✅ 완료 조건</div>□ SS 적용 대상이 식별되었다<br>□ SS=1인 record에 II>0이 확인되었다</div>
+  <div class="skip"><div class="skip-t">⏭ 건너뛰기</div>모든 투여가 기록됨 → <strong>Q17로 바로 이동</strong></div>
+</div></div>
+
+<!-- Q17 -->
+<div class="qc" style="border-left-color:var(--p1)" data-type="COND"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p1b);color:var(--p1)">Q17</span><span class="qt">CAR-T/세포치료제처럼 특수한 투여 형태인가?</span><div class="qbg"><span class="bd b-c">COND</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+<div class="qb">
+  <div class="sig"><div class="sig-t">🔍 의의</div>세포치료제는 투여가 1회(single infusion)이고, 이후 세포가 체내에서 expansion한다. DV가 투여 후 <strong>증가하는 것이 정상</strong>이다. 전통적 PK(투여 후 감소)와 완전히 다르므로 별도 인지가 필요하다.</div>
+  <div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>
+    CAR-T/세포치료제 dosing record 구조를 확인하는 R 코드:<br>
+    <code>dose_df %>% filter(EVID==1) %>% summarise(n_doses_per_ID = n(), .by=ID)</code> → 대부분 1회여야 함<br>
+    AMT 단위 확인: 세포수(cells)인지 확인
+  </div>
+  <div class="skip"><div class="skip-t">⏭ 건너뛰기</div>일반 소분자/항체 약물 → <strong>Q18로 바로 이동</strong></div>
+</div></div>
+
+<!-- Q18 -->
+<div class="qc" style="border-left-color:var(--p1)" data-type="COND"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p1b);color:var(--p1)">Q18</span><span class="qt">EVID=2로 처리해야 할 기타 이벤트(식사, 자극 등)가 있는가?</span><div class="qbg"><span class="bd b-c">COND</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+<div class="qb">
+  <div class="sig"><div class="sig-t">🔍 의의</div>Turnover model에서 외부 자극(식사, 약리학적 자극 등)을 input으로 넣으려면 EVID=2를 사용한다. 일반적인 PK 모델에서는 쓰지 않는다.</div>
+  <div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>
+    EVID=2 이벤트가 필요하면 해당 record를 생성하는 R 코드:<br>
+    <code>evid2_df <- tibble(ID=..., DATETIME=..., AMT=0, CMT=..., EVID=2, MDV=1, DV=0)</code>
+  </div>
+  <div class="skip"><div class="skip-t">⏭ 건너뛰기</div>표준 PK 모델(EVID=0,1만) → <strong>Q19로 바로 이동</strong></div>
+</div></div>
+
+<!-- Q19 -->
+<div class="qc" style="border-left-color:var(--p1)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p1b);color:var(--p1)">Q19</span><span class="qt">Dosing 데이터프레임에 논리적 오류가 없는가?</span><div class="qbg"><span class="bd b-m">MUST</span><span class="bd b-a">AUTO</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+<div class="qb">
+  <div class="sig"><div class="sig-t">🔍 의의</div>Phase 1a의 최종 관문. 여기서 PASS하지 않으면 이후 모든 작업이 잘못된 dosing 위에 쌓인다. 장인은 각 building block을 완성할 때마다 반드시 자동 검증을 돌린다.</div>
+  <div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>
+    <code>dose_df</code>에 대해 다음 5개 자동 검증을 수행하는 R 코드를 짜줘. 각 항목을 PASS/FAIL로 보고하고, FAIL이면 문제 record 목록을 출력:<br>
+    <strong>①</strong> 모든 행이 <code>EVID ∈ {1,3,4}</code>이고 <code>MDV==1</code>인가?<br>
+    <strong>②</strong> EVID=1/4이면 <code>AMT > 0</code>인가?<br>
+    <strong>③</strong> 모든 ID에 최소 1개 dosing record가 있는가?<br>
+    <strong>④</strong> DATETIME에 NA가 있는가?<br>
+    <strong>⑤</strong> ID별 투여 횟수 요약 통계
+  </div>
+  <div class="done"><div class="done-t">✅ 완료 조건</div>□ 5개 항목 모두 PASS<br>□ FAIL 항목이 있었다면 수정 완료</div>
+</div></div>
+
+</div></div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- PHASE 1b: Q20–Q26 — 나머지 Phase는 같은 패턴으로          -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="ps" id="p1b">
+<div class="pb" style="background:var(--p1b);color:var(--p1)" onclick="tp(this)">
+  <div class="n" style="background:var(--p1);color:#fff">1b</div>
+  <div class="inf"><div class="tt">Observation Records를 조립하라 (EVID=0)</div><div class="st">PK/PD 관찰값 — DV, BLQ, MDV를 정확히 세팅하라</div></div>
+  <span class="qc">Q20–Q26</span>
+  <svg class="chv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+</div>
+<div class="pbd">
+
+<div class="qc" style="border-left-color:var(--p1)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p1b);color:var(--p1)">Q20</span><span class="qt">PK 농도 데이터를 추출하여 DV 컬럼을 만들 수 있는가?</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+<div class="qb">
+  <div class="sig"><div class="sig-t">🔍 의의</div>DV(Dependent Variable)는 NONMEM이 실제로 fitting하는 값이다. SDTM PC 도메인이면 <code>PCSTRESN</code>(숫자 표준값)을 사용한다. <code>PCORRES</code>(원본값)와 다른 행이 있으면 변환 이력을 확인해야 한다.</div>
+  <div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>
+    observation 소스에서 PK 농도를 추출하여 obs 데이터프레임을 만드는 R 코드:<br>
+    <code>obs_df <- pc %>% left_join(id_map) %>% mutate(DV = PCSTRESN, CMT = 2, EVID = 0, AMT = 0) %>% select(ID, DATETIME, DV, CMT, EVID, MDV, AMT)</code><br>
+    <strong>(1)</strong> DV 단위 확정<br>
+    <strong>(2)</strong> PCSTRESN ≠ PCORRES 불일치 목록<br>
+    <strong>(3)</strong> <code>PCSTAT=="NOT DONE"</code> → MDV=1 처리
+  </div>
+  <div class="done"><div class="done-t">✅ 완료 조건</div>□ <code>obs_df</code>가 생성되었다<br>□ DV 단위가 확정·선언되었다<br>□ NOT DONE record가 처리되었다</div>
+</div></div>
+
+<div class="qc" style="border-left-color:var(--p1)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p1b);color:var(--p1)">Q21</span><span class="qt">BLQ(정량한계 미만)는 어디에 어떻게 표시되어 있는가?</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+<div class="qb">
+  <div class="sig"><div class="sig-t">🔍 의의</div>BLQ를 그냥 DV=0, MDV=0으로 두면 NONMEM이 "0이라는 농도를 실제로 관측했다"고 해석하여 terminal phase의 파라미터가 편향된다. BLQ 비율에 따라 M1/M3/M5/M7 method를 선택해야 하며, 이 선택은 Q36에서 한다. 여기서는 먼저 <strong>BLQ flag와 LLOQ 값을 만든다</strong>.</div>
+  <div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>
+    BLQ를 식별하고 flag/LLOQ 컬럼을 생성하는 R 코드:<br>
+    <code>obs_df <- obs_df %>% mutate(BLQ = case_when(PCSTAT=="BLQ" ~ 1, PCORRES %in% c("BLQ","&lt;LLOQ","NS") ~ 1, TRUE ~ 0), LLOQ = [LLOQ값])</code><br>
+    BLQ 비율 요약: 전체 / ID별 / 시점별(binned TIME)
+  </div>
+  <div class="done"><div class="done-t">✅ 완료 조건</div>□ <code>BLQ</code> 컬럼(0/1)이 생성되었다<br>□ <code>LLOQ</code> 값 컬럼이 생성되었다<br>□ 전체 BLQ 비율이 보고되었다</div>
+</div></div>
+
+<div class="qc" style="border-left-color:var(--p1)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p1b);color:var(--p1)">Q22</span><span class="qt">MDV를 올바르게 세팅했는가?</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+<div class="qb">
+  <div class="sig"><div class="sig-t">🔍 의의</div><code>MDV=0</code>이면 NONMEM이 해당 행의 DV를 likelihood에 포함한다. <code>MDV=1</code>이면 무시한다. 유효 관찰→MDV=0, BLQ(M1)→MDV=1, 결측→MDV=1. 이 단계에서는 M1을 기본 적용하고, M-method 최종 결정은 Q36에서.</div>
+  <div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>
+    MDV를 설정하는 R 코드:<br>
+    <code>obs_df <- obs_df %>% mutate(MDV = case_when(BLQ==1 ~ 1, is.na(DV) ~ 1, TRUE ~ 0))</code><br>
+    MDV 분포: <code>count(MDV)</code>
+  </div>
+  <div class="done"><div class="done-t">✅ 완료 조건</div>□ MDV가 올바르게 설정되었다<br>□ MDV 분포(0/1)가 보고되었다</div>
+</div></div>
+
+<div class="qc" style="border-left-color:var(--p1)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p1b);color:var(--p1)">Q23</span><span class="qt">Observation이 들어갈 CMT 번호는 몇 번인가?</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+<div class="qb">
+  <div class="sig"><div class="sig-t">🔍 의의</div>PK 농도는 central compartment에서 측정하므로 보통 CMT=2. PD endpoint가 있으면 별도 CMT 또는 DVID로 구분. Q01 역설계와 일치해야 한다.</div>
+  <div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>
+    Observation CMT 할당: <code>obs_df <- obs_df %>% mutate(CMT = 2)</code><br>
+    PD endpoint가 있으면 DVID 추가: <code>mutate(DVID = case_when(endpoint=="PK"~1, endpoint=="PD"~2))</code>
+  </div>
+  <div class="done"><div class="done-t">✅ 완료 조건</div>□ 모든 obs record에 CMT가 할당되었다<br>□ Q01의 CMT 체계와 일치한다</div>
+</div></div>
+
+<div class="qc" style="border-left-color:var(--p1)" data-type="COND"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p1b);color:var(--p1)">Q24</span><span class="qt">Parent + Metabolite 또는 PK+PD를 동시에 다루는가?</span><div class="qbg"><span class="bd b-c">COND</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+<div class="qb">
+  <div class="sig"><div class="sig-t">🔍 의의</div>다중 endpoint면 CMT 또는 DVID로 구분해야 $ERROR에서 endpoint별 다른 residual error model을 적용할 수 있다. DV 단위가 다르면 magnitude 차이로 한쪽 endpoint가 무시될 수 있다.</div>
+  <div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>
+    다중 endpoint 처리 R 코드: endpoint별 CMT/DVID 매핑, DV 단위 비교, magnitude 비교(<code>summary(DV, .by=endpoint)</code>)
+  </div>
+  <div class="skip"><div class="skip-t">⏭ 건너뛰기</div>단일 분석물, 단일 endpoint → <strong>Q25로 바로 이동</strong></div>
+</div></div>
+
+<div class="qc" style="border-left-color:var(--p1)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p1b);color:var(--p1)">Q25</span><span class="qt">Predose 채혈이 있는가? DV>0이면 왜 그런가?</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+<div class="qb">
+  <div class="sig"><div class="sig-t">🔍 의의</div>Single dose 연구에서 predose DV>0이면 3가지 가능성: (1) carry-over(이전 노출), (2) assay cross-reactivity, (3) 데이터 입력 오류. Multiple dose에서 predose=trough이므로 DV>0은 정상. Predose의 TIME convention(TIME=0 vs TIME=-0.01)도 여기서 결정.</div>
+  <div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>
+    Predose sample을 식별하고 처리하는 R 코드:<br>
+    <strong>(1)</strong> Predose record 목록: nominal time = 0 또는 "predose"인 행<br>
+    <strong>(2)</strong> Single dose에서 DV>0인 predose 경고: <code>filter(predose & DV > 0)</code><br>
+    <strong>(3)</strong> TIME convention 적용: 같은 TIME에 dose와 predose가 겹치면 predose의 TIME을 -0.01로 미세 조정
+  </div>
+  <div class="done"><div class="done-t">✅ 완료 조건</div>□ Predose record가 식별되었다<br>□ Single dose predose DV>0이 검토되었다<br>□ TIME convention이 적용되었다</div>
+</div></div>
+
+<div class="qc" style="border-left-color:var(--p1)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p1b);color:var(--p1)">Q26</span><span class="qt">Observation 데이터프레임에 논리적 오류가 없는가?</span><div class="qbg"><span class="bd b-m">MUST</span><span class="bd b-a">AUTO</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+<div class="qb">
+  <div class="sig"><div class="sig-t">🔍 의의</div>Phase 1b의 최종 관문. Dosing 검증(Q19)과 동일한 방어적 검증을 Observation에도 수행한다.</div>
+  <div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>
+    <code>obs_df</code>에 대해 5개 자동 검증:<br>
+    ① 모든 행 EVID=0? ② MDV=0인 행의 DV가 숫자? ③ 모든 ID에 ≥1 유효 obs? ④ BLQ flag와 MDV 일관성? ⑤ DV 5-number summary
+  </div>
+  <div class="done"><div class="done-t">✅ 완료 조건</div>□ 5개 항목 모두 PASS<br>□ DV 분포가 보고되었다<br>□ ID별 obs 수 → rich/sparse 판단</div>
+</div></div>
+
+</div></div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- PHASE 2–6: 동일 패턴으로 Q27–Q67 (간결화)     -->
+<!-- ══════════════════════════════════════════════ -->
+
+<!-- PHASE 2 -->
+<div class="ps" id="p2"><div class="pb" style="background:var(--p2b);color:var(--p2)" onclick="tp(this)"><div class="n" style="background:var(--p2);color:#fff">2</div><div class="inf"><div class="tt">TIME 변수를 계산하라 — 가장 치명적인 단계</div><div class="st">한 번 틀리면 전체 분석이 무의미. 버그 #1 원인.</div></div><span class="qc">Q27–Q35</span><svg class="chv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></div>
+<div class="pbd">
+
+<div class="qc" style="border-left-color:var(--p2)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p2b);color:var(--p2)">Q27</span><span class="qt">TIME=0의 기준점(Reference Time)은 무엇으로 정하는가?</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="sig"><div class="sig-t">🔍 의의</div>표준: <strong>각 ID의 첫 투여 시점 = TIME 0</strong>. 절대 규칙: 같은 데이터셋 내 모든 ID가 동일한 reference 로직. multi-study pooling에서도 study별이 아닌 <strong>ID별</strong> 첫 투여 기준.</div><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div><code>ref_time <- dose_df %>% group_by(ID) %>% summarise(REF_TIME = min(DATETIME)) %>% ungroup()</code><br>REF_TIME 테이블을 출력하고, 모든 후속 데이터프레임에 join할 준비</div><div class="done"><div class="done-t">✅ 완료 조건</div>□ REF_TIME 테이블(ID별 1행)이 생성되었다<br>□ 모든 ID에 REF_TIME이 있다</div></div></div>
+
+<div class="qc" style="border-left-color:var(--p2)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p2b);color:var(--p2)">Q28</span><span class="qt">모든 DATETIME을 POSIXct로 파싱하고 Timezone을 통일했는가?</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="sig"><div class="sig-t">🔍 의의</div>Date class와 POSIXct를 섞어서 연산하면 예기치 않은 결과가 나온다. tz를 명시하지 않으면 시스템 locale을 따라가서 다른 컴퓨터에서 재현이 안 된다. 다기관 국제 연구면 timezone 일관성 확인, 장기 연구면 DST 확인.</div><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>모든 DATETIME 변수를 <code>lubridate::ymd_hms(tz="UTC")</code>로 통일 파싱하는 R 코드. 파싱 실패 건수 보고. 날짜만 있고 시간이 없는 record 목록(Q30에서 impute).</div><div class="done"><div class="done-t">✅ 완료 조건</div>□ 모든 DATETIME이 POSIXct(tz="UTC")로 파싱됨<br>□ 파싱 실패 0건 (또는 실패 원인 파악됨)</div></div></div>
+
+<div class="qc" style="border-left-color:var(--p2)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p2b);color:var(--p2)">Q29</span><span class="qt">TIME(hours)을 계산하라 — 음수가 나오는가?</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div><code>nm_df <- nm_df %>% left_join(ref_time) %>% mutate(TIME = as.numeric(difftime(DATETIME, REF_TIME, units="hours")))</code><br>min(TIME), max(TIME), 음수 건수 보고. ID별 max TIME으로 연구 기간 일치 확인.</div><div class="done"><div class="done-t">✅ 완료 조건</div>□ TIME 컬럼이 생성됨<br>□ 음수 TIME 건수가 파악됨 (Q31에서 처리)</div></div></div>
+
+<div class="qc" style="border-left-color:var(--p2)" data-type="COND"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p2b);color:var(--p2)">Q30</span><span class="qt">시간이 결측인 record가 있는가? 어떻게 Impute하는가?</span><div class="qbg"><span class="bd b-c">COND</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="sig"><div class="sig-t">🔍 의의</div>Imputed된 시간은 반드시 <code>TIMEF=1</code> flag를 달아야 나중에 sensitivity analysis에서 imputed records만 제외하여 영향 평가가 가능하다.</div><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>시간 결측 record를 impute하고 TIMEF flag를 생성하는 R 코드. 투여 시간 누락→protocol 스케줄로, 채혈 시간 누락→nominal time으로 impute.</div><div class="skip"><div class="skip-t">⏭ 건너뛰기</div>모든 datetime 완전 → <strong>Q31로 바로 이동</strong></div></div></div>
+
+<div class="qc" style="border-left-color:var(--p2)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p2b);color:var(--p2)">Q31</span><span class="qt">음수 TIME은 의도적(predose)인가, 오류인가?</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>음수 TIME 전체 목록: <code>filter(TIME < 0)</code>. 각각 predose(의도적)인지 ref time 오류인지 판정. predose이면 TIME=-0.01 미세 조정 적용.</div><div class="done"><div class="done-t">✅ 완료 조건</div>□ 음수 TIME이 모두 검토됨<br>□ 의도적/오류가 판정됨</div></div></div>
+
+<div class="qc" style="border-left-color:var(--p2)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p2b);color:var(--p2)">Q32</span><span class="qt">같은 TIME에 dose와 obs가 겹칠 때, dose가 먼저 오는가?</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="sig"><div class="sig-t">🔍 의의</div>역순이면 NONMEM이 "투여 전 관찰"로 해석한다. <strong>Top 2 실무 실수</strong>.</div><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div><code>arrange(ID, TIME, desc(EVID))</code> 정렬 적용. 동일 TIME에 dose+obs가 있는 건수 보고. 정렬 후 역순 0건 확인.</div><div class="done"><div class="done-t">✅ 완료 조건</div>□ 정렬 완료<br>□ 역순 0건 확인</div></div></div>
+
+<div class="qc" style="border-left-color:var(--p2)" data-type="COND"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p2b);color:var(--p2)">Q33</span><span class="qt">Actual time과 Nominal time을 둘 다 보존했는가?</span><div class="qbg"><span class="bd b-c">COND</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>NTIME 컬럼 생성. |TIME-NTIME|>2hr인 record 목록 보고.</div><div class="skip"><div class="skip-t">⏭ 건너뛰기</div>Nominal time 변수 없음 → <strong>Q34로 바로 이동</strong></div></div></div>
+
+<div class="qc" style="border-left-color:var(--p2)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p2b);color:var(--p2)">Q34</span><span class="qt">TAD(직전 투여 후 경과 시간)를 계산했는가?</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="sig"><div class="sig-t">🔍 의의</div>TAD는 GOF plot(DV vs TAD), VPC 진단에서 핵심 변수. 전처리에서 빠지면 모델 진단 자체가 어려워진다. ADDL/II로 압축된 intermediate dose도 반영해야 한다.</div><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>TAFD(=TIME)와 TAD를 계산하는 R 코드. ADDL/II 반영. ID 1~2명 샘플로 TIME/TAFD/TAD 대조표 출력하여 검증.</div><div class="done"><div class="done-t">✅ 완료 조건</div>□ TAFD, TAD 컬럼 생성됨<br>□ TAD ≥ 0 확인<br>□ 투여 직후 TAD ≈ 0 확인</div></div></div>
+
+<div class="qc" style="border-left-color:var(--p2)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p2b);color:var(--p2)">Q35</span><span class="qt">TIME 변수에 NA, Inf, 역전(비단조)이 없는가?</span><div class="qbg"><span class="bd b-m">MUST</span><span class="bd b-a">AUTO</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>TIME 최종 검증 5개: ① ID 내 단조 비감소? ② 첫 dosing TIME=0? ③ NA/Inf/NaN 없음? ④ TIME 범위 비정상 gap? ⑤ TAD 음수 없음?</div><div class="done"><div class="done-t">✅ 완료 조건</div>□ 5개 항목 모두 PASS</div></div></div>
+
+</div></div>
+
+<!-- PHASE 3 -->
+<div class="ps" id="p3"><div class="pb" style="background:var(--p3b);color:var(--p3)" onclick="tp(this)"><div class="n" style="background:var(--p3);color:#fff">3</div><div class="inf"><div class="tt">BLQ 처리, Outlier FLAG, 합치기 & 무결성 검증</div><div class="st">M-method 적용, 행 삭제 금지, merge 후 편집증적 검증</div></div><span class="qc">Q36–Q42</span><svg class="chv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></div>
+<div class="pbd">
+
+<div class="qc" style="border-left-color:var(--p3)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p3b);color:var(--p3)">Q36</span><span class="qt">BLQ를 어떤 M-method(M1/M3/M5/M7)로 처리하는가?</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="sig"><div class="sig-t">🔍 의의</div>BLQ 비율에 따라: &lt;10%→M1(제외), 10-25%→M5 or M3, &gt;25%→M3(censoring). M7은 첫 BLQ만 M3, 이후 연속 BLQ는 M1.</div><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>Q21의 BLQ 비율에 따라 M-method를 선택하고 DV/MDV를 재설정하는 R 코드. M3 선택 시 $ERROR censoring snippet도 제공: <code>IF(BLQ.EQ.1) THEN; YLO=0; YHI=LLOQ; ENDIF</code></div><div class="done"><div class="done-t">✅ 완료 조건</div>□ M-method가 선택·적용됨<br>□ DV/MDV가 method에 맞게 재설정됨<br>□ M3/M7 선택 시 control stream snippet이 준비됨</div></div></div>
+
+<div class="qc" style="border-left-color:var(--p3)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p3b);color:var(--p3)">Q37</span><span class="qt">의심스러운 관찰값을 EXCL 플래그로 표시했는가? (행 삭제 금지)</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="sig"><div class="sig-t">🔍 의의</div>장인은 <strong>절대 행을 삭제하지 않는다</strong>. <code>EXCL=1</code> flag로 표시하면 <code>IGNORE=(EXCL.GT.0)</code> 하나로 base run과 sensitivity run을 전환할 수 있다. 행 삭제=원본 복원 불가+sensitivity analysis 불가. <strong>Top 10 실무 실수</strong>.</div><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>약동학적으로 의심스러운 값을 식별하고 EXCL+EXCLR 컬럼을 생성하는 R 코드: (1) 비현실적 고/저농도, (2) Cmax 전 비정상 고농도, (3) protocol deviation. <code>mutate(EXCL = ifelse(의심조건, 1, 0), EXCLR = case_when(...))</code></div><div class="done"><div class="done-t">✅ 완료 조건</div>□ EXCL/EXCLR 컬럼 생성됨<br>□ 행 삭제 0건 (모두 flag로만 처리)</div></div></div>
+
+<div class="qc" style="border-left-color:var(--p3)" data-type="COND"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p3b);color:var(--p3)">Q38</span><span class="qt">DV log 변환은 데이터에서 할 것인가, Control Stream에서 할 것인가?</span><div class="qbg"><span class="bd b-c">COND</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="sig"><div class="sig-t">🔍 의의</div>Control stream에서 <code>Y=LOG(F)</code>로 처리하면 원본 DV가 보존된다. 데이터에서 log(DV)를 취하면 DV=0일 때 log(0)=-∞ 문제가 생긴다. <strong>Control stream 처리 권장.</strong></div><div class="skip"><div class="skip-t">⏭ 건너뛰기</div>Control stream에서 처리할 계획 → <strong>Q39로 바로 이동</strong></div></div></div>
+
+<div class="qc" style="border-left-color:var(--p3)" data-type="COND"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p3b);color:var(--p3)">Q39</span><span class="qt">Rich sampling인가, Sparse sampling인가?</span><div class="qbg"><span class="bd b-c">COND</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>ID별 유효 obs 수 분포: <code>obs_df %>% filter(MDV==0) %>% count(ID) %>% summary()</code>. Rich(≥8)/Sparse(1-3) 비율.</div></div></div>
+
+<div class="qc" style="border-left-color:var(--p3)" data-type="COND"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p3b);color:var(--p3)">Q40</span><span class="qt">BLQ가 시간대별로 어떤 패턴을 보이는가?</span><div class="qbg"><span class="bd b-c">COND</span><span class="bd b-v">VISUAL</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>BLQ 비율 vs binned TIME 그래프: <code>ggplot(aes(x=TIME_bin, y=blq_pct)) + geom_col()</code>. Terminal phase BLQ 증가=정상. 초기 BLQ=dosing error 의심.</div><div class="skip"><div class="skip-t">⏭ 건너뛰기</div>BLQ 0% → <strong>Q41로 바로 이동</strong></div></div></div>
+
+<div class="qc" style="border-left-color:var(--p3)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p3b);color:var(--p3)">Q41</span><span class="qt">Dosing + Observation을 합치고 정렬하라</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div><code>nm_df <- bind_rows(dose_df, obs_df) %>% arrange(ID, TIME, desc(EVID))</code><br>합치기 전후 행 수 비교: <code>nrow(dose_df) + nrow(obs_df) == nrow(nm_df)</code></div><div class="done"><div class="done-t">✅ 완료 조건</div>□ nm_df가 생성됨<br>□ 행 수 산술이 맞다<br>□ 정렬이 ID→TIME→desc(EVID)</div></div></div>
+
+<div class="qc" style="border-left-color:var(--acc)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--accb);color:var(--acc)">Q42</span><span class="qt">합친 후 중복·누락·행수 불일치가 없는가?</span><div class="qbg"><span class="bd b-m">MUST</span><span class="bd b-a">AUTO</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="sig"><div class="sig-t">🔍 의의</div>장인은 merge할 때마다 <strong>편집증에 가까운 검증</strong>을 수행한다. 중복 행, anti_join으로 누락 ID, 행수 산술, EVID 분포 비교, ungroup() 확인 — 이것이 <strong>방어적 프로그래밍</strong>의 핵심이다.</div><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>5개 검증: ① 중복행(ID+TIME+EVID+CMT 기준): <code>get_dupes()</code><br>② anti_join: dosing-only IDs, obs-only IDs<br>③ 행수 산술: dose+obs == combined<br>④ EVID별 record 수 비교(합치기 전후)<br>⑤ <code>is.grouped_df(nm_df)</code> → FALSE 확인</div><div class="done"><div class="done-t">✅ 완료 조건</div>□ 5개 검증 모두 PASS<br>□ 중복 행 0건<br>□ 의도치 않은 grouping 없음</div></div></div>
+
+</div></div>
+
+<!-- PHASE 4 -->
+<div class="ps" id="p4"><div class="pb" style="background:var(--p4b);color:var(--p4)" onclick="tp(this)"><div class="n" style="background:var(--p4);color:#fff">4</div><div class="inf"><div class="tt">공변량(Covariate)을 추출하고 merge하라</div><div class="st">Baseline + time-varying. merge 후 행수 변동 = 사고.</div></div><span class="qc">Q43–Q50</span><svg class="chv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></div>
+<div class="pbd">
+
+<div class="qc" style="border-left-color:var(--p4)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p4b);color:var(--p4)">Q43</span><span class="qt">Baseline Covariates(AGE, WT, SEX 등)를 추출하라</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>DM/ADSL에서 baseline covariates 추출: <code>cov_df <- dm %>% left_join(id_map) %>% select(ID, AGE, SEX, RACE, WT, HT) %>% distinct(ID, .keep_all=TRUE)</code>. "Baseline" = 첫 투여 전 마지막 측정값. 각 covariate의 분포(summary)와 결측률(%) 보고.</div><div class="done"><div class="done-t">✅ 완료 조건</div>□ cov_df가 ID당 1행으로 생성됨<br>□ 분포와 결측률이 보고됨</div></div></div>
+
+<div class="qc" style="border-left-color:var(--p4)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p4b);color:var(--p4)">Q44</span><span class="qt">문자열 범주형 변수를 숫자로 코딩하라</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>NONMEM은 숫자만 처리하므로 문자열→숫자 코딩: <code>mutate(SEX = ifelse(SEX=="M", 0, 1))</code>. 매핑 테이블을 tribble로 출력하여 Data Spec에 포함.</div><div class="done"><div class="done-t">✅ 완료 조건</div>□ 모든 문자열 변수가 숫자로 변환됨<br>□ 코딩 매핑 테이블이 기록됨</div></div></div>
+
+<div class="qc" style="border-left-color:var(--p4)" data-type="COND"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p4b);color:var(--p4)">Q45</span><span class="qt">파생 변수(BSA, CLCR, BMI)를 계산해야 하는가?</span><div class="qbg"><span class="bd b-c">COND</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>BSA(DuBois), CLCR(Cockcroft-Gault), BMI 공식을 R로 구현. 원변수(SCR 등) 결측으로 계산 불가 ID 목록.</div><div class="skip"><div class="skip-t">⏭ 건너뛰기</div>파생 변수 불필요 → <strong>Q46으로 바로 이동</strong></div></div></div>
+
+<div class="qc" style="border-left-color:var(--p4)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p4b);color:var(--p4)">Q46</span><span class="qt">Baseline Covariates를 ID 기준 merge하라 — 행수가 변했는가?</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="sig"><div class="sig-t">🔍 의의</div>1:many merge가 되면 행이 증폭되고, merge key 불일치면 행이 소실된다. merge 전후 <code>nrow()</code>가 반드시 동일해야 한다. <strong>Top 8 실무 실수</strong>.</div><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div><code>nrow_before <- nrow(nm_df)</code><br><code>nm_df <- nm_df %>% left_join(cov_df, by="ID")</code><br><code>stopifnot(nrow(nm_df) == nrow_before)</code> — 행수 불변 assertion. merge 후 covariate 결측 수.</div><div class="done"><div class="done-t">✅ 완료 조건</div>□ 행수 불변 확인됨 (PASS)<br>□ Merge 후 covariate 결측 수가 보고됨</div></div></div>
+
+<div class="qc" style="border-left-color:var(--p4)" data-type="COND"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p4b);color:var(--p4)">Q47</span><span class="qt">Time-varying Covariates를 LOCF로 merge해야 하는가?</span><div class="qbg"><span class="bd b-c">COND</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>LOCF merge: <code>fill(.direction="down")</code> 또는 rolling join. 병용약물: CM 시작~종료 → <code>COMED=1</code>.</div><div class="skip"><div class="skip-t">⏭ 건너뛰기</div>Baseline-only로 충분 → <strong>Q48로</strong></div></div></div>
+
+<div class="qc" style="border-left-color:var(--p4)" data-type="COND"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p4b);color:var(--p4)">Q48</span><span class="qt">Covariate 변경 시점에 Covariate-only record를 삽입해야 하는가?</span><div class="qbg"><span class="bd b-c">COND</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>EVID=2, MDV=1, DV=., AMT=0 record 삽입. 삽입 후 정렬 재확인.</div><div class="skip"><div class="skip-t">⏭ 건너뛰기</div>Baseline-only cov → <strong>Q49로</strong></div></div></div>
+
+<div class="qc" style="border-left-color:var(--p4)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p4b);color:var(--p4)">Q49</span><span class="qt">Covariate 결측률은 몇 %이고, 어떻게 처리하는가?</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>결측률 테이블: <code>nm_df %>% summarise(across(c(WT,AGE,...), ~mean(is.na(.))))</code>. &lt;5%→median impute, 5-20%→LOCF/MI, &gt;20%→사용 재고. NA→-99 코딩. imputation flag 생성.</div><div class="done"><div class="done-t">✅ 완료 조건</div>□ 결측률 테이블이 보고됨<br>□ Imputation이 완료되고 flag가 생성됨</div></div></div>
+
+<div class="qc" style="border-left-color:var(--p4)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p4b);color:var(--p4)">Q50</span><span class="qt">Covariate 값이 생물학적으로 가능한 범위 안에 있는가?</span><div class="qbg"><span class="bd b-m">MUST</span><span class="bd b-a">AUTO</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>범위 체크: WT∈[30,250]kg, AGE∈[0,120], CLCR∈[5,300], ALB∈[1,6]. 범위 밖 목록 보고. Baseline covariate가 ID 내 불변인지 확인.</div><div class="done"><div class="done-t">✅ 완료 조건</div>□ 범위 밖 값이 0건이거나 검토 완료<br>□ Baseline covariate ID 내 불변 확인</div></div></div>
+
+</div></div>
+
+<!-- PHASE 5 -->
+<div class="ps" id="p5"><div class="pb" style="background:var(--p5b);color:var(--p5)" onclick="tp(this)"><div class="n" style="background:var(--p5);color:#fff">5</div><div class="inf"><div class="tt">NONMEM이 읽을 수 있는 최종 형태로 마무리하라</div><div class="st">NA→".", 컬럼명 규격, CSV 저장, $INPUT 생성</div></div><span class="qc">Q51–Q57</span><svg class="chv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></div>
+<div class="pbd">
+
+<div class="qc" style="border-left-color:var(--p5)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p5b);color:var(--p5)">Q51</span><span class="qt">필수 컬럼(ID, TIME, DV, AMT, CMT, EVID, MDV)이 모두 있는가?</span><div class="qbg"><span class="bd b-m">MUST</span><span class="bd b-a">AUTO</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>필수 컬럼 존재 체크 + $INPUT 호환 순서 배치: <code>nm_df <- nm_df %>% select(ID, TIME, DV, AMT, CMT, EVID, MDV, RATE, ..., everything())</code>. 누락 컬럼 자동 생성(기본값).</div></div></div>
+
+<div class="qc" style="border-left-color:var(--p5)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p5b);color:var(--p5)">Q52</span><span class="qt">최종 정렬: ID↑ → TIME↑ → EVID↓ 순서가 맞는가?</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div><code>nm_df <- nm_df %>% arrange(ID, TIME, desc(EVID)) %>% mutate(NMSEQNO = row_number())</code>. ID 1~2명 head 출력 검증.</div></div></div>
+
+<div class="qc" style="border-left-color:var(--p5)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p5b);color:var(--p5)">Q53</span><span class="qt">NA를 모두 "."으로 바꾸고, 문자열이 남아있지 않은가?</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>Header 제외 모든 값이 숫자 또는 "."인지 확인. 유럽 locale 콤마 소수점 주의. <code>write.csv()</code>에서 <code>na="."</code> 적용.</div></div></div>
+
+<div class="qc" style="border-left-color:var(--p5)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p5b);color:var(--p5)">Q54</span><span class="qt">Non-ASCII 문자(한글, BOM 등)가 없는가?</span><div class="qbg"><span class="bd b-m">MUST</span><span class="bd b-a">AUTO</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>non-ASCII 검출: <code>grep("[^\x20-\x7E]", nm_df_char)</code>. 검출되면 제거. 인코딩 UTF-8(BOM 없이) 확정.</div></div></div>
+
+<div class="qc" style="border-left-color:var(--p5)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p5b);color:var(--p5)">Q55</span><span class="qt">컬럼명이 8자 이내, 대문자, 특수문자 없음을 만족하는가?</span><div class="qbg"><span class="bd b-m">MUST</span><span class="bd b-a">AUTO</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>위반 컬럼 검출 + rename: <code>names(nm_df) <- toupper(names(nm_df))</code>. 8자 초과 or 특수문자 포함 → rename.</div></div></div>
+
+<div class="qc" style="border-left-color:var(--p5)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p5b);color:var(--p5)">Q56</span><span class="qt">CSV로 저장하고 다시 읽어서 원본과 동일한가?</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div><code>write.csv(nm_df, "nm_data.csv", row.names=FALSE, na=".", quote=FALSE)</code><br>Round-trip: 다시 읽어서 <code>dim()</code>, <code>head()</code> 비교. 파일 크기 보고.</div></div></div>
+
+<div class="qc" style="border-left-color:var(--p5)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p5b);color:var(--p5)">Q57</span><span class="qt">$INPUT과 $DATA 문자열을 생성하라</span><div class="qbg"><span class="bd b-m">MUST</span><span class="bd b-a">AUTO</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div><code>cat("$INPUT", paste(names(nm_df), collapse=" "))</code><br><code>cat("$DATA nm_data.csv IGNORE=@")</code><br>사용하지 않는 컬럼은 DROP. EXCL 사용 시 <code>IGNORE=(EXCL.GT.0)</code> 추가.</div></div></div>
+
+</div></div>
+
+<!-- PHASE 6 -->
+<div class="ps" id="p6"><div class="pb" style="background:var(--p6b);color:var(--p6)" onclick="tp(this)"><div class="n" style="background:var(--p6);color:#fff">6</div><div class="inf"><div class="tt">QC & Validation — 최종 관문을 통과하라</div><div class="st">여기를 건너뛰면 NONMEM이 돌아도 결과를 믿을 수 없다</div></div><span class="qc">Q58–Q67</span><svg class="chv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></div>
+<div class="pbd">
+
+<div class="qc" style="border-left-color:var(--p6)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p6b);color:var(--p6)">Q58</span><span class="qt">구조적 무결성 종합 체크 — 12개 항목이 모두 PASS인가?</span><div class="qbg"><span class="bd b-m">MUST</span><span class="bd b-a">AUTO</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>최종 nm_df에 대해 12개 자동 체크를 수행하는 R 함수를 짜줘. 각 항목 PASS/FAIL로 보고:<br>① 모든 ID에 ≥1 dosing? ② ≥1 valid obs? ③ EVID=1→AMT>0,MDV=1? ④ EVID=0→AMT=0? ⑤ 중복행 없음? ⑥ CMT 유효? ⑦ ADDL/II→II>0? ⑧ SS=1→II 존재? ⑨ NA/non-numeric 없음? ⑩ Header 1줄? ⑪ 각 ID 첫 record가 dosing? ⑫ non-ASCII 없음?<br>가능하면 <code>NMdata::NMcheckData()</code>도 실행.</div><div class="done"><div class="done-t">✅ 완료 조건</div>□ 12개 항목 모두 PASS</div></div></div>
+
+<div class="qc" style="border-left-color:var(--p6)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p6b);color:var(--p6)">Q59</span><span class="qt">EVID×MDV×BLQ 교차표에 비정상 조합이 없는가?</span><div class="qbg"><span class="bd b-m">MUST</span><span class="bd b-a">AUTO</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div><code>nm_df %>% count(EVID, MDV, BLQ)</code>. 비정상 조합(EVID=1+MDV=0, EVID=0+AMT>0) 경고.</div></div></div>
+
+<div class="qc" style="border-left-color:var(--p6)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p6b);color:var(--p6)">Q60</span><span class="qt">개인별 DV vs TIME 플롯을 그려서 이상한 프로파일이 없는가?</span><div class="qbg"><span class="bd b-m">MUST</span><span class="bd b-v">VISUAL</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="sig"><div class="sig-t">🔍 의의</div>자동 검증으로 잡을 수 없는 것을 눈으로 잡는다. 투여 직후 농도=0, 비축적 상황에서 지속 증가, 극단 농도값 — 이것들은 플롯으로만 보인다. <strong>전체 ID를 다 봐야 한다.</strong></div><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>모든 ID에 대해 DV vs TIME 개인별 프로파일(linear + log) ggplot2 코드. 투여 시점을 <code>geom_vline()</code>으로 표시. <code>facet_wrap(~ID)</code>. Red flag ID 목록.</div></div></div>
+
+<div class="qc" style="border-left-color:var(--p6)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p6b);color:var(--p6)">Q61</span><span class="qt">AMT vs TIME 조감도에서 투여 패턴에 누락/이상이 없는가?</span><div class="qbg"><span class="bd b-m">MUST</span><span class="bd b-v">VISUAL</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>AMT vs TIME scatter(전체 ID overlay). 색상=dose group. 용량 변경·투여 중단·누락 패턴 식별.</div></div></div>
+
+<div class="qc" style="border-left-color:var(--p6)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p6b);color:var(--p6)">Q62</span><span class="qt">Spaghetti Plot과 Covariate 분포에 극단값이 없는가?</span><div class="qbg"><span class="bd b-m">MUST</span><span class="bd b-v">VISUAL</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>(1) Spaghetti plot: 전체 ID overlay(linear+log). (2) Covariate histogram/boxplot. (3) Pairs plot(WT-HT, AGE-CLCR). 이상치 보고.</div></div></div>
+
+<div class="qc" style="border-left-color:var(--acc)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--accb);color:var(--acc)">Q63</span><span class="qt">Dose-normalized DV 플롯에서 용량 비례성이 보이는가?</span><div class="qbg"><span class="bd b-m">MUST</span><span class="bd b-v">VISUAL</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="sig"><div class="sig-t">🔍 의의</div>DV/AMT vs TAD를 dose group별로 그렸을 때 프로파일이 겹치면 dose-proportional PK. <strong>겹치지 않으면 non-linear PK</strong> → Michaelis-Menten 등 비선형 모델이 필요할 수 있다. Q01의 target model을 여기서 재검증한다.</div><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>DV/AMT vs TAD spaghetti plot(log scale), dose group별 색상. Dose-proportionality 시각 평가. Non-linear PK 의심 시 Q01 재검토 권고.</div></div></div>
+
+<div class="qc" style="border-left-color:var(--p6)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p6b);color:var(--p6)">Q64</span><span class="qt">Data Specification 문서를 작성하라</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>각 컬럼에 대해: 컬럼명/설명/단위/데이터타입/결측코딩/값범위/코딩규칙. BLQ처리 방법, AMT/DV 단위, TIME 기준점, 제외 기준 요약, 총 대상자·record 수를 <code>tribble()</code>로 정리.</div></div></div>
+
+<div class="qc" style="border-left-color:var(--acc)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--accb);color:var(--acc)">Q65</span><span class="qt">R 스크립트가 모듈화되어 있고, raw→csv 재현이 가능한가?</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="sig"><div class="sig-t">🔍 의의</div>장인의 가장 중요한 원칙: <strong>100% 스크립트화, 수동 수정 0건</strong>. 누가 실행해도 같은 결과가 나와야 한다. Excel에서 셀 하나를 수동 수정했다면 그건 traceability가 깨진 것이다.</div><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>지금까지 생성된 모든 R 코드를 모듈 파이프라인으로 정리:<br>01_Read_Clean_PK.R / 02_Read_Clean_Dosing.R / 03_Merge_Format.R / 04_Covariate.R / 05_QC_Plots.R<br>+ 00_Master.R (전체 순차 실행). raw→csv 재현 테스트.</div><div class="done"><div class="done-t">✅ 완료 조건</div>□ 모듈화된 R 스크립트 5개 + Master 1개<br>□ raw→csv 재현 테스트 PASS<br>□ 수동 수정 0건 확인</div></div></div>
+
+<div class="qc" style="border-left-color:var(--acc)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--accb);color:var(--acc)">Q66</span><span class="qt">Sensitivity Analysis를 위한 FLAG가 모두 준비되었는가?</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="sig"><div class="sig-t">🔍 의의</div>장인은 전처리 단계에서 이미 <strong>미래의 sensitivity analysis를 설계</strong>한다. 모든 의사결정(outlier 제외, 시간 imputation, BLQ 처리)이 결과에 미치는 영향을 정량적으로 평가할 수 있도록 FLAG를 남기는 것 — 이것이 방어적 전처리의 완성이다.</div><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>전체 FLAG 요약 테이블(FLAG명/목적/record수/%)과 각 sensitivity run의 $DATA IGNORE 조건문을 생성하는 R 코드:<br>• TIMEF=1 → 시간 imputation 영향<br>• EXCL=1 → outlier 제외/포함 영향<br>• BLQ=1 → M1 vs M3 영향<br>각 run의 예상 N(사용 record 수) 계산.</div><div class="done"><div class="done-t">✅ 완료 조건</div>□ FLAG 요약 테이블이 완성됨<br>□ Sensitivity run $DATA 조건문이 준비됨</div></div></div>
+
+<div class="qc" style="border-left-color:var(--p6)" data-type="MUST"><div class="qh" onclick="tq(this)"><span class="qn" style="background:var(--p6b);color:var(--p6)">Q67</span><span class="qt">최종 산출물 8개가 모두 갖춰졌는가? → NONMEM-Ready 완성</span><div class="qbg"><span class="bd b-m">MUST</span></div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="prm"><div class="prm-t">📋 최종 체크리스트</div>
+    ☐ NONMEM-ready 데이터 파일 (<code>.csv</code>)<br>
+    ☐ $INPUT + $DATA 문자열<br>
+    ☐ R 전처리 스크립트 (재현 가능, 모듈화)<br>
+    ☐ Data Specification 문서<br>
+    ☐ QC 플롯 모음 (individual, spaghetti, dose-time, dose-normalized, covariate)<br>
+    ☐ 제외 기준 요약 (flowchart)<br>
+    ☐ Sensitivity analysis plan + FLAG 요약<br>
+    ☐ Data review meeting notes 템플릿
+  </div>
+  <div class="done" style="font-size:15px;font-weight:700;text-align:center;padding:18px;background:linear-gradient(135deg,var(--p5b),var(--accb))">
+    모두 ✅이면 → 🎉 NONMEM-Ready Dataset Complete
+  </div>
+  <div class="craft"><div class="craft-t">🔨 장인 노트 — 다음 단계</div><code>NMdata::NMscanData()</code>: NONMEM output에서 데이터를 읽어 원본과 자동 대조. 모델이 실제로 어떤 데이터를 사용했는지 역추적 가능. 디버깅의 핵심.</div>
+</div></div>
+
+</div></div>
+
+<!-- ═══════════ REFERENCE TABLES ═══════════ -->
+<div class="info-box" style="margin-top:2rem">
+  <div class="info-box-title">조기 완료 가이드</div>
+  <table class="stbl">
+    <tr><th>데이터 유형</th><th>예상 종료</th><th>건너뛰는 질문</th></tr>
+    <tr><td>깨끗한 SDTM (표준 PK)</td><td>~Q42</td><td>Q06,Q07,Q12,Q15-18,Q24,Q30,Q33,Q38-40,Q45,Q47-48</td></tr>
+    <tr><td>Raw CRF/Excel</td><td>Q67 (풀코스)</td><td>Q06 정도만</td></tr>
+    <tr><td>기존 NONMEM 수정</td><td>~Q35</td><td>대부분, 수정 범위에 따라</td></tr>
+    <tr><td>Multi-study pooling</td><td>Q67</td><td>거의 없음 — Q07 필수</td></tr>
+    <tr><td>CAR-T / 세포치료제</td><td>Q67</td><td>Q14,Q16. 단 Q17 필수</td></tr>
+  </table>
+</div>
+
+<div class="info-box" style="margin-top:1rem">
+  <div class="info-box-title">🔨 장인의 4대 원칙</div>
+  <table class="stbl">
+    <tr><th>원칙</th><th>설명</th><th>핵심 질문</th></tr>
+    <tr><td><strong>역설계</strong></td><td>Target model 구조에서 출발해 데이터를 맞춘다</td><td>Q01, Q13, Q23, Q63</td></tr>
+    <tr><td><strong>방어적 프로그래밍</strong></td><td>모든 조작에 검증, ungroup(), unit test</td><td>Q14, Q42, Q46, Q58</td></tr>
+    <tr><td><strong>편집증적 QC</strong></td><td>merge 전후 행수, anti_join, 범위 체크 자동화</td><td>Q19, Q26, Q35, Q42, Q50, Q58</td></tr>
+    <tr><td><strong>완벽한 재현성</strong></td><td>100% 스크립트화, 모듈 파이프라인, 수동 수정 0건</td><td>Q65, Q66, Q67</td></tr>
+  </table>
+</div>
+
+<div class="footer">
+  NONMEM-Ready 67-Step Question Sequence v4.0 · Generated 2026-04-14 · 장인의 역설계 · 방어적 프로그래밍 · 편집증적 QC · 완벽한 재현성<br>
+  Based on NONMEM Data Preprocessing Decision Map + Senior Pharmacometrician Gold Standard
+</div>
+
+</div>
+
+<script>
+function tp(b){b.closest('.ps').classList.toggle('open')}
+function tq(h){h.closest('.qc').classList.toggle('open')}
+function toggleAll(o){
+  document.querySelectorAll('.ps').forEach(p=>{o?p.classList.add('open'):p.classList.remove('open')});
+  document.querySelectorAll('.qc').forEach(c=>{o?c.classList.add('open'):c.classList.remove('open')});
+}
+function showOnly(t){
+  document.querySelectorAll('.qc').forEach(c=>{
+    if(t==='ALL'){c.style.display='';return}
+    c.style.display=c.dataset.type===t?'':'none';
+  });
+  document.querySelectorAll('.ps').forEach(p=>p.classList.add('open'));
+}
+</script>
+</body>
+</html>

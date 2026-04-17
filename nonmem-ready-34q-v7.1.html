@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NONMEM-Ready 데이터 전처리 체크리스트 v7.1 — 34 Steps</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0e13;
+  --surface: #14171e;
+  --surface-raised: #1a1e28;
+  --surface-hover: #1f2432;
+  --border: #2a2f3d;
+  --border-active: #3d4456;
+  --text: #e2e4e9;
+  --text-dim: #8b90a0;
+  --text-muted: #5c6172;
+  --accent: #5b9ef5;
+  --accent-dim: #3a6db8;
+  --gate: #f59e0b;
+  --gate-bg: rgba(245,158,11,0.08);
+  --gate-border: rgba(245,158,11,0.25);
+  --green: #34d399;
+  --green-bg: rgba(52,211,153,0.08);
+  --green-border: rgba(52,211,153,0.25);
+  --red: #f87171;
+  --orange: #fb923c;
+  --phase0: #8b5cf6;
+  --phase1: #3b82f6;
+  --phase2: #06b6d4;
+  --phase3: #10b981;
+  --phase4: #f59e0b;
+  --phase5: #ef4444;
+  --phase6: #ec4899;
+  --phase7: #8b5cf6;
+  --phase8: #6366f1;
+  --pkg: #a78bfa;
+  --radius: 8px;
+  --radius-lg: 12px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'IBM Plex Sans', 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.65;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 32px 20px 80px;
+}
+
+/* ── Header ── */
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--border);
+}
+
+.header-badge {
+  display: inline-block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  background: rgba(91,158,245,0.08);
+  border: 1px solid rgba(91,158,245,0.2);
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+}
+
+.header h1 {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+
+.header .subtitle {
+  font-size: 14px;
+  color: var(--text-dim);
+  font-weight: 400;
+}
+
+/* ── Progress Bar ── */
+.progress-container {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(12,14,19,0.92);
+  backdrop-filter: blur(12px);
+  padding: 12px 0;
+  margin-bottom: 28px;
+  border-bottom: 1px solid var(--border);
+}
+
+.progress-inner {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.progress-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.progress-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-dim);
+}
+
+.progress-count {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--accent);
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--surface-raised);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--green));
+  border-radius: 3px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 0%;
+}
+
+/* ── Phase Sections ── */
+.phase {
+  margin-bottom: 32px;
+}
+
+.phase-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+
+.phase-header:hover {
+  background: var(--surface-raised);
+}
+
+.phase-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 3px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.phase-title {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.phase-progress {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.phase-chevron {
+  color: var(--text-muted);
+  transition: transform 0.2s;
+  font-size: 14px;
+}
+
+.phase.collapsed .phase-chevron {
+  transform: rotate(-90deg);
+}
+
+.phase.collapsed .phase-body {
+  display: none;
+}
+
+/* Phase colors */
+.phase-0 .phase-tag { background: rgba(139,92,246,0.15); color: var(--phase0); }
+.phase-1 .phase-tag { background: rgba(59,130,246,0.15); color: var(--phase1); }
+.phase-2 .phase-tag { background: rgba(6,182,212,0.15); color: var(--phase2); }
+.phase-3 .phase-tag { background: rgba(16,185,129,0.15); color: var(--phase3); }
+.phase-4 .phase-tag { background: rgba(245,158,11,0.15); color: var(--phase4); }
+.phase-5 .phase-tag { background: rgba(239,68,68,0.15); color: var(--phase5); }
+.phase-6 .phase-tag { background: rgba(236,72,153,0.15); color: var(--phase6); }
+.phase-7 .phase-tag { background: rgba(139,92,246,0.15); color: var(--phase7); }
+.phase-8 .phase-tag { background: rgba(99,102,241,0.15); color: var(--phase8); }
+
+/* ── Question Cards ── */
+.question {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  transition: border-color 0.2s, background 0.2s;
+  overflow: hidden;
+}
+
+.question:hover {
+  border-color: var(--border-active);
+}
+
+.question.checked {
+  border-color: var(--green-border);
+  background: var(--green-bg);
+}
+
+.question.is-gate {
+  border-color: var(--gate-border);
+  background: var(--gate-bg);
+}
+
+.question.is-gate.checked {
+  border-color: var(--green-border);
+  background: var(--green-bg);
+}
+
+.q-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+}
+
+.q-check {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  border: 2px solid var(--border-active);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  background: transparent;
+}
+
+.question.checked .q-check {
+  background: var(--green);
+  border-color: var(--green);
+}
+
+.question.checked .q-check::after {
+  content: '✓';
+  color: var(--bg);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.question.is-gate .q-check {
+  border-color: var(--gate);
+  border-radius: 50%;
+}
+
+.question.is-gate.checked .q-check {
+  background: var(--gate);
+  border-color: var(--gate);
+}
+
+.q-content { flex: 1; min-width: 0; }
+
+.q-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.q-number {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.q-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.gate-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--gate);
+  background: rgba(245,158,11,0.12);
+  border: 1px solid rgba(245,158,11,0.3);
+  padding: 1px 8px;
+  border-radius: 3px;
+}
+
+.q-desc {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+.q-details {
+  padding: 0 16px 14px 48px;
+}
+
+.q-detail-toggle {
+  font-size: 12px;
+  color: var(--accent-dim);
+  cursor: pointer;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0;
+  transition: color 0.15s;
+}
+
+.q-detail-toggle:hover {
+  color: var(--accent);
+}
+
+.q-detail-body {
+  display: none;
+  margin-top: 8px;
+}
+
+.q-detail-body.open {
+  display: block;
+}
+
+/* Code blocks */
+.code-block {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  line-height: 1.7;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 14px;
+  margin: 8px 0;
+  overflow-x: auto;
+  color: var(--text-dim);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.code-block .cm { color: #6b7280; }
+.code-block .fn { color: #93c5fd; }
+.code-block .str { color: #86efac; }
+.code-block .kw { color: #c4b5fd; }
+.code-block .op { color: #fca5a5; }
+
+/* Package tags */
+.pkg-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.pkg-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--pkg);
+  background: rgba(167,139,250,0.08);
+  border: 1px solid rgba(167,139,250,0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.pkg-tag::before {
+  content: '📦 ';
+}
+
+/* Decision table */
+.decision-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0;
+  font-size: 12px;
+}
+
+.decision-table th {
+  text-align: left;
+  padding: 6px 10px;
+  background: var(--bg);
+  color: var(--text-dim);
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.decision-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid rgba(42,47,61,0.5);
+  color: var(--text-dim);
+}
+
+.decision-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Warn/Note callouts */
+.callout {
+  font-size: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin: 8px 0;
+  line-height: 1.6;
+}
+
+.callout-warn {
+  background: rgba(245,158,11,0.06);
+  border-left: 3px solid var(--gate);
+  color: var(--orange);
+}
+
+.callout-danger {
+  background: rgba(239,68,68,0.06);
+  border-left: 3px solid var(--red);
+  color: var(--red);
+}
+
+.callout-info {
+  background: rgba(91,158,245,0.06);
+  border-left: 3px solid var(--accent);
+  color: var(--accent);
+}
+
+/* ── Footer ── */
+.footer {
+  text-align: center;
+  padding-top: 32px;
+  margin-top: 40px;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.reset-btn {
+  display: inline-block;
+  margin-top: 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: var(--red);
+  background: rgba(239,68,68,0.06);
+  border: 1px solid rgba(239,68,68,0.2);
+  padding: 6px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.reset-btn:hover {
+  background: rgba(239,68,68,0.12);
+  border-color: rgba(239,68,68,0.4);
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .container { padding: 20px 12px 60px; }
+  .header h1 { font-size: 20px; }
+  .q-details { padding-left: 36px; }
+  .q-main { padding: 12px; gap: 10px; }
+}
+</style>
+</head>
+<body>
+
+<div class="progress-container">
+  <div class="progress-inner">
+    <div class="progress-stats">
+      <span class="progress-label">전체 진행률</span>
+      <span class="progress-count" id="progressCount">0 / 34</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+<div class="header">
+  <div class="header-badge">v7.1 — 34 Steps · 8 Phases · 3 Gates</div>
+  <h1>NONMEM-Ready 데이터 전처리 체크리스트</h1>
+  <p class="subtitle">Protocol → Data → Model 계약서 — 임상 현실 재구성의 전 과정</p>
+</div>
+
+<div id="phases"></div>
+
+<div class="footer">
+  <div>NONMEM-Ready Preprocessing Checklist v7.1 · 34Q · AIMS BioScience</div>
+  <div style="margin-top:4px;">Based on Uppsala / FDA / ICH-E9 Gold Standard</div>
+  <button class="reset-btn" onclick="resetAll()">전체 초기화</button>
+</div>
+
+</div>
+
+<script>
+const DATA = [
+  {
+    phase: 0,
+    tag: "P0",
+    title: "Protocol & Data Inventory",
+    subtitle: "사전 준비 — 데이터를 열기 전에",
+    questions: [
+      {
+        id: "q01",
+        title: "약물 특성 파악",
+        desc: "반감기, 투여 경로(IV/oral/SC), 단회/다중 투여, 알려진 DDI·음식 효과 확인 → TIME 오류 허용 범위, RATE/ADDL 코딩 방식, 별도 플래그 필요 여부 결정",
+        detail: `<div class="callout callout-info">핵심 질문: 이 약의 t½은? → |actual−nominal| > t½×0.1이면 actual time 사용 가치 있음</div>
+<table class="decision-table">
+<tr><th>확인 항목</th><th>결정 사항</th></tr>
+<tr><td>반감기</td><td>TIME 오류 허용 범위</td></tr>
+<tr><td>투여 경로</td><td>RATE, CMT 코딩</td></tr>
+<tr><td>다중 투여 여부</td><td>SS, II, ADDL 필요 여부</td></tr>
+<tr><td>DDI / 음식 효과</td><td>별도 플래그 변수</td></tr>
+</table>`,
+        pkgs: ["—"]
+      },
+      {
+        id: "q02",
+        title: "Protocol · CRF · SAP 통독",
+        desc: "투여 스케줄, 방문일, 채혈 시점, dose modification 규칙 파악. 데이터는 프로토콜의 불완전한 구현물 — 프로토콜이 ground truth",
+        detail: `<div class="callout callout-warn">⚠ 프로토콜을 먼저 읽지 않으면 이상값이 '오류'인지 '임상 현실'인지 구분 불가</div>
+<div class="code-block"><span class="cm"># 확인 우선순위</span>
+1. 투여 스케줄 (fixed dose? weight-based?)
+2. PK 채혈 time window (nominal ± 허용 범위)
+3. Dose reduction/interruption 규칙
+4. Baseline 정의 (Screening vs Day 1)</div>`,
+        pkgs: ["—"]
+      },
+      {
+        id: "q03",
+        title: "Raw Data Inventory",
+        desc: "str(), dim(), names(), 결측 분포, 날짜 범위, 단위(mg vs μg, ng/mL vs μg/L) — 변수별 현실성 검토",
+        detail: `<div class="code-block"><span class="fn">str</span>(rawdata)
+<span class="fn">dim</span>(rawdata)
+<span class="fn">sapply</span>(rawdata, <span class="kw">function</span>(x) <span class="fn">sum</span>(<span class="fn">is.na</span>(x)))
+<span class="fn">table</span>(rawdata$STUDYID)
+<span class="fn">range</span>(rawdata$DATE, <span class="kw">na.rm</span>=TRUE)
+<span class="cm"># 날짜 범위가 현실적인가?</span></div>`,
+        pkgs: ["dplyr", "readr", "haven"]
+      },
+      {
+        id: "q04",
+        title: "Data Dictionary 대조",
+        desc: "코드값·변수명이 실제 데이터와 일치하는지, 대상자 수가 프로토콜 예정 수와 부합하는지 확인",
+        detail: `<div class="code-block"><span class="cm"># 코드값 대조</span>
+<span class="fn">table</span>(rawdata$ROUTE)   <span class="cm"># 프로토콜과 일치?</span>
+<span class="fn">n_distinct</span>(rawdata$SUBJID)  <span class="cm"># 예정 N vs 실제 N</span>
+<span class="fn">anti_join</span>(dict_expected, rawdata_cols)  <span class="cm"># 누락 변수</span></div>`,
+        pkgs: ["dplyr", "janitor"]
+      }
+    ]
+  },
+  {
+    phase: 1,
+    tag: "P1",
+    title: "Dosing Records",
+    subtitle: "투여 기록 구축",
+    questions: [
+      {
+        id: "q05",
+        title: "EVID · AMT 설계",
+        desc: "투여 경로별 EVID 코딩(1/2/3/4), AMT 단위 통일(mg 권장), 모든 투여 record의 DV=0 또는 '.'",
+        detail: `<table class="decision-table">
+<tr><th>EVID</th><th>의미</th><th>용도</th></tr>
+<tr><td>1</td><td>투여 기록</td><td>dose event</td></tr>
+<tr><td>0</td><td>관측값</td><td>DV 기록</td></tr>
+<tr><td>2</td><td>Other type</td><td>공변량 변화 등</td></tr>
+<tr><td>3</td><td>Reset</td><td>모든 상태변수 → 0</td></tr>
+<tr><td>4</td><td>Reset + Dose</td><td>새 투여 사이클 시작</td></tr>
+</table>
+<div class="callout callout-warn">⚠ 투여 record에서 MDV=1 필수 — EVID=1이면 NONMEM이 DV를 무시하지만, MDV=1을 명시해야 안전</div>`,
+        pkgs: ["dplyr", "tidyr"]
+      },
+      {
+        id: "q06",
+        title: "RATE 설정",
+        desc: "IV bolus → RATE=0, IV infusion → RATE=dose/duration(양수), Oral → RATE=0. 음수 RATE는 $MODEL RATE 지정 시에만",
+        detail: `<div class="code-block"><span class="cm"># RATE 코딩 규칙</span>
+IV bolus:    RATE = 0  (또는 생략)
+IV infusion: RATE = AMT / DURATION  (양수)
+Oral:        RATE = 0
+
+<span class="cm"># Duration으로 지정하고 싶을 때:</span>
+RATE = <span class="op">-2</span>  →  $MODEL에서 D1 추정
+<span class="cm"># 이 경우 DUR 컬럼에 infusion 시간 기입</span></div>`,
+        pkgs: ["dplyr"]
+      },
+      {
+        id: "q07",
+        title: "CMT 설계 — 모델-데이터 계약",
+        desc: "모델 구조(compartment 수, 흡수 모델)에 따라 CMT 번호 배정. Oral→Depot(CMT=1), IV→Central(CMT=2). 이 계약이 틀리면 NONMEM은 에러 없이 잘못된 결과 산출",
+        detail: `<div class="code-block"><span class="cm"># Oral 2-compartment 기준:</span>
+CMT=1  Depot (흡수 구획) — oral 투여
+CMT=2  Central — IV 투여 + 모든 PK 관측
+CMT=3  Peripheral
+
+<span class="cm"># IV + Oral 병용 연구:</span>
+Oral dose  → CMT=1 (Depot)
+IV dose    → CMT=2 (Central)
+PK sample  → CMT=2 (Central)</div>
+<div class="callout callout-danger">⚠ Oral 투여를 CMT=2로 넣으면 흡수 과정 없이 Central에 직접 투입 → PRED 과대추정. NONMEM은 에러를 내지 않아 발견이 어려움</div>`,
+        pkgs: ["dplyr"]
+      },
+      {
+        id: "q08",
+        title: "ADDL / II 결정",
+        desc: "ADDL+II는 '완전히 균일한 기간'에만 적용. Dose reduction, 투여 시각 변동, time-varying 공변량 변화가 있으면 개별 record가 안전",
+        detail: `<div class="callout callout-danger">⚠ ADDL 적용 전제조건 — 하나라도 위반하면 개별 record로 전환:
+• 해당 기간 동안 투여량이 동일
+• 투여 간격이 일정 (±허용 범위)
+• 그 사이에 공변량 변화 없음 (특히 time-varying)</div>
+<div class="code-block"><span class="cm"># 잘못된 접근:</span>
+<span class="cm"># "매일 1회 28일 투여" → ADDL=27, II=24 일괄 처리</span>
+
+<span class="cm"># 반드시 확인:</span>
+<span class="cm"># 1) 28일 중 dose reduction 있었는가?</span>
+<span class="cm"># 2) 병원 방문일 투여 시각이 달라졌는가?</span>
+<span class="cm"># 3) eGFR 변화로 용량 조정이 있었는가?</span>
+
+<span class="cm"># 불확실하면 개별 record가 항상 더 안전</span></div>`,
+        pkgs: ["dplyr", "tidyr"]
+      },
+      {
+        id: "q09",
+        gate: true,
+        title: "Dosing QC Gate",
+        desc: "투여 record 전수 검증 — 총 누적 투여량이 CRF와 일치하는가? AMT 단위 통일되었는가? CMT 배정 정확한가? ADDL·II 구간 내 균일성 확인했는가?",
+        detail: `<div class="code-block"><span class="cm"># Dosing QC 자동화 검사</span>
+dose_audit <- dat %>%
+  <span class="fn">filter</span>(EVID == 1) %>%
+  <span class="fn">group_by</span>(ID) %>%
+  <span class="fn">summarise</span>(
+    total_amt = <span class="fn">sum</span>(AMT * (1 + <span class="fn">replace_na</span>(ADDL, 0))),
+    n_dose = <span class="fn">n</span>(),
+    routes = <span class="fn">paste</span>(<span class="fn">unique</span>(ROUTE), collapse=<span class="str">"/"</span>)
+  )
+
+<span class="cm"># CRF 기록과 total_amt 대조</span>
+<span class="cm"># CMT 값이 투여 경로와 일치하는지 cross-tabulation</span>
+<span class="fn">table</span>(dat$ROUTE[dat$EVID==1], dat$CMT[dat$EVID==1])</div>
+<div class="callout callout-warn">🚧 이 Gate를 통과해야 P2 (Observation Records)로 진행</div>`,
+        pkgs: ["dplyr", "tidyr"]
+      }
+    ]
+  },
+  {
+    phase: 2,
+    tag: "P2",
+    title: "Observation Records",
+    subtitle: "관측 기록 구축",
+    questions: [
+      {
+        id: "q10",
+        title: "DV 설정",
+        desc: "농도값 정리, 단위 통일(ng/mL 또는 μg/L), log 변환 여부 결정. DV=0인 관측값은 log-domain 모델에서 오류 유발 — 별도 처리 필요",
+        detail: `<div class="code-block"><span class="cm"># 단위 통일 및 DV 검증</span>
+obs <- dat %>% <span class="fn">filter</span>(EVID == 0)
+<span class="fn">summary</span>(obs$DV)
+<span class="fn">table</span>(obs$DVUNIT)  <span class="cm"># 단위 혼재 여부</span>
+
+<span class="cm"># DV ≤ 0인 관측값 확인</span>
+obs %>% <span class="fn">filter</span>(DV <= 0 & MDV == 0) %>% <span class="fn">nrow</span>()
+
+<span class="cm"># Log-domain 모델 사용 시:</span>
+<span class="cm"># DV=0 → MDV=1로 처리하거나 BQL로 재분류</span></div>`,
+        pkgs: ["dplyr"]
+      },
+      {
+        id: "q11",
+        title: "BQL 플래그 생성",
+        desc: "BLQ 컬럼 생성(0/1), BQL 비율 산출, 비율별 처리 전략 사전 수립. Trough에 BQL이 집중되는지 분포 확인",
+        detail: `<table class="decision-table">
+<tr><th>BQL 비율</th><th>권장 방법</th></tr>
+<tr><td>&lt; 5%</td><td>Discard 또는 LLOQ/2 (탐색적)</td></tr>
+<tr><td>5–20%</td><td>M3 method 필수</td></tr>
+<tr><td>&gt; 20%</td><td>M3 + 모델 구조 재검토 (assay 적절성 의심)</td></tr>
+<tr><td>Trough 집중</td><td>반드시 M3, M4도 sensitivity로 비교</td></tr>
+</table>
+<div class="code-block"><span class="cm"># BQL 비율 산출</span>
+dat %>%
+  <span class="fn">filter</span>(EVID == 0) %>%
+  <span class="fn">summarise</span>(
+    n_obs = <span class="fn">n</span>(),
+    n_bql = <span class="fn">sum</span>(BLQ == 1),
+    pct_bql = n_bql / n_obs * 100
+  )</div>`,
+        pkgs: ["dplyr"]
+      },
+      {
+        id: "q12",
+        title: "MDV 설정 · Predose 처리 · 다중 Endpoint",
+        desc: "MDV 코딩 규칙(EVID=1→MDV=1, BQL→MDV=1, 관측→MDV=0). Predose trough는 이전 cycle trough로 재정의. 다중 endpoint(PK+PD)는 CMT+DVID로 구분",
+        detail: `<div class="code-block"><span class="cm"># MDV 코딩</span>
+dat <- dat %>%
+  <span class="fn">mutate</span>(
+    MDV = <span class="fn">case_when</span>(
+      EVID == 1            ~ 1L,  <span class="cm"># 투여 기록</span>
+      EVID == 2            ~ 1L,  <span class="cm"># 공변량 변화</span>
+      BLQ == 1             ~ 1L,  <span class="cm"># BQL</span>
+      <span class="fn">is.na</span>(DV)            ~ 1L,  <span class="cm"># 결측 농도</span>
+      TRUE                 ~ 0L   <span class="cm"># 유효 관측값</span>
+    )
+  )
+
+<span class="cm"># Predose trough 처리 (다회 투여)</span>
+<span class="cm"># Pre-dose sample = 이전 cycle의 trough</span>
+<span class="cm"># → TIME을 이전 투여 시각 기준으로 재정의</span>
+<span class="cm"># → SS 달성 여부 판단에 활용 가능</span>
+<span class="cm"># → 삭제하면 중요한 PK 정보 손실</span>
+
+<span class="cm"># 다중 Endpoint (PK + PD)</span>
+<span class="cm"># DVID 또는 CMT로 endpoint 구분</span>
+<span class="cm"># 각 endpoint별 단위, 스케일 확인</span></div>`,
+        pkgs: ["dplyr"]
+      },
+      {
+        id: "q13",
+        gate: true,
+        title: "Observation QC Gate",
+        desc: "관측 record 전수 검증 — EVID=0 & MDV=0인 record의 DV가 모두 양수인가? BLQ 플래그 수가 원본 DB와 일치하는가? Predose 재정의가 논리적인가? 다중 endpoint CMT 배정 정확한가?",
+        detail: `<div class="code-block"><span class="cm"># Observation QC 자동화 검사</span>
+
+<span class="cm"># 1. 유효 관측값 양수 확인</span>
+<span class="fn">stopifnot</span>(<span class="fn">all</span>(
+  dat$DV[dat$EVID == 0 & dat$MDV == 0] > 0
+))
+
+<span class="cm"># 2. BQL 수 원본 대조</span>
+n_bql_final <- <span class="fn">sum</span>(dat$BLQ == 1 & dat$EVID == 0)
+<span class="cm"># → 임상 DB의 BQL 수와 일치?</span>
+
+<span class="cm"># 3. MDV 논리 검증</span>
+dat %>% <span class="fn">filter</span>(EVID == 0, MDV == 0, <span class="fn">is.na</span>(DV)) %>%
+  <span class="fn">nrow</span>()  <span class="cm"># 반드시 0이어야 함</span>
+
+<span class="cm"># 4. 다중 endpoint CMT 교차검증</span>
+<span class="fn">table</span>(dat$DVID[dat$EVID==0], dat$CMT[dat$EVID==0])</div>
+<div class="callout callout-warn">🚧 이 Gate를 통과해야 P3 (Time Construction)으로 진행 — P1 Dosing Gate(Q09)와 대칭 구조</div>`,
+        pkgs: ["dplyr", "testthat"]
+      }
+    ]
+  },
+  {
+    phase: 3,
+    tag: "P3",
+    title: "Time Construction",
+    subtitle: "시간 변수 구축 — 가장 중요한 단계",
+    questions: [
+      {
+        id: "q14",
+        title: "TIME 기준점 · Actual vs Nominal",
+        desc: "TIME = (실제 채혈 일시) − (첫 투여 일시). Actual vs nominal time은 프로토콜 준수율에 따라 선택. 기관별 time-recording 신뢰도가 다르면 기관 플래그 추가",
+        detail: `<div class="code-block"><span class="cm"># Actual vs Nominal 판단 기준</span>
+time_dev <- dat %>%
+  <span class="fn">mutate</span>(delta = actual_time - nominal_time) %>%
+  <span class="fn">summarise</span>(
+    med_dev  = <span class="fn">median</span>(<span class="fn">abs</span>(delta), na.rm=T),
+    p95_dev  = <span class="fn">quantile</span>(<span class="fn">abs</span>(delta), 0.95, na.rm=T)
+  )
+
+<span class="cm"># |actual − nominal| > t½ × 0.1 이면</span>
+<span class="cm"># → actual time 사용 가치 있음</span>
+<span class="cm"># → 그렇지 않으면 nominal이 오히려 안전</span>
+<span class="cm">#    (간호사가 시각을 나중에 추정 기록하는 경우)</span>
+
+<span class="cm"># 기관별 신뢰도 차이 확인</span>
+dat %>% <span class="fn">group_by</span>(SITEID) %>%
+  <span class="fn">summarise</span>(time_missing_pct =
+    <span class="fn">mean</span>(<span class="fn">is.na</span>(actual_time)) * 100)</div>`,
+        pkgs: ["dplyr", "lubridate"]
+      },
+      {
+        id: "q15",
+        title: "시간 오류 패턴 탐지·수정",
+        desc: "자정 넘김(날짜+1), 시각 미기록(nominal time 대체+플래그), 채혈<투여 시각 역전, 투여 시각 미기록(기관 표준 투약시간 확인)",
+        detail: `<div class="code-block"><span class="cm"># 흔한 시간 오류 패턴</span>
+
+<span class="cm"># 1. 자정 넘김 — 채혈이 다음 날인데 날짜 미갱신</span>
+<span class="cm"># → 채혈 시각 < 투여 시각이면 날짜 +1 후보</span>
+
+<span class="cm"># 2. 시각 미기록 (날짜만 존재)</span>
+<span class="cm"># → nominal time으로 대체 + TIMEFLAG=1</span>
+
+<span class="cm"># 3. 투여 시각 미기록</span>
+<span class="cm"># → 프로토콜의 표준 투약 시간 사용</span>
+<span class="cm"># → 기관별로 다를 수 있음 — DM에게 질의</span>
+
+<span class="cm"># 4. 동일 환자 내 TIME 역전</span>
+dat %>% <span class="fn">group_by</span>(ID) %>%
+  <span class="fn">mutate</span>(time_rev = TIME < <span class="fn">lag</span>(TIME)) %>%
+  <span class="fn">filter</span>(time_rev == TRUE)</div>`,
+        pkgs: ["dplyr", "lubridate"]
+      },
+      {
+        id: "q16",
+        title: "동일 TIME 정렬 규칙",
+        desc: "동일 시각에 투여+채혈이 존재하면 투여 record(EVID=1)가 반드시 먼저. NONMEM은 동일 TIME에서 파일 순서대로 처리",
+        detail: `<div class="code-block"><span class="cm"># 정렬 규칙: ID → TIME → EVID (역순)</span>
+<span class="cm"># EVID=1(투여)이 EVID=0(관측)보다 먼저</span>
+dat <- dat %>%
+  <span class="fn">arrange</span>(ID, TIME, <span class="fn">desc</span>(EVID))
+
+<span class="cm"># 검증: 동일 TIME에서 EVID=1이 EVID=0보다 앞에 있는지</span>
+dat %>% <span class="fn">group_by</span>(ID, TIME) %>%
+  <span class="fn">filter</span>(<span class="fn">n</span>() > 1) %>%
+  <span class="fn">mutate</span>(order_ok = EVID >= <span class="fn">lead</span>(EVID, default=0)) %>%
+  <span class="fn">filter</span>(!order_ok)</div>
+<div class="callout callout-danger">⚠ 이 정렬이 틀리면 투여 전 농도가 투여 후 농도로 처리됨 — 흡수 파라미터에 심각한 편향 도입</div>`,
+        pkgs: ["dplyr"]
+      }
+    ]
+  },
+  {
+    phase: 4,
+    tag: "P4",
+    title: "Covariate Processing",
+    subtitle: "공변량 처리",
+    questions: [
+      {
+        id: "q17",
+        title: "Baseline 정의",
+        desc: "Screening vs Day 1 Pre-dose 중 어느 것이 Baseline인가? 공변량별로 다를 수 있음. SAP 정의와 반드시 일치시킬 것 — 규제 제출 시 불일치는 질의 대상",
+        detail: `<table class="decision-table">
+<tr><th>공변량</th><th>권장 Baseline</th><th>이유</th></tr>
+<tr><td>SCr, eGFR</td><td>Screening</td><td>더 안정적, 급성 변동 적음</td></tr>
+<tr><td>체중 (WT)</td><td>Day 1 Pre-dose</td><td>Screening 후 체중 변화 가능</td></tr>
+<tr><td>종양 크기</td><td>Baseline scan 날짜</td><td>Day 1과 다를 수 있음</td></tr>
+<tr><td>ALT/AST</td><td>Screening 또는 Day 1</td><td>SAP 정의 따름</td></tr>
+</table>
+<div class="callout callout-warn">⚠ Baseline 정의를 SAP와 다르게 하면 FDA/EMA 질의 대상</div>`,
+        pkgs: ["dplyr"]
+      },
+      {
+        id: "q18",
+        title: "Time-invariant 공변량",
+        desc: "WT, HT, SEX, RACE, GENO 등 Baseline 값을 모든 record에 동일하게 반복 기입. 한 ID 내에서 변동이 없어야 함",
+        detail: `<div class="code-block"><span class="cm"># Baseline 공변량 추출 후 전 record 반복</span>
+baseline <- dat %>%
+  <span class="fn">filter</span>(EVID == 1) %>%
+  <span class="fn">group_by</span>(ID) %>%
+  <span class="fn">slice</span>(1) %>%
+  <span class="fn">ungroup</span>() %>%
+  <span class="fn">select</span>(ID, BWT = WT, BHT = HT, SEX, RACE)
+
+dat <- dat %>% <span class="fn">left_join</span>(baseline, by = <span class="str">"ID"</span>)
+
+<span class="cm"># 검증: time-invariant 공변량이 ID 내에서 일정한지</span>
+dat %>% <span class="fn">group_by</span>(ID) %>%
+  <span class="fn">summarise</span>(<span class="fn">across</span>(
+    <span class="fn">c</span>(BWT, SEX, RACE),
+    ~<span class="fn">n_distinct</span>(.x, na.rm=T)
+  )) %>%
+  <span class="fn">filter</span>(<span class="fn">if_any</span>(<span class="fn">everything</span>(), ~.x > 1))</div>`,
+        pkgs: ["dplyr", "tidyr"]
+      },
+      {
+        id: "q19",
+        title: "Time-varying 공변량",
+        desc: "eGFR, ALT, 병용약물 등 시간에 따라 변하는 공변량. LOCF 적용 여부 명시. 변화 시점마다 record 삽입 또는 NONMEM $DATA IGNORE 활용",
+        detail: `<div class="code-block"><span class="cm"># eGFR 계산 — 공식 선택이 결과에 영향</span>
+<span class="cm"># CKD-EPI (2021 race-free) 권장</span>
+<span class="cm"># eGFR > 60: CKD-EPI가 더 정확</span>
+<span class="cm"># eGFR < 30: 둘 다 부정확, 실측 GFR 우선</span>
+
+<span class="cm"># LOCF 적용</span>
+dat <- dat %>%
+  <span class="fn">group_by</span>(ID) %>%
+  <span class="fn">arrange</span>(TIME) %>%
+  <span class="fn">fill</span>(eGFR, ALT, .direction = <span class="str">"down"</span>) %>%
+  <span class="fn">ungroup</span>()
+
+<span class="cm"># 어떤 공식/방법을 썼는지</span>
+<span class="cm"># Data Handling Spec에 반드시 명시</span></div>`,
+        pkgs: ["dplyr", "tidyr"]
+      },
+      {
+        id: "q20",
+        title: "결측 공변량 처리",
+        desc: "MCAR/MAR/MNAR 판별 후 적절한 imputation 적용. 연속형→median+indicator, 범주형→최빈값 또는 별도 범주. 절대로 PK 농도를 interpolation으로 채우지 않음",
+        detail: `<div class="code-block"><span class="cm"># 결측 유형별 처리</span>
+<span class="cm"># MCAR (완전 무작위) → median imputation 허용</span>
+<span class="cm"># MAR  (관측 의존)   → multiple imputation 고려</span>
+<span class="cm"># MNAR (결측=정보)   → sensitivity analysis 필수</span>
+
+<span class="cm"># 실전 처리:</span>
+dat <- dat %>%
+  <span class="fn">mutate</span>(
+    WT_IMP = <span class="fn">ifelse</span>(<span class="fn">is.na</span>(WT),
+      <span class="fn">median</span>(WT, na.rm=T), WT),
+    WT_MISS = <span class="fn">as.integer</span>(<span class="fn">is.na</span>(WT))
+    <span class="cm"># 결측 indicator dummy 변수</span>
+  )
+
+<span class="cm"># 결측 PK 농도:</span>
+<span class="cm"># → MDV=1 (NONMEM이 무시)</span>
+<span class="cm"># → 결측 사유 플래그 추가</span>
+<span class="cm"># → 절대 interpolation 금지</span></div>`,
+        pkgs: ["dplyr", "mice"]
+      }
+    ]
+  },
+  {
+    phase: 5,
+    tag: "P5",
+    title: "BQL Handling",
+    subtitle: "정량한계 미만 처리",
+    questions: [
+      {
+        id: "q21",
+        title: "BQL 처리 방법 선택",
+        desc: "BQL 비율과 분포(trough 집중 여부)에 따라 Discard/LLOQ÷2/M3/M4 결정. 5% 이상이면 M3 필수. Naive 방법(=0)은 절대 권장 안 함",
+        detail: `<div class="code-block"><span class="cm"># BQL 처리 계층</span>
+Level 1 (Naive):   BQL = 0 or LLOQ/2
+  → 편향 도입, <span class="op">비권장</span>
+  → 단, BQL < 5% &amp; 탐색적 목적이면 허용
+
+Level 2 (Discard): BQL record 제거
+  → CL 과대추정 위험
+  → Trough 집중 시 특히 위험
+
+Level 3 (M3/M4):   Beal 2001 — Gold Standard
+  → BQL을 likelihood contribution으로 처리
+  → F_FLAG=1 구현
+  → 계산 비용 크지만 bias 없음</div>`,
+        pkgs: ["dplyr"]
+      },
+      {
+        id: "q22",
+        title: "M3/M4 구현 (해당 시)",
+        desc: "데이터: BQL record에 MDV=1, DV=LLOQ, BLQ=1 설정. Control stream: F_FLAG=1, PHI(누적정규분포) 사용. M4는 BQL=정확히 0으로 처리",
+        detail: `<div class="code-block"><span class="cm">; NONMEM $ERROR block — M3 구현</span>
+<span class="cm">; 데이터: BQL → MDV=1, DV=LLOQ, BLQ=1</span>
+<span class="cm">;         Non-BQL → MDV=0, DV=실측값, BLQ=0</span>
+
+$ERROR
+  IF (BLQ.EQ.1) THEN
+    Y = PHI((LOG(LLOQ)-IPRED)/W)
+    F_FLAG = 1   <span class="cm">; likelihood contribution</span>
+  ELSE
+    Y = DV
+    F_FLAG = 0
+  ENDIF
+
+<span class="cm">; M4 변형: BQL 시점의 농도를 정확히 0으로</span>
+<span class="cm">; → M3보다 보수적, sensitivity 비교용</span></div>`,
+        pkgs: ["dplyr"]
+      }
+    ]
+  },
+  {
+    phase: 6,
+    tag: "P6",
+    title: "Final Assembly",
+    subtitle: "Population Screening · 병합 · 최종 구조",
+    questions: [
+      {
+        id: "q23",
+        title: "Population Screening — 분석 대상 선정",
+        desc: "제외 기준 적용: 투여 기록 없음(n_dose=0), 관측값 2개 미만, 관찰 기간 < 반감기, 전 샘플 BQL. 모든 제외 근거를 Analysis Dataset Creation Report에 기록",
+        detail: `<div class="code-block"><span class="cm"># 분석 대상 결정</span>
+excluded <- dat %>%
+  <span class="fn">group_by</span>(ID) %>%
+  <span class="fn">summarise</span>(
+    n_dose   = <span class="fn">sum</span>(EVID == 1),
+    n_obs    = <span class="fn">sum</span>(EVID == 0 & MDV == 0),
+    max_time = <span class="fn">max</span>(TIME),
+    all_bql  = <span class="fn">all</span>(BLQ[EVID == 0] == 1)
+  ) %>%
+  <span class="fn">filter</span>(
+    n_dose == 0 |
+    n_obs < 2 |
+    max_time < t_half |
+    all_bql == TRUE
+  )
+
+<span class="cm"># 제외 이유별 집계</span>
+<span class="cm"># → Analysis Dataset Creation Report에 기록</span>
+<span class="cm"># → 규제 제출 시 감사 대상 문서</span></div>
+<div class="callout callout-warn">⚠ 제외 근거를 문서화하지 않으면 FDA/EMA 감사에서 지적 대상</div>`,
+        pkgs: ["dplyr"]
+      },
+      {
+        id: "q24",
+        title: "데이터 병합 · Row Count 검증",
+        desc: "Dosing + Observation + Covariate 병합. Join 전후 row count 검증(anti_join으로 누락 확인). 의도한 만큼만 row가 증가했는지 반드시 확인",
+        detail: `<div class="code-block"><span class="cm"># 병합 전후 row count 추적</span>
+n_before <- <span class="fn">nrow</span>(dose_dat) + <span class="fn">nrow</span>(obs_dat)
+dat <- <span class="fn">bind_rows</span>(dose_dat, obs_dat) %>%
+  <span class="fn">left_join</span>(cov_dat, by = <span class="str">"ID"</span>)
+n_after <- <span class="fn">nrow</span>(dat)
+
+<span class="cm"># 누락 확인</span>
+<span class="fn">anti_join</span>(dose_dat, dat, by = <span class="fn">c</span>(<span class="str">"ID"</span>,<span class="str">"TIME"</span>,<span class="str">"EVID"</span>))
+<span class="fn">anti_join</span>(obs_dat, dat, by = <span class="fn">c</span>(<span class="str">"ID"</span>,<span class="str">"TIME"</span>,<span class="str">"EVID"</span>))
+
+<span class="cm"># 중복 record 확인</span>
+dat %>% <span class="fn">group_by</span>(ID, TIME, EVID) %>%
+  <span class="fn">filter</span>(<span class="fn">n</span>() > 1)</div>`,
+        pkgs: ["dplyr"]
+      },
+      {
+        id: "q25",
+        title: "최종 컬럼 · 정렬 · Header",
+        desc: "필수 컬럼(ID, TIME, DV, AMT, EVID, MDV, CMT) 존재 확인. ID→TIME→desc(EVID) 정렬. NONMEM $DATA 구문에 대응하는 header. NA → '.' 변환",
+        detail: `<div class="code-block"><span class="cm"># 필수 컬럼 확인</span>
+required <- <span class="fn">c</span>(<span class="str">"ID"</span>,<span class="str">"TIME"</span>,<span class="str">"DV"</span>,<span class="str">"AMT"</span>,<span class="str">"EVID"</span>,
+               <span class="str">"MDV"</span>,<span class="str">"CMT"</span>,<span class="str">"BLQ"</span>)
+<span class="fn">stopifnot</span>(<span class="fn">all</span>(required %in% <span class="fn">names</span>(dat)))
+
+<span class="cm"># 정렬</span>
+dat <- dat %>% <span class="fn">arrange</span>(ID, TIME, <span class="fn">desc</span>(EVID))
+
+<span class="cm"># NA → "." 변환 (NONMEM 형식)</span>
+dat_nm <- dat %>%
+  <span class="fn">mutate</span>(<span class="fn">across</span>(<span class="fn">everything</span>(),
+    ~<span class="fn">ifelse</span>(<span class="fn">is.na</span>(.x), <span class="str">"."</span>, <span class="fn">as.character</span>(.x))))
+
+<span class="cm"># Header 대문자 확인</span>
+<span class="fn">names</span>(dat_nm) <- <span class="fn">toupper</span>(<span class="fn">names</span>(dat_nm))
+
+<span class="cm"># CSV 출력</span>
+<span class="fn">write_csv</span>(dat_nm, <span class="str">"final/nm_ready.csv"</span>)</div>`,
+        pkgs: ["dplyr", "readr"]
+      },
+      {
+        id: "q26",
+        title: "최종 파일 구조 검증",
+        desc: "첫 투여 기준 TIME=0 record 존재, 투여 record의 DV=0/'.' & MDV=1, EVID 코딩 일관성, 전체 record 수가 설명 가능한지 확인",
+        detail: `<div class="code-block"><span class="cm"># 구조 검증 자동화</span>
+<span class="fn">stopifnot</span>(
+  <span class="cm"># 1. 음수 TIME 없음</span>
+  <span class="fn">all</span>(dat$TIME >= 0),
+  <span class="cm"># 2. 유효 관측값 양수</span>
+  <span class="fn">all</span>(dat$DV[dat$EVID==0 & dat$MDV==0] > 0),
+  <span class="cm"># 3. 투여 record의 MDV=1</span>
+  <span class="fn">all</span>(dat$MDV[dat$EVID==1] == 1),
+  <span class="cm"># 4. 첫 record가 TIME=0 투여</span>
+  <span class="fn">all</span>(dat %>% <span class="fn">group_by</span>(ID) %>%
+    <span class="fn">slice</span>(1) %>%
+    <span class="fn">pull</span>(TIME) == 0)
+)</div>`,
+        pkgs: ["dplyr", "testthat"]
+      }
+    ]
+  },
+  {
+    phase: 7,
+    tag: "P7",
+    title: "Documentation",
+    subtitle: "문서화 — 재현성과 규제 추적성",
+    questions: [
+      {
+        id: "q27",
+        title: "Data Handling Specification",
+        desc: "모든 전처리 결정사항 문서화 — 이상치 처리, 결측치 imputation 방법, TIME 수정 근거, BQL 처리 방법, Baseline 정의, eGFR 공식 선택 등",
+        detail: `<div class="code-block"><span class="cm"># Data Handling Spec 필수 포함 항목</span>
+□ BQL 처리 방법 및 근거
+□ 결측 공변량 처리 (imputation 방법)
+□ Baseline 정의 (SAP 일치 여부)
+□ TIME 구축 규칙 (actual vs nominal)
+□ eGFR 계산 공식 (CKD-EPI 2021 등)
+□ 이상치 처리 근거 (수정 vs 제외)
+□ Population screening 제외 기준
+□ ADDL/II 적용 기준</div>
+<div class="callout callout-info">이 문서는 규제 제출 시 감사 대상 — 나중에 누가 봐도 모든 결정을 재현할 수 있어야 함</div>`,
+        pkgs: ["rmarkdown", "knitr"]
+      },
+      {
+        id: "q28",
+        title: "Analysis Dataset Creation Report",
+        desc: "제외 근거, 이상치 처리 기록, 원본 대비 최종 record 수 설명, 데이터 흐름도(Disposition). 규제 제출 시 이 문서가 감사 대상",
+        detail: `<div class="code-block"><span class="cm"># Report 포함 항목</span>
+1. Data Disposition Table
+   원본 N → 각 제외 단계별 N → 최종 N
+
+2. 이상치 목록
+   ID, TIME, 원래 값, 수정/제외 여부, 근거
+
+3. 결측치 현황
+   변수별 결측 수/비율, imputation 방법
+
+4. Record Count Reconciliation
+   Dosing records: 원본 vs 최종
+   Observation records: 원본 vs 최종</div>`,
+        pkgs: ["rmarkdown", "gt", "flextable"]
+      },
+      {
+        id: "q29",
+        title: "재현 스크립트 완전성",
+        desc: "raw/ → derived/ → final/ 전 과정이 스크립트로 재현되는지 실제 실행하여 확인. 최종 파일의 MD5 체크섬 일치 여부 검증",
+        detail: `<div class="code-block"><span class="cm"># 디렉토리 구조</span>
+raw/      → 원본 (read-only, 절대 수정 금지)
+derived/  → 전처리 스크립트 출력
+final/    → QC 완료 데이터셋
+
+<span class="cm"># 재현 스크립트 실행</span>
+source(<span class="str">"01_Read_and_Clean_PK.R"</span>)
+source(<span class="str">"02_Read_and_Clean_Dosing.R"</span>)
+source(<span class="str">"03_Merge_and_Format.R"</span>)
+source(<span class="str">"04_Covariate_Derivation.R"</span>)
+source(<span class="str">"05_BQL_Processing.R"</span>)
+source(<span class="str">"06_Final_Assembly.R"</span>)
+
+<span class="cm"># MD5 체크섬 대조</span>
+<span class="fn">tools</span>::<span class="fn">md5sum</span>(<span class="str">"final/nm_ready.csv"</span>)</div>`,
+        pkgs: ["here", "renv"]
+      }
+    ]
+  },
+  {
+    phase: 8,
+    tag: "P8",
+    title: "QC / QA",
+    subtitle: "검증 — 편집증에 가까운 최종 점검",
+    questions: [
+      {
+        id: "q30",
+        title: "PRED Check — 데이터 구조 검증",
+        desc: "가장 단순한 1-compartment 모델로 PRED vs DV 육안 검토. 목적은 모델 평가가 아니라 데이터 구조 검증 — 패턴 이상은 데이터 오류의 신호",
+        detail: `<div class="callout callout-danger">⚠ PRED Check에서 발견하는 오류가 가장 치명적이고 가장 발견하기 어려운 것들</div>
+<table class="decision-table">
+<tr><th>PRED 패턴</th><th>의심 원인</th></tr>
+<tr><td>모든 ID에서 PRED ≈ 0</td><td>AMT 단위 오류 (mg vs μg) 또는 CMT 오류</td></tr>
+<tr><td>특정 ID에서 PRED → ∞</td><td>TIME 역전 또는 중복 EVID=1 record</td></tr>
+<tr><td>흡수 피크 없이 단순 감소</td><td>Depot CMT 누락 — oral이 central로 투입</td></tr>
+<tr><td>Trough가 0으로 하락</td><td>ADDL/II 기간 중 투여 누락</td></tr>
+<tr><td>농도가 투여량과 불비례</td><td>AMT 또는 단위 불일치</td></tr>
+</table>`,
+        pkgs: ["xpose", "ggplot2"]
+      },
+      {
+        id: "q31",
+        title: "시각적 QC — Spaghetti Plot · 타임라인",
+        desc: "ID별 TIME vs DV(log scale) spaghetti plot 생성. 투약-채혈 타임라인 시각화. 약리학적으로 설명할 수 없는 프로파일 탐지",
+        detail: `<div class="code-block"><span class="cm"># Spaghetti Plot</span>
+<span class="fn">ggplot</span>(dat[dat$EVID==0 & dat$MDV==0,],
+  <span class="fn">aes</span>(TIME, DV, group=ID, color=<span class="fn">factor</span>(ID))) +
+  <span class="fn">geom_line</span>(alpha=0.5) +
+  <span class="fn">geom_point</span>(size=1) +
+  <span class="fn">scale_y_log10</span>() +
+  <span class="fn">theme_minimal</span>() +
+  <span class="fn">labs</span>(x=<span class="str">"Time (h)"</span>, y=<span class="str">"Concentration"</span>)
+
+<span class="cm"># 확인 항목:</span>
+<span class="cm"># - 투약 전 농도가 비정상적으로 높은가?</span>
+<span class="cm"># - 반감기가 약물 특성과 맞는가?</span>
+<span class="cm"># - 흡수 상(oral)이 관찰되는가?</span>
+<span class="cm"># - 이상한 spike가 있는가?</span></div>`,
+        pkgs: ["ggplot2", "xpose"]
+      },
+      {
+        id: "q32",
+        title: "자동화 QC — 금기 사항 검사",
+        desc: "음수 TIME, 동일 시점 관측 중복, baseline 공변량 ID 내 변동, EVID/MDV 조합 불일치, 극단값(WT=0, AGE=200) 등 프로그래밍적 일괄 검사",
+        detail: `<div class="code-block"><span class="cm"># 자동화 QC 검사 코드</span>
+
+<span class="cm"># 1. 음수 TIME</span>
+<span class="fn">stopifnot</span>(<span class="fn">all</span>(dat$TIME >= 0))
+
+<span class="cm"># 2. 동일 시점 관측 중복</span>
+<span class="fn">stopifnot</span>(!<span class="fn">any</span>(<span class="fn">duplicated</span>(
+  dat[dat$EVID==0, <span class="fn">c</span>(<span class="str">"ID"</span>,<span class="str">"TIME"</span>)])))
+
+<span class="cm"># 3. Baseline 공변량 ID 내 불변</span>
+dat %>% <span class="fn">group_by</span>(ID) %>%
+  <span class="fn">summarise</span>(<span class="fn">across</span>(
+    <span class="fn">c</span>(BWT,SEX,RACE),
+    ~<span class="fn">n_distinct</span>(.x, na.rm=T))) %>%
+  <span class="fn">filter</span>(<span class="fn">if_any</span>(-ID, ~.x > 1))
+
+<span class="cm"># 4. 극단값 탐지</span>
+<span class="fn">summary</span>(dat[!<span class="fn">duplicated</span>(dat$ID),
+  <span class="fn">c</span>(<span class="str">"WT"</span>,<span class="str">"AGE"</span>,<span class="str">"SCR"</span>,<span class="str">"EGFR"</span>)])
+
+<span class="cm"># 5. EVID-MDV 논리 일관성</span>
+<span class="fn">table</span>(dat$EVID, dat$MDV)</div>`,
+        pkgs: ["dplyr", "testthat"]
+      },
+      {
+        id: "q33",
+        title: "최종 체크리스트 일괄 확인",
+        desc: "모든 필수 컬럼 존재, TIME=0 투여 record 존재, BQL 처리 명시, 결측 공변량 명시, NONMEM header 대응, 재현 스크립트 실행 확인",
+        detail: `<div class="code-block"><span class="cm"># 제출 전 최종 체크리스트</span>
+□ 모든 필수 컬럼 (ID,TIME,DV,AMT,EVID,MDV,CMT)
+□ 첫 투여 기준 TIME=0 record 존재
+□ 투여 record: DV=0/'.', MDV=1
+□ BQL 처리 방법 → Data Handling Spec
+□ 결측 공변량 처리 → Data Handling Spec
+□ NONMEM $DATA header 대응 확인
+□ 재현 스크립트 실행 → 동일 출력
+□ Data Handling Spec 완성
+□ Analysis Dataset Creation Report 완성</div>`,
+        pkgs: ["dplyr"]
+      },
+      {
+        id: "q34",
+        gate: true,
+        title: "Independent QC — 2인 검증",
+        desc: "독립적 프로그래머가 동일 raw data에서 별도 코딩 후 결과 대조. Record count, BQL 수, 누적 투여량, 공변량 분포가 모두 일치해야 최종 서명. 규제 제출 필수 요건",
+        detail: `<table class="decision-table">
+<tr><th>검증 단계</th><th>내용</th></tr>
+<tr><td>Programming QC</td><td>다른 사람이 동일 raw data에서 독립 코딩 → 결과 대조</td></tr>
+<tr><td>Record Count</td><td>원본 대비 최종 record 수 차이 설명 가능</td></tr>
+<tr><td>BQL 플래그</td><td>BLQ=1 수가 임상 DB의 BQL 수와 일치</td></tr>
+<tr><td>Dose Audit</td><td>총 누적 투여량 = CRF 기록</td></tr>
+<tr><td>Covariate 분포</td><td>Baseline 공변량 요약통계 일치</td></tr>
+<tr><td>PRED Check</td><td>독립 QC자도 1-cpt 모델 PRED 검토</td></tr>
+</table>
+<div class="callout callout-warn">🚧 최종 GATE — 2인 서명 완료 후에만 분석 진행. 규제 제출 시 필수</div>`,
+        pkgs: ["diffdf", "testthat"]
+      }
+    ]
+  }
+];
+
+// ── State ──
+let checked = {};
+try {
+  const saved = localStorage.getItem('nm_v71_checked');
+  if (saved) checked = JSON.parse(saved);
+} catch(e) {}
+
+function save() {
+  try { localStorage.setItem('nm_v71_checked', JSON.stringify(checked)); } catch(e) {}
+}
+
+// ── Render ──
+function render() {
+  const container = document.getElementById('phases');
+  container.innerHTML = '';
+
+  DATA.forEach(phase => {
+    const phaseEl = document.createElement('div');
+    phaseEl.className = `phase phase-${phase.phase}`;
+
+    const checkedInPhase = phase.questions.filter(q => checked[q.id]).length;
+    const totalInPhase = phase.questions.length;
+
+    phaseEl.innerHTML = `
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-tag">${phase.tag}</span>
+        <span class="phase-title">${phase.title} <span style="font-weight:400;color:var(--text-muted);font-size:13px;">— ${phase.subtitle}</span></span>
+        <span class="phase-progress">${checkedInPhase}/${totalInPhase}</span>
+        <span class="phase-chevron">▾</span>
+      </div>
+      <div class="phase-body">
+        ${phase.questions.map(q => renderQuestion(q)).join('')}
+      </div>
+    `;
+
+    container.appendChild(phaseEl);
+  });
+
+  updateProgress();
+}
+
+function renderQuestion(q) {
+  const isChecked = checked[q.id];
+  const isGate = q.gate;
+  const num = q.id.replace('q','Q');
+
+  return `
+    <div class="question ${isChecked ? 'checked' : ''} ${isGate ? 'is-gate' : ''}" id="card-${q.id}">
+      <div class="q-main" onclick="toggle('${q.id}')">
+        <div class="q-check"></div>
+        <div class="q-content">
+          <div class="q-top">
+            <span class="q-number">${num}</span>
+            ${isGate ? '<span class="gate-badge">GATE</span>' : ''}
+            <span class="q-title">${q.title}</span>
+          </div>
+          <div class="q-desc">${q.desc}</div>
+        </div>
+      </div>
+      <div class="q-details">
+        <div class="q-detail-toggle" onclick="event.stopPropagation(); toggleDetail('${q.id}')">
+          ▸ 상세 · 코드 · 판단 기준
+        </div>
+        <div class="q-detail-body" id="detail-${q.id}">
+          ${q.detail}
+          <div class="pkg-row">
+            ${q.pkgs.map(p => `<span class="pkg-tag">${p}</span>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function toggle(id) {
+  checked[id] = !checked[id];
+  save();
+  const card = document.getElementById(`card-${id}`);
+  card.classList.toggle('checked', checked[id]);
+  updateProgress();
+}
+
+function toggleDetail(id) {
+  const body = document.getElementById(`detail-${id}`);
+  body.classList.toggle('open');
+  const toggle = body.previousElementSibling;
+  toggle.textContent = body.classList.contains('open') ? '▾ 상세 · 코드 · 판단 기준' : '▸ 상세 · 코드 · 판단 기준';
+}
+
+function togglePhase(header) {
+  header.parentElement.classList.toggle('collapsed');
+}
+
+function updateProgress() {
+  const total = DATA.reduce((s, p) => s + p.questions.length, 0);
+  const done = Object.values(checked).filter(Boolean).length;
+  document.getElementById('progressCount').textContent = `${done} / ${total}`;
+  document.getElementById('progressFill').style.width = `${(done/total)*100}%`;
+}
+
+function resetAll() {
+  if (!confirm('모든 체크 상태를 초기화하시겠습니까?')) return;
+  checked = {};
+  save();
+  render();
+}
+
+// ── Init ──
+render();
+</script>
+
+</body>
+</html>

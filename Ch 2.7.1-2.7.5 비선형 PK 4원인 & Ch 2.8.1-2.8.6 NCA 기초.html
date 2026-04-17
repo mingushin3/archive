@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PK/PD Mastery: Nonlinear Systems</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Cormorant+Garamond:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$']],
+        displayMath: [['$$', '$$']],
+        processEscapes: true
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+    };
+    </script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #09090e;
+            --sidebar-bg: #0c0c12;
+            --text-color: #ede8df;
+            --accent-gold: #c9a84c;
+            --accent-muted: #8a7b58;
+            --card-bg: #14141d;
+            --border-color: #2a2a35;
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Noto Sans KR', sans-serif;
+            --font-mono: 'IBM Plex Mono', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            display: flex;
+        }
+
+        /* Sidebar */
+        aside {
+            position: fixed;
+            top: 0; left: 0;
+            width: 260px;
+            height: 100vh;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 2rem 1rem;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        aside h2 {
+            font-family: var(--font-serif);
+            color: var(--accent-gold);
+            margin-bottom: 2rem;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        aside nav ul {
+            list-style: none;
+        }
+
+        aside nav ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        aside nav ul li a {
+            color: #a09d96;
+            text-decoration: none;
+            display: block;
+            padding: 0.5rem 1rem;
+            border-left: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        aside nav ul li a:hover, aside nav ul li a.active {
+            color: var(--accent-gold);
+            border-left-color: var(--accent-gold);
+            background-color: rgba(201, 168, 76, 0.05);
+        }
+
+        aside nav ul ul {
+            padding-left: 1.5rem;
+            margin-top: 0.25rem;
+            font-size: 0.85rem;
+        }
+
+        /* Main Content */
+        main {
+            margin-left: 260px;
+            padding: 3rem 4rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: var(--font-serif);
+            color: var(--accent-gold);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        h1 { font-size: 2.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; }
+        h2 { font-size: 2.2rem; padding-top: 2rem; border-top: 1px dashed var(--border-color); }
+        h3 { font-size: 1.6rem; color: #dfd8c8; }
+
+        p, li { margin-bottom: 1rem; color: #cfccc4; font-weight: 300; }
+        
+        .big-idea {
+            font-size: 1.3rem;
+            font-family: var(--font-serif);
+            font-style: italic;
+            color: var(--accent-gold);
+            padding: 1.5rem;
+            background: rgba(201, 168, 76, 0.08);
+            border-left: 4px solid var(--accent-gold);
+            margin: 2rem 0;
+        }
+
+        /* Concept Cards */
+        .concept-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .zettelkasten {
+            background: #000;
+            border: 1px solid #333;
+            padding: 1.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-top: 1.5rem;
+            border-radius: 4px;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            font-size: 0.95rem;
+        }
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            text-align: left;
+        }
+        th { background-color: rgba(201, 168, 76, 0.1); color: var(--accent-gold); }
+
+        /* Code Blocks */
+        pre {
+            background: #000;
+            border: 1px solid #333;
+            padding: 1.5rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            color: #0f0;
+            margin: 1.5rem 0;
+        }
+
+        /* Accordion */
+        .accordion {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            cursor: pointer;
+            padding: 1.2rem;
+            width: 100%;
+            border: 1px solid var(--border-color);
+            text-align: left;
+            outline: none;
+            font-size: 1rem;
+            transition: 0.3s;
+            margin-top: 1rem;
+            font-family: var(--font-sans);
+            display: flex;
+            justify-content: space-between;
+        }
+        .accordion:hover, .accordion.active { background-color: #1a1a24; }
+        .panel {
+            padding: 0 1.2rem;
+            background-color: var(--bg-color);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            border: 1px solid var(--border-color);
+            border-top: none;
+        }
+        .panel-content { padding: 1.2rem 0; }
+
+        /* Simulator UI */
+        .simulator-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        .chart-wrapper { position: relative; height: 400px; width: 100%; margin-bottom: 1.5rem; }
+        
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .control-group { display: flex; flex-direction: column; }
+        .control-group label {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--accent-gold);
+            margin-bottom: 0.5rem;
+        }
+        
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px; width: 16px;
+            border-radius: 50%;
+            background: var(--accent-gold);
+            cursor: pointer;
+            margin-top: -6px;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px;
+            cursor: pointer;
+            background: var(--border-color);
+            border-radius: 2px;
+        }
+        
+        .stats-panel {
+            display: flex;
+            justify-content: space-around;
+            background: #000;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .btn {
+            background: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--accent-gold);
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-family: var(--font-sans);
+            transition: all 0.2s;
+            border-radius: 4px;
+        }
+        .btn:hover { background: rgba(201, 168, 76, 0.2); }
+        .btn.active { background: var(--accent-gold); color: #000; }
+        
+        .preset-bar { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+        
+        .mission-panel {
+            background: rgba(201, 168, 76, 0.05);
+            border-left: 4px solid var(--accent-gold);
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .warning-banner {
+            display: none;
+            background: rgba(255, 60, 60, 0.1);
+            border: 1px solid #ff3c3c;
+            color: #ff3c3c;
+            padding: 0.8rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* SVG Hub Diagram */
+        .svg-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        @media (max-width: 768px) {
+            aside { transform: translateX(-100%); }
+            main { margin-left: 0; padding: 2rem 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <aside>
+        <h2>PK/PD Mastery</h2>
+        <nav>
+            <ul>
+                <li><a href="#sec1" class="nav-link">§1. Session Header</a></li>
+                <li><a href="#sec2" class="nav-link">§2. Concept Anatomy Cards</a>
+                    <ul>
+                        <li><a href="#card-capacity">Capacity-Limited</a></li>
+                        <li><a href="#card-time">Time-Dependent</a></li>
+                        <li><a href="#card-binding">Binding (Open/Closed)</a></li>
+                    </ul>
+                </li>
+                <li><a href="#sec3" class="nav-link">§3. Structural Isomorphism</a></li>
+                <li><a href="#sec4" class="nav-link">§4. Interactive Simulator</a></li>
+                <li><a href="#sec5" class="nav-link">§5. Confusion Pair Dissection</a></li>
+                <li><a href="#sec6" class="nav-link">§6. Pragmatic Applications</a></li>
+                <li><a href="#sec7" class="nav-link">§7. Self-Test Module</a></li>
+                <li><a href="#sec8" class="nav-link">§8. Meta-Frame & Moat</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main>
+        <section id="sec1">
+            <h1>§1 — Session Header & Roadmap</h1>
+            <p><strong>Source:</strong> Gabrielsson & Weiner, Chapter 2, Section 2.7.1 - 2.7.5 (Pages 112-134)</p>
+            <p><strong>Title:</strong> Nonlinear Systems - Capacity, Time, Flow and Binding</p>
+            
+            <div class="big-idea">
+                "비선형 약동학은 중첩의 원리(Superposition principle)가 깨지는 현상이며, 이는 단순히 수학적 일탈이 아니라 용량(Capacity), 시간(Time), 혈류(Flow), 결합(Binding)이라는 생리학적 시스템의 물리적 한계가 임계점에 도달했음을 나타내는 진단적 신호이다."
+            </div>
+
+            <h3>Knowledge Graph Position</h3>
+            <p><strong>Prerequisites:</strong> 1차 선형 동태학(Linear Kinetics), 청소율(Clearance) 및 분포용적(Volume of Distribution)의 기본 개념, 중첩의 원리.</p>
+            <p><strong>Unlocks:</strong> 표적 매개 약물 배치(TMDD), 집단 약동학(PopPK)의 시간 변동성 모델링, 독성동태학(Toxicokinetics)에서의 종간 외삽(Species Extrapolation).</p>
+        </section>
+
+        <section id="sec2">
+            <h2>§2 — Concept Anatomy Cards</h2>
+
+            <div id="card-capacity" class="concept-card">
+                <h3>A. Capacity-Limited Kinetics (Michaelis-Menten)</h3>
+                <p><strong>Formal Definition:</strong> 체내 약물 농도가 높아짐에 따라 제거를 담당하는 효소나 수송체의 능력이 포화(Saturation)되어, 청소율(Clearance)이 일정하게 유지되지 않고 농도에 반비례하여 감소하는 현상이다[cite: 7, 102].</p>
+                
+                <h4>B. Derivation & Mathematical Structure</h4>
+                <p>Michaelis-Menten 역학에 따른 제거 속도(Elimination Rate)는 다음과 같다[cite: 174]:</p>
+                <p>$$Rate = \frac{V_{max} \cdot C}{K_m + C}$$</p>
+                <p>여기서 $Cl = \frac{Rate}{C}$ 이므로, 청소율은 다음과 같이 도출된다[cite: 135]:</p>
+                <p>$$Cl = \frac{V_{max}}{K_m + C}$$</p>
+                <ul>
+                    <li>$V_{max}$ (단위: mass/time): 시스템의 최대 대사 속도(Maximum metabolic rate)[cite: 137]. 효소의 총량($E_{tot}$)에 비례한다.</li>
+                    <li>$K_m$ (단위: mass/volume): 최대 속도의 절반($V_{max}/2$)에 도달할 때의 약물 농도(Michaelis-Menten constant)[cite: 137]. 효소와 기질 간의 친화도의 역수이다.</li>
+                    <li>$C$: 중심 구획의 체내 약물 농도.</li>
+                </ul>
+
+                <h4>C. Structural Necessity</h4>
+                <p>왜 이 형태여야만 하는가? 효소($E$)와 약물($S$)이 결합하여 복합체($ES$)를 형성한 후 대사체로 변환되는 질량 작용의 법칙(Law of Mass Action) 때문이다. 시스템 내 총 효소량은 유한하므로, $C \gg K_m$ 조건에서는 모든 효소가 포화되어 $Rate \approx V_{max}$ (0차 반응)가 되며 [cite: 178, 180], 반대로 $C \ll K_m$ 조건에서는 $Rate \approx (\frac{V_{max}}{K_m}) \cdot C$ (1차 반응)로 선형화된다[cite: 185, 186].</p>
+
+                <h4>D. Assumptions & Boundary Conditions</h4>
+                <p>효소의 생성 및 분해 속도가 측정 시간 동안 일정하다고 가정한다. 만약 용량 포화와 동시에 자가유도(Autoinduction)가 발생하면(Gabrielsson Case Study PK22처럼), $V_{max}$ 자체가 시간에 따라 변하게 되어 이 정적 수식은 붕괴한다.</p>
+
+                <div class="zettelkasten">
+---
+aliases: [Capacity-limited kinetics, Michaelis-Menten PK, 포화 동태학]
+tags: [pharmacometrics/pk, nonlinear, clearance]
+up: "[[Nonlinear Pharmacokinetics]]"
+related: ["[[Time-dependent kinetics]]", "[[TMDD]]"]
+source: "Gabrielsson & Weiner, 5th Ed, p. 115-117"
+---
+Capacity-limited kinetics는 Clearance가 농도 C의 함수가 되는 현상이다. $Cl = V_{max} / (K_m + C)$. 이로 인해 중첩의 원리(Superposition)가 깨지며, 용량을 2배 증가시킬 때 AUC는 2배 이상 비례적으로 증가한다. $C \gg K_m$일 때 0차 역학으로 전환되며, 이는 주로 과량투여(overdosing)나 독성학 연구에서 관찰된다.
+                </div>
+            </div>
+
+            <div id="card-time" class="concept-card">
+                <h3>B. Time-Dependent Kinetics (Enzyme Turnover & Induction)</h3>
+                <p><strong>Formal Definition:</strong> 약물의 청소율을 결정하는 효소의 양(Pool) 자체가 약물 투여 시간에 따라 생리학적/생화학적으로 변화하는 현상. 대표적으로 자가유도(Autoinduction)와 타가유도(Heteroinduction)가 있다[cite: 13, 256].</p>
+                
+                <h4>B. Derivation & Mathematical Structure</h4>
+                <p>효소($E$)의 회전(Turnover) 모델은 0차 생성($R_{in}$)과 1차 소실($k_{out}$)로 구성된다[cite: 296]:</p>
+                <p>$$\frac{dE}{dt} = R_{in} - k_{out} \cdot E$$</p>
+                <p>약물 투여 전 기저 상태(Baseline)의 효소 농도는 정상상태이므로[cite: 298]:</p>
+                <p>$$E_0 = \frac{R_{in}}{k_{out}}$$</p>
+                <p>유도제(Inducer)가 $R_{in}$을 증가시켜 새로운 정상상태 $E'$에 도달할 때, 시간에 따른 청소율의 변화는 다음과 같이 나타난다[cite: 318]:</p>
+                <p>$$Cl_t = Cl' - (Cl' - Cl_{pre}) \cdot e^{-k_{out} \cdot t}$$</p>
+                <p>여기서 변화 속도를 결정하는 것은 유도제의 농도가 아니라 효소 자체의 분해 속도 상수인 $k_{out}$이다[cite: 326].</p>
+
+                <h4>C. Structural Necessity</h4>
+                <p>유도 반응은 즉각적이지 않다. DNA 전사 -> mRNA 번역 -> 단백질 합성의 과정을 거치며, 기존 단백질이 분해되는 속도($k_{out}$)에 의해 새로운 정상상태로의 전이 속도가 지배받는다. 따라서 모델은 지연(delay) 구조를 필수적으로 포함해야 하며, 이는 간접 반응(Indirect Response) 모델의 구조와 수학적으로 동일하다.</p>
+
+                <div class="zettelkasten">
+---
+aliases: [Time-dependent kinetics, Autoinduction, Enzyme Turnover]
+tags: [pharmacometrics/pk, indirect-response, induction]
+up: "[[Nonlinear Pharmacokinetics]]"
+related: ["[[Capacity-limited kinetics]]"]
+source: "Gabrielsson & Weiner, 5th Ed, p. 119-121"
+---
+시간 의존적 비선형성은 Clearance가 시간의 함수로 변하는 현상이다. 효소 유도(Induction) 모델에서 새로운 효소 풀(pool)의 정상상태 도달 시간은 약물의 반감기가 아니라 유도되는 효소의 소실 반감기($\ln(2)/k_{out}$)에 의해 결정된다. 이는 동일한 유도제가 종(Species)에 따라 다른 노출 패턴을 보이게 하는 핵심 원인이다.
+                </div>
+            </div>
+
+            <div id="card-binding" class="concept-card">
+                <h3>C. Binding-Dependent Kinetics (Open vs. Closed Systems)</h3>
+                <p><strong>Formal Definition:</strong> 단백결합률의 변화가 약물의 유리 농도(Unbound concentration, $C_u$) 및 총 농도(Total concentration, $C$)에 미치는 비선형적 영향. 특히 체내(In vivo, Open system)와 체외(In vitro, Closed system)의 해석적 차이를 구분하는 것이 핵심이다[cite: 597, 719, 733].</p>
+                
+                <h4>B. Derivation & Mathematical Structure</h4>
+                <p>총 농도는 유리 농도와 결합 농도의 합이다[cite: 626]:</p>
+                <p>$$C = C_u + C_b$$</p>
+                <p>유리 분율(Free fraction, $f_u$)은 다음과 같이 질량 작용의 법칙으로 유도된다[cite: 633, 701, 702]:</p>
+                <p>$$f_u = \frac{C_u}{C} = \frac{1}{1 + n \cdot [P_T] \cdot K_a} \quad (\text{단, } C_u \text{가 낮을 때})$$</p>
+                <p>Open System (정상상태 IV 주입)에서의 유리 농도는 결합에 독립적이다[cite: 620, 734]:</p>
+                <p>$$C_u = \frac{Dose Rate}{Cl_u}$$</p>
+
+                <h4>C. Structural Necessity</h4>
+                <p>In vitro (Closed) 시스템에서는 질량 보존의 법칙에 따라 단백질이 추가되면 $C_u$가 감소한다[cite: 731]. 그러나 In vivo (Open) 시스템에서는 지속적인 투여(Input)와 제거(Output)가 일어난다. 간이나 신장이 '유리 약물($C_u$)'만을 제거한다고 할 때($Cl_u$가 일정), 투여 속도가 같다면 정상상태의 $C_u$는 단백결합과 무관하게 일정하게 유지되어야만 수학적 평형이 성립한다[cite: 777]. 총 농도 $C$만이 $f_u$의 변화에 따라 수동적으로 변할 뿐이다.</p>
+
+                <div class="zettelkasten">
+---
+aliases: [Protein Binding, Open vs Closed System, Free Fraction]
+tags: [pharmacometrics/pk, binding, misconceptions]
+up: "[[Nonlinear Pharmacokinetics]]"
+related: ["[[Clearance]]", "[[Drug-Drug Interactions]]"]
+source: "Gabrielsson & Weiner, 5th Ed, p. 129-134"
+---
+임상 현장의 가장 흔한 오해: 단백결합 치환 상호작용(Displacement)이 약효를 크게 증가시킬 것이라는 착각. In vivo는 Open system이므로, 치환으로 인해 일시적으로 $C_u$가 증가하더라도 제거 속도가 증가하여 결국 새로운 정상상태에서 $C_u$는 원래 수준으로 복귀한다. 임상적 의미를 갖는 유일한 예외는 고추출률 약물의 정맥투여 등 매우 제한적이다.
+                </div>
+            </div>
+        </section>
+
+        <section id="sec3">
+            <h2>§3 — Structural Isomorphism Map</h2>
+            <p>비선형 역학과 포화(Saturation) 현상은 PK에만 존재하는 것이 아닙니다. 자원의 유한성으로 인해 발생하는 포화 곡선은 자연계의 보편적 수학 구조입니다.</p>
+
+            <div class="svg-container">
+                <svg width="600" height="400" viewBox="0 0 600 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <style>
+                        .hub-text { font-family: 'IBM Plex Mono'; font-size: 14px; fill: #c9a84c; text-anchor: middle; font-weight: bold; }
+                        .spoke-text { font-family: 'Noto Sans KR'; font-size: 12px; fill: #cfccc4; text-anchor: middle; }
+                        .label-text { font-family: 'Noto Sans KR'; font-size: 10px; fill: #8a7b58; text-anchor: middle; font-style: italic; }
+                    </style>
+                    <circle cx="300" cy="200" r="50" fill="#14141d" stroke="#c9a84c" stroke-width="2"/>
+                    <text x="300" y="195" class="hub-text">y = ax / (b+x)</text>
+                    <text x="300" y="215" class="hub-text">Saturation</text>
+                    
+                    <line x1="300" y1="150" x2="300" y2="70" stroke="#2a2a35" stroke-width="2" stroke-dasharray="4"/>
+                    <line x1="300" y1="250" x2="300" y2="330" stroke="#2a2a35" stroke-width="2" stroke-dasharray="4"/>
+                    <line x1="250" y1="200" x2="150" y2="200" stroke="#2a2a35" stroke-width="2" stroke-dasharray="4"/>
+                    <line x1="350" y1="200" x2="450" y2="200" stroke="#2a2a35" stroke-width="2" stroke-dasharray="4"/>
+                    
+                    <text x="310" y="110" class="label-text" transform="rotate(-90, 310, 110)">효소/수송체 포화</text>
+                    <text x="290" y="290" class="label-text" transform="rotate(90, 290, 290)">수용체 결합 한계</text>
+                    <text x="200" y="190" class="label-text">생태계 수용력</text>
+                    <text x="400" y="190" class="label-text">촉매 표면적 포화</text>
+                    
+                    <rect x="240" y="30" width="120" height="40" rx="4" fill="#0c0c12" stroke="#8a7b58"/>
+                    <text x="300" y="50" class="spoke-text">약동학 (PK)</text>
+                    <text x="300" y="65" class="spoke-text" style="font-size: 10px;">Michaelis-Menten</text>
+                    
+                    <rect x="240" y="330" width="120" height="40" rx="4" fill="#0c0c12" stroke="#8a7b58"/>
+                    <text x="300" y="350" class="spoke-text">약력학 (PD)</text>
+                    <text x="300" y="365" class="spoke-text" style="font-size: 10px;">Emax Model</text>
+                    
+                    <rect x="30" y="180" width="120" height="40" rx="4" fill="#0c0c12" stroke="#8a7b58"/>
+                    <text x="90" y="200" class="spoke-text">생태학</text>
+                    <text x="90" y="215" class="spoke-text" style="font-size: 10px;">Holling Type II</text>
+                    
+                    <rect x="450" y="180" width="120" height="40" rx="4" fill="#0c0c12" stroke="#8a7b58"/>
+                    <text x="510" y="200" class="spoke-text">화학공학</text>
+                    <text x="510" y="215" class="spoke-text" style="font-size: 10px;">Langmuir Adsorption</text>
+                </svg>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>비교 항목</th>
+                        <th>추상 구조 (쌍곡선)</th>
+                        <th>PK (효소 동태학)</th>
+                        <th>PD (수용체 결합)</th>
+                        <th>화학 (Langmuir 흡착)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>독립 변수 (x)</strong></td>
+                        <td>Input 량</td>
+                        <td>농도 ($C$)</td>
+                        <td>농도 ($C$)</td>
+                        <td>기체 압력 ($P$)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>종속 변수 (y)</strong></td>
+                        <td>Output 반응</td>
+                        <td>제거 속도 ($Rate$)</td>
+                        <td>효과 ($E$)</td>
+                        <td>표면 덮임률 ($\theta$)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>최대 용량 (a)</strong></td>
+                        <td>Asymptote (점근선)</td>
+                        <td>최대 대사 속도 ($V_{max}$)</td>
+                        <td>최대 효과 ($E_{max}$)</td>
+                        <td>최대 흡착량 ($1.0$)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>친화도 지표 (b)</strong></td>
+                        <td>Half-maximal x</td>
+                        <td>$K_m$</td>
+                        <td>$EC_{50}$</td>
+                        <td>$1/K$ (평형상수 역수)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <button class="accordion">Transfer Mission 1: 흡착 표면적과 Vmax의 관계 ▽</button>
+            <div class="panel">
+                <div class="panel-content">
+                    <p><strong>전이 질문:</strong> Langmuir 흡착 모델에서 촉매의 표면적을 물리적으로 2배 늘리면 최대 흡착량이 2배가 됩니다. 이것이 PK에서 유도제(Inducer)가 투여되었을 때의 현상과 어떻게 수학적으로 동일합니까?</p>
+                    <p><strong>구조적 해답:</strong> 촉매의 표면적은 PK에서 간세포 내 '효소의 총량($E_{tot}$)'과 정확히 일대일 대응됩니다. 유도제(예: Phenobarbital) 투여 시 $R_{in}$이 증가하여 정상상태 효소 풀($E_{ss}$)이 커집니다[cite: 383, 392]. $V_{max}$는 $k_{cat} \cdot E_{tot}$이므로, 촉매 표면적이 넓어진 것처럼 $V_{max}$가 증가하여 고농도에서의 처리 용량이 선형적으로 확장됩니다. 친화도인 $K_m$은 변하지 않습니다[cite: 244].</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec4">
+            <h2>§4 — Interactive Simulator: Capacity-Limited PK (Fixed Axis)</h2>
+            <p>1구획 모델에서 정맥 투여(IV Bolus) 후 선형 1차 역학과 비선형(MM) 역학의 중첩 원리 위배 시뮬레이션입니다.</p>
+
+            <div class="simulator-container">
+                <div class="preset-bar">
+                    <button class="btn active" onclick="setPreset('linear')">저농도 (Linear 구간)</button>
+                    <button class="btn" onclick="setPreset('saturation')">고농도 (Saturation 구간)</button>
+                    <button class="btn" onclick="setPreset('induction')">효소 유도 ($V_{max}$ ↑)</button>
+                    <button class="btn" onclick="toggleReference()">기준선 고정 / 해제</button>
+                </div>
+
+                <div class="chart-wrapper">
+                    <canvas id="pkChart"></canvas>
+                </div>
+
+                <div class="stats-panel">
+                    <span id="stat-auc">AUC: -- mg·h/L</span>
+                    <span id="stat-halflife">Current t½: -- h</span>
+                    <span id="stat-cl">Apparent Cl: -- L/h</span>
+                </div>
+
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label>Dose (mg): <span id="val-dose">100</span></label>
+                        <input type="range" id="slider-dose" min="10" max="2000" step="10" value="100">
+                    </div>
+                    <div class="control-group">
+                        <label>Vmax (mg/h): <span id="val-vmax">50</span></label>
+                        <input type="range" id="slider-vmax" min="10" max="200" step="5" value="50">
+                    </div>
+                    <div class="control-group">
+                        <label>Km (mg/L): <span id="val-km">20</span></label>
+                        <input type="range" id="slider-km" min="1" max="100" step="1" value="20">
+                    </div>
+                    <div class="control-group">
+                        <label>Vd (L): <span id="val-vd">10</span></label>
+                        <input type="range" id="slider-vd" min="5" max="50" step="1" value="10">
+                    </div>
+                </div>
+
+                <div id="sim-warning" class="warning-banner">
+                    경고: 초기 농도($C_0$)가 $K_m$을 크게 초과하여 0차 역학 구간에 진입했습니다. 약물이 반감기 단위로 소실되지 않고 직선으로 강하합니다.
+                </div>
+
+                <div class="mission-panel">
+                    <p><strong>[Target Mission]:</strong> Dose를 현재 100mg에서 500mg으로 5배 올리십시오. 선형 시스템이라면 AUC가 정확히 5배가 되어야 합니다. 하지만 시뮬레이터에서 AUC가 5배 이상 폭발적으로 증가하는 것을 확인하십시오. 그 후, $V_{max}$를 조절하여 AUC를 선형 비례 수준으로 되돌리려면 효소량이 얼마나 유도(Induction)되어야 하는지 찾아보세요.</p>
+                </div>
+            </div>
+            
+            <script>
+                // State Architecture
+                const state = {
+                    dose: 100, vmax: 50, km: 20, v: 10,
+                    tMax: 48, dt: 0.2, // Fixed X-axis
+                    refCurve: null
+                };
+
+                let chartInstance = null;
+
+                function getModelData() {
+                    let c = state.dose / state.v;
+                    let data = [];
+                    let auc = 0;
+                    for(let t = 0; t <= state.tMax; t += state.dt) {
+                        data.push({x: t, y: c});
+                        let dc = - (state.vmax * c) / (state.km + c) / state.v * state.dt;
+                        auc += c * state.dt;
+                        c += dc;
+                        if(c < 0) c = 0;
+                    }
+                    return { data, auc };
+                }
+
+                function updateChart() {
+                    const result = getModelData();
+                    
+                    // Update Warning
+                    const C0 = state.dose / state.v;
+                    const warning = document.getElementById('sim-warning');
+                    if(C0 > state.km * 2) warning.style.display = 'block';
+                    else warning.style.display = 'none';
+
+                    // Update UI text
+                    document.getElementById('val-dose').innerText = state.dose;
+                    document.getElementById('val-vmax').innerText = state.vmax;
+                    document.getElementById('val-km').innerText = state.km;
+                    document.getElementById('val-vd').innerText = state.v;
+                    
+                    document.getElementById('stat-auc').innerHTML = `AUC: ${result.auc.toFixed(1)} mg·h/L`;
+                    document.getElementById('stat-cl').innerHTML = `Apparent Cl (at t=0): ${(state.vmax / (state.km + C0)).toFixed(2)} L/h`;
+                    
+                    const datasets = [{
+                        label: 'Current MM Curve',
+                        data: result.data,
+                        borderColor: '#c9a84c',
+                        borderWidth: 2,
+                        fill: true,
+                        backgroundColor: 'rgba(201, 168, 76, 0.1)',
+                        pointRadius: 0,
+                        tension: 0.1
+                    }];
+
+                    if(state.refCurve) {
+                        datasets.push({
+                            label: 'Reference Baseline',
+                            data: state.refCurve,
+                            borderColor: '#8a7b58',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            fill: false,
+                            pointRadius: 0
+                        });
+                    }
+
+                    if(chartInstance) {
+                        chartInstance.data.datasets = datasets;
+                        chartInstance.update();
+                    } else {
+                        const ctx = document.getElementById('pkChart').getContext('2d');
+                        chartInstance = new Chart(ctx, {
+                            type: 'line',
+                            data: { datasets: datasets },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    x: { 
+                                        type: 'linear', 
+                                        min: 0, max: state.tMax, // Fixed Axis
+                                        title: { display: true, text: 'Time (h)', color: '#ede8df' },
+                                        grid: { color: '#2a2a35' }
+                                    },
+                                    y: { 
+                                        type: 'linear', 
+                                        min: 0, max: 200, // Fixed Axis
+                                        title: { display: true, text: 'Concentration (mg/L)', color: '#ede8df' },
+                                        grid: { color: '#2a2a35' }
+                                    }
+                                },
+                                plugins: { legend: { labels: { color: '#ede8df' } } }
+                            }
+                        });
+                    }
+                }
+
+                // Event Listeners
+                ['dose', 'vmax', 'km', 'vd'].forEach(param => {
+                    document.getElementById(`slider-${param}`).addEventListener('input', (e) => {
+                        state[param] = parseFloat(e.target.value);
+                        updateChart();
+                    });
+                });
+
+                function toggleReference() {
+                    if(state.refCurve) {
+                        state.refCurve = null;
+                    } else {
+                        state.refCurve = getModelData().data;
+                    }
+                    updateChart();
+                }
+
+                function setPreset(type) {
+                    document.querySelectorAll('.preset-bar .btn').forEach(b => b.classList.remove('active'));
+                    event.target.classList.add('active');
+                    if(type === 'linear') { state.dose = 50; state.vmax = 50; state.km = 50; state.v = 10; }
+                    if(type === 'saturation') { state.dose = 1000; state.vmax = 50; state.km = 20; state.v = 10; }
+                    if(type === 'induction') { state.dose = 1000; state.vmax = 150; state.km = 20; state.v = 10; }
+                    
+                    ['dose', 'vmax', 'km', 'vd'].forEach(param => {
+                        document.getElementById(`slider-${param}`).value = state[param];
+                    });
+                    updateChart();
+                }
+
+                // Init
+                updateChart();
+            </script>
+        </section>
+
+        <section id="sec5">
+            <h2>§5 — Confusion Pair Dissection</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>비교 차원</th>
+                        <th>자가유도 (Autoinduction)</th>
+                        <th>용량 포화 (Capacity-Limited)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>표면적 유사성</strong></td>
+                        <td colspan="2">둘 다 반복 투여 시 예상되는 AUC나 축적 지수(Accumulation ratio)에서 벗어나 중첩의 원리를 위반한다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>왜 혼동하는가?</strong></td>
+                        <td>시간이 지남에 따라 농도가 '예상보다 낮아짐'.</td>
+                        <td>고농도에서 농도가 '예상보다 높아짐'. 방향은 반대이나 둘 다 비선형이므로 종종 1차 역학 오차로 오인된다.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>생리학적 지시체</strong></td>
+                        <td>단백질(효소) 합성 증가 또는 분해 둔화에 의한 <strong>효소 풀(Pool)의 팽창</strong>[cite: 258, 259].</td>
+                        <td>제한된 수의 효소에 과도한 기질(약물)이 몰려 발생하는 <strong>작업 병목 현상</strong>[cite: 246].</td>
+                    </tr>
+                    <tr>
+                        <td><strong>시간/농도 의존성</strong></td>
+                        <td>시간 의존적 (Time-dependent). 즉시 나타나지 않고 $k_{out}$의 반감기에 따라 서서히 진행됨[cite: 13, 260].</td>
+                        <td>농도 의존적 (Concentration-dependent). 투여 즉시 농도가 $K_m$을 넘으면 바로 관찰됨[cite: 13, 156].</td>
+                    </tr>
+                    <tr>
+                        <td><strong>기억 고리</strong></td>
+                        <td colspan="2">"용량 포화는 공장 직원의 '과로(병목)'이고, 유도는 직원을 추가 채용하는 '시간(교육 지연)'이 걸리는 작업이다."</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="sec6">
+            <h2>§6 — Pragmatic Application Scenarios & Diagnostic Pathology</h2>
+            
+            <h3>Scenario: Phase 1 Dose Escalation</h3>
+            <p>단회 투여 증량 시험(SAD)에서 용량을 10, 30, 100 mg으로 올렸을 때 AUC가 50, 160, 800으로 비례성을 잃고 급증했습니다. 이는 $100mg$ 투여 시 $C_{max}$가 $K_m$을 초과하여 발생한 <strong>용량 포화(Capacity-limited elimination)</strong>의 전형적 징후입니다. 이를 NONMEM으로 모델링하여 규제 기관에 제출할 때, 선형 Cl 대신 $V_{max}$와 $K_m$을 추정해야 합니다.</p>
+
+            <pre><code>
+$SUBROUTINE ADVAN1 TRANS1
+$PK
+  V = THETA(1) * EXP(ETA(1))
+  VMAX = THETA(2) * EXP(ETA(2))
+  KM = THETA(3) * EXP(ETA(3))
+
+$DES
+  C = A(1)/V
+  DADT(1) = - (VMAX * C) / (KM + C) ; Michaelis-Menten elimination
+            </code></pre>
+
+            <h3>Diagnostic Pathology: 선형 모델 오용 시의 잔차 패턴</h3>
+            <p>만약 위와 같은 포화 동태학 데이터에 강제로 1차 선형 모델(단순 $CL$)을 적합시키면, 진단도(GOF Plot)에서 다음과 같은 <strong>병리학적 패턴(Diagnostic Signature)</strong>이 나타납니다.</p>
+            <ul>
+                <li><strong>CWRES vs TIME (The U-Shape / Bias Wave):</strong> 고농도 구간(투여 직후)에서는 모델이 실제보다 과소예측(Under-predict)하고, 저농도 구간에서는 과대예측(Over-predict)하는 뚜렷한 U자 형태의 체계적 편향이 발생합니다. 이는 "현재 농도에 따라 실제 Cl이 변하고 있는데 모델은 상수 Cl을 고집하고 있다"는 수학적 비명입니다.</li>
+                <li><strong>DV vs IPRED (The Bowing Pattern):</strong> 관측값(DV)이 예측값(IPRED)의 1:1 대각선에서 활처럼 휘어지는 모양을 보입니다.</li>
+            </ul>
+        </section>
+
+        <section id="sec7">
+            <h2>§7 — Self-Test: Active Recall Module</h2>
+
+            <button class="accordion">Q1 [★★] Michaelis-Menten 역학에서 $C \ll K_m$일 때 모델은 어떻게 단순화되며, 이때의 겉보기 청소율(Apparent Clearance)은 어떻게 표현되는가? ▽</button>
+            <div class="panel">
+                <div class="panel-content">
+                    <p><strong>A:</strong> $C$가 $K_m$보다 매우 작을 때 분모의 $C$를 무시할 수 있으므로 식은 1차 역학인 $Rate \approx \frac{V_{max}}{K_m} \cdot C$로 단순화된다[cite: 186]. 이때의 겉보기 청소율은 일정한 상수인 $\frac{V_{max}}{K_m}$이 된다[cite: 188].</p>
+                    <p><em>Next depth:</em> 그렇다면 1차 역학 구간에서 추정된 $Cl$ 값만으로 $V_{max}$와 $K_m$을 각각 분리하여 추정할 수 있는가?</p>
+                </div>
+            </div>
+
+            <button class="accordion">Q2 [★] 효소 유도(Induction) 모델에서 약물을 장기간 투여하여 새로운 정상상태(Steady-state)의 Clearance에 도달하는 데 걸리는 시간은 무엇에 의해 결정되는가? ▽</button>
+            <div class="panel">
+                <div class="panel-content">
+                    <p><strong>A:</strong> 투여되는 약물의 반감기가 아니라, 타겟이 되는 <strong>효소 자체의 분해(소실) 반감기($\ln(2)/k_{out}$)</strong>에 의해 결정된다[cite: 284, 326]. 예를 들어 Phenobarbital 유도의 경우 효소의 turnover 반감기가 140시간에 달할 수 있다[cite: 285].</p>
+                    <p><em>Next depth:</em> 약물의 반감기보다 효소의 반감기가 훨씬 길다면, 약물 휴약기(Washout) 동안 약물은 몸에서 다 빠져나갔는데도 Clearance는 여전히 높은 상태가 유지될 수 있는가?</p>
+                </div>
+            </div>
+
+            <button class="accordion">Q3 [★] 체내(In vivo) 시스템에서 약물의 단백결합률이 90%에서 95%로 증가했다(치환 발생). 정상상태에서 약물의 총 농도($C$)와 유리 농도($C_u$)는 각각 어떻게 변하는가? (단, 투여 속도와 간/신장의 유리 약물 청소율($Cl_u$)은 일정하다고 가정) ▽</button>
+            <div class="panel">
+                <div class="panel-content">
+                    <p><strong>A:</strong> Open System이므로 정상상태 <strong>유리 농도($C_u$)는 변하지 않고 일정하게 유지</strong>된다 ($C_u = Rate/Cl_u$)[cite: 777]. 반면 결합률이 증가(유리 분율 $f_u$가 $0.1$에서 $0.05$로 감소)했으므로, <strong>총 농도($C = C_u / f_u$)는 2배 증가</strong>한다[cite: 694, 765].</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec8">
+            <h2>§8 — Meta-Frame & Professional Moat</h2>
+            
+            <h3>Professional Moat</h3>
+            <p>
+                "NONMEM 코드에 `$DES DADT(1) = -VMAX*C/(KM+C)`를 입력하고 R로 진단도를 뽑아내는 것은 초급 계량약리학자나 최신 AI 모델도 완벽하게 수행할 수 있습니다. 
+                그러나 이 섹션의 지식을 진정으로 내재화한 전문가가 갖는 <strong>대체 불가능한 해자(Moat)</strong>는 데이터가 수식에 맞지 않을 때 '수학적 잔차'를 '생리학적 메커니즘의 한계'로 번역해내는 능력에 있습니다. 
+                이들은 고농도에서 AUC가 튀는 현상을 보고 단순히 '비선형 모델을 써야지'라고 생각하는 데 그치지 않고, '투여된 화합물이 간세포 내 효소의 처리 용량을 압도했구나'라고 물리적 실체를 봅니다. 
+                단백결합 변동으로 총 농도가 치솟았을 때 패닉에 빠져 용량을 줄이는 임상의에게, 'Open System 생리학에 따라 활성 형태인 유리 농도는 안전한 상태입니다'라고 수학적 근거를 들어 설득할 수 있습니다. 
+                즉, 수식을 코드로 치환하는 자가 아니라, <strong>수식을 생명체의 제약 조건(Constraints)으로 투영해 내는 직관</strong>이야말로 AI 시대에 Pharmacometrician을 의사 결정의 정점으로 유지시키는 유일한 권력입니다."
+            </p>
+        </section>
+
+    </main>
+
+    <script>
+        // Sidebar active state logic
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        const observerOptions = {
+            root: null,
+            rootMargin: '-20% 0px -60% 0px',
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    navLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href').substring(1) === entry.target.id) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => observer.observe(section));
+
+        // Accordion logic
+        var acc = document.getElementsByClassName("accordion");
+        for (var i = 0; i < acc.length; i++) {
+            acc[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var panel = this.nextElementSibling;
+                if (panel.style.maxHeight) {
+                    panel.style.maxHeight = null;
+                } else {
+                    panel.style.maxHeight = panel.scrollHeight + "px";
+                }
+            });
+        }
+    </script>
+</body>
+</html>

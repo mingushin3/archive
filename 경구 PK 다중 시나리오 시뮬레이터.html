@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>경구 PK 다중 시나리오 시뮬레이터</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --bg2: #161b27;
+    --bg3: #1e2535;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --txt: #e8eaf0;
+    --txt2: #8892a4;
+    --txt3: #4d5a6e;
+    --blue: #4f8ef7;
+    --blue-dim: rgba(79,142,247,0.12);
+    --green: #34d399;
+    --red: #f87171;
+    --accent: #7c6fef;
+    --font: 'Inter', system-ui, sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); color: var(--txt); font-family: var(--font); font-size: 13px; line-height: 1.5; }
+
+  .app { max-width: 880px; margin: 0 auto; padding: 20px 16px 40px; }
+
+  /* ── Header ── */
+  .hdr { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+  .hdr-title { font-size: 17px; font-weight: 600; letter-spacing: -.3px; color: var(--txt); }
+  .hdr-sub { font-size: 11px; color: var(--txt3); font-family: var(--mono); margin-top: 3px; }
+  .hdr-eq { font-family: var(--mono); font-size: 10px; color: var(--txt3); text-align: right; line-height: 1.8; }
+
+  /* ── Section label ── */
+  .sec { font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--txt3); margin: 16px 0 8px; }
+
+  /* ── Base params ── */
+  .pg { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 24px; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 4px; }
+  .pr { display: flex; flex-direction: column; gap: 4px; }
+  .ph { display: flex; justify-content: space-between; align-items: baseline; }
+  .pn { font-size: 11px; color: var(--txt2); }
+  .pv { font-family: var(--mono); font-size: 12px; font-weight: 500; color: var(--blue); min-width: 48px; text-align: right; }
+  .sr { display: flex; align-items: center; gap: 5px; }
+  .sr input[type=range] { flex: 1; -webkit-appearance: none; height: 3px; background: var(--bg3); border-radius: 2px; outline: none; cursor: pointer; }
+  .sr input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; border-radius: 50%; background: var(--blue); border: 2px solid var(--bg); cursor: pointer; transition: transform .1s; }
+  .sr input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+  .sm { font-size: 9px; color: var(--txt3); min-width: 20px; font-family: var(--mono); }
+  .sm.r { text-align: right; }
+
+  /* ── Tabs ── */
+  .tabs { display: flex; gap: 0; overflow-x: auto; margin-bottom: 0; scrollbar-width: none; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px 10px 0 0; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tb { font-size: 11px; font-weight: 500; padding: 9px 13px; border: none; background: none; cursor: pointer; color: var(--txt3); border-bottom: 2px solid transparent; white-space: nowrap; font-family: var(--font); transition: color .15s, border-color .15s; flex-shrink: 0; }
+  .tb:first-child { border-radius: 9px 0 0 0; }
+  .tb.a { color: var(--blue); border-bottom-color: var(--blue); background: var(--blue-dim); }
+  .tb:hover:not(.a) { color: var(--txt); }
+
+  /* ── Panels ── */
+  .panels { background: var(--bg2); border: 1px solid var(--border); border-top: none; border-radius: 0 0 10px 10px; padding: 14px 16px; margin-bottom: 12px; min-height: 80px; }
+  .pan { display: none; }
+  .pan.a { display: block; }
+  .si { font-size: 11.5px; color: var(--txt2); line-height: 1.7; padding: 8px 12px; background: rgba(79,142,247,0.06); border-left: 2px solid var(--blue); border-radius: 0 6px 6px 0; margin-bottom: 12px; }
+  .si strong { color: var(--txt); font-weight: 600; }
+
+  /* ── Scenario params ── */
+  .spg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; }
+
+  /* ── Disease ── */
+  .dsel { width: 100%; font-size: 12px; padding: 7px 10px; border: 1px solid var(--border2); border-radius: 7px; background: var(--bg3); color: var(--txt); font-family: var(--font); cursor: pointer; margin-bottom: 10px; outline: none; }
+  .dsel:focus { border-color: var(--blue); }
+  .dmx { display: flex; gap: 20px; }
+  .dmi { display: flex; flex-direction: column; gap: 2px; }
+  .dml { font-size: 10px; color: var(--txt3); }
+  .dmv { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--accent); }
+
+  /* ── Controls row ── */
+  .ctrl { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .cmpt { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--txt2); cursor: pointer; user-select: none; }
+  .cmpt input[type=checkbox] { cursor: pointer; accent-color: var(--blue); }
+
+  /* ── Metrics ── */
+  .mets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
+  .mc { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+  .ml { font-size: 10px; color: var(--txt3); margin-bottom: 3px; text-transform: uppercase; letter-spacing: .06em; }
+  .mv { font-family: var(--mono); font-size: 16px; font-weight: 500; color: var(--txt); }
+  .mu { font-size: 10px; color: var(--txt3); }
+  .dx { font-family: var(--mono); font-size: 10px; font-weight: 600; display: block; margin-top: 2px; }
+  .dx.up { color: var(--red); }
+  .dx.dn { color: var(--green); }
+
+  /* ── Legend ── */
+  .leg { display: flex; gap: 16px; font-size: 11px; color: var(--txt3); margin-bottom: 6px; }
+  .li { display: flex; align-items: center; gap: 5px; }
+  .ll { width: 18px; height: 2px; }
+
+  /* ── Chart ── */
+  .cw { position: relative; height: 270px; width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 8px 4px; }
+
+  /* ── Footer note ── */
+  .fnote { font-size: 10px; color: var(--txt3); margin-top: 10px; font-family: var(--mono); }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Header -->
+  <div class="hdr">
+    <div>
+      <div class="hdr-title">경구 PK 다중 시나리오 시뮬레이터</div>
+      <div class="hdr-sub">1-compartment · RK4 numerical integration · Δ vs baseline</div>
+    </div>
+    <div class="hdr-eq">
+      C(t) = F·Dose·ka / [Vd·(ka−ke)] · (e<sup>−ke·t</sup> − e<sup>−ka·t</sup>)<br>
+      RK4 dt = 0.04 h · tMax = max(48, min(96, 10/ke)) h
+    </div>
+  </div>
+
+  <!-- Base params -->
+  <div class="sec">기본 파라미터 — 모든 시나리오 공통</div>
+  <div class="pg">
+    <div class="pr"><div class="ph"><span class="pn">F — 생체이용률</span><span class="pv" id="vF">0.80</span></div><div class="sr"><span class="sm">0.1</span><input type="range" id="sF" min=".1" max="1" step=".01" value=".8"><span class="sm r">1.0</span></div></div>
+    <div class="pr"><div class="ph"><span class="pn">Dose (mg)</span><span class="pv" id="vD">100</span></div><div class="sr"><span class="sm">10</span><input type="range" id="sD" min="10" max="1000" step="10" value="100"><span class="sm r">1000</span></div></div>
+    <div class="pr"><div class="ph"><span class="pn">ka (h⁻¹) — 흡수속도상수</span><span class="pv" id="vKa">1.00</span></div><div class="sr"><span class="sm">0.1</span><input type="range" id="sKa" min=".1" max="5" step=".05" value="1"><span class="sm r">5.0</span></div></div>
+    <div class="pr"><div class="ph"><span class="pn">Vd (L) — 분포용적</span><span class="pv" id="vVd">50</span></div><div class="sr"><span class="sm">5</span><input type="range" id="sVd" min="5" max="500" step="5" value="50"><span class="sm r">500</span></div></div>
+    <div class="pr"><div class="ph"><span class="pn">ke (h⁻¹) — 소실속도상수</span><span class="pv" id="vKe">0.15</span></div><div class="sr"><span class="sm">0.01</span><input type="range" id="sKe" min=".01" max="2" step=".01" value=".15"><span class="sm r">2.0</span></div></div>
+  </div>
+
+  <!-- Scenario tabs -->
+  <div class="sec">흡수 메커니즘 / 외부 개입 / 질병 상태</div>
+  <div class="tabs">
+    <button class="tb a" data-s="first">① 1차 흡수</button>
+    <button class="tb" data-s="zero">② 0차 흡수</button>
+    <button class="tb" data-s="alag">③ Alag</button>
+    <button class="tb" data-s="transit">④ Transit</button>
+    <button class="tb" data-s="er">⑤ 서방정 ER</button>
+    <button class="tb" data-s="food">⑥ 기름진 음식</button>
+    <button class="tb" data-s="exercise">⑦ 격렬한 운동</button>
+    <button class="tb" data-s="disease">⑧ 질병 상태</button>
+  </div>
+  <div class="panels">
+
+    <!-- Panel 1: First order -->
+    <div class="pan a" id="p-first">
+      <div class="si"><strong>1차 흡수 (기준선)</strong> — 장관 내 잔류량에 비례하는 속도로 흡수. 해석적 풀이: Tmax = ln(ka/ke)/(ka−ke), Cmax = C(Tmax), AUC∞ = F·Dose/(Vd·ke). 다른 모든 시나리오의 기준선으로 사용.</div>
+    </div>
+
+    <!-- Panel 2: Zero order -->
+    <div class="pan" id="p-zero">
+      <div class="si"><strong>0차 흡수</strong> — T_dur 동안 일정 속도(R₀ = F·Dose/T_dur)로 흡수, 정맥 infusion과 동일한 입력 함수. 흡수기 동안 직선에 가까운 완만한 상승 → 종료 후 1차 소실. <strong>Cmax↓, Tmax≈T_dur, AUC 동일.</strong></div>
+      <div class="spg">
+        <div class="pr"><div class="ph"><span class="pn">T_dur — 흡수 지속 시간 (h)</span><span class="pv" id="vZt">4.0</span></div><div class="sr"><span class="sm">.5</span><input type="range" id="sZt" min=".5" max="12" step=".5" value="4"><span class="sm r">12</span></div></div>
+      </div>
+    </div>
+
+    <!-- Panel 3: Alag -->
+    <div class="pan" id="p-alag">
+      <div class="si"><strong>흡수 지연 (Alag)</strong> — 투약 후 일정 시간 동안 흡수 없음. 장용 코팅, 위내 붕해 지연, 결장 표적 제형 등이 원인. 전체 곡선이 우측으로 이동. <strong>Tmax = Alag + Tmax₀, Cmax·AUC 불변.</strong></div>
+      <div class="spg">
+        <div class="pr"><div class="ph"><span class="pn">Alag (h)</span><span class="pv" id="vAl">0.50</span></div><div class="sr"><span class="sm">.1</span><input type="range" id="sAl" min=".1" max="4" step=".1" value=".5"><span class="sm r">4</span></div></div>
+      </div>
+    </div>
+
+    <!-- Panel 4: Transit -->
+    <div class="pan" id="p-transit">
+      <div class="si"><strong>Transit 구획 모델</strong> — 소장을 n개 구획이 순차 통과 후 흡수. n↑ 또는 ktr↓ 시 흡수 분포가 분산되어 어깨 구조(shoulder) 또는 시그모이드형 상승, Tmax↑, Cmax↓. n=1은 1차 흡수와 동일.</div>
+      <div class="spg">
+        <div class="pr"><div class="ph"><span class="pn">Transit 구획 수 (n)</span><span class="pv" id="vTn">3</span></div><div class="sr"><span class="sm">1</span><input type="range" id="sTn" min="1" max="10" step="1" value="3"><span class="sm r">10</span></div></div>
+        <div class="pr"><div class="ph"><span class="pn">ktr (h⁻¹)</span><span class="pv" id="vTk">2.00</span></div><div class="sr"><span class="sm">.2</span><input type="range" id="sTk" min=".2" max="10" step=".2" value="2"><span class="sm r">10</span></div></div>
+      </div>
+    </div>
+
+    <!-- Panel 5: ER -->
+    <div class="pan" id="p-er">
+      <div class="si"><strong>서방정 ER</strong> — 고체 제제에서 1차 속도로 용출(dissolution, kd)된 후 흡수. kd 범위는 상용 서방정 95% CI 기반: <strong>0.05–0.60 h⁻¹ (T₅₀% ≈ 1.2–14h)</strong>. kd↓ → 낮고 평평한 곡선, Tmax 수십 시간. AUC는 동일 (kd는 속도만 결정).</div>
+      <div class="spg">
+        <div class="pr"><div class="ph"><span class="pn">용출 속도 kd (h⁻¹) · T₅₀% = ln2/kd</span><span class="pv" id="vEk">0.15</span></div><div class="sr"><span class="sm">.05</span><input type="range" id="sEk" min=".05" max=".6" step=".01" value=".15"><span class="sm r">.60</span></div></div>
+      </div>
+    </div>
+
+    <!-- Panel 6: Food -->
+    <div class="pan" id="p-food">
+      <div class="si"><strong>기름진 음식 (FDA 표준: ~800–1000 kcal, 지방 50%)</strong> — 위 배출 지연 → ka↓. BCS II·IV 약물은 담즙 미셀 용해도↑ → F↑. 음성 시점 = 투약 전 섭취. F 변화는 약물에 따라 음수(흡수↓)도 가능.</div>
+      <div class="spg">
+        <div class="pr"><div class="ph"><span class="pn">식사 시점 (h; 음수=투약 전)</span><span class="pv" id="vFt">0.0</span></div><div class="sr"><span class="sm">−2</span><input type="range" id="sFt" min="-2" max="2" step=".5" value="0"><span class="sm r">+2</span></div></div>
+        <div class="pr"><div class="ph"><span class="pn">ka 감소율 (%)</span><span class="pv" id="vFk">50</span></div><div class="sr"><span class="sm">0</span><input type="range" id="sFk" min="0" max="80" step="5" value="50"><span class="sm r">80</span></div></div>
+        <div class="pr"><div class="ph"><span class="pn">F 변화율 (%)</span><span class="pv" id="vFF">+20</span></div><div class="sr"><span class="sm">−50</span><input type="range" id="sFF" min="-50" max="100" step="5" value="20"><span class="sm r">+100</span></div></div>
+      </div>
+    </div>
+
+    <!-- Panel 7: Exercise -->
+    <div class="pan" id="p-exercise">
+      <div class="si"><strong>격렬한 운동</strong> — 내장 혈류↓(ka↓ 최대 60%), 근육 혈류↑(친지질성 약물 Vd↑ 30%), 간 혈류↓(ke↓ 최대 40%). 운동 종료 후 정상화. 강도 = % VO₂max. 운동 구간은 그래프에서 농도 꺾임으로 확인 가능.</div>
+      <div class="spg">
+        <div class="pr"><div class="ph"><span class="pn">운동 시작 시점 (h)</span><span class="pv" id="vEx">1.0</span></div><div class="sr"><span class="sm">0</span><input type="range" id="sEx" min="0" max="8" step=".5" value="1"><span class="sm r">8</span></div></div>
+        <div class="pr"><div class="ph"><span class="pn">지속 시간 (h)</span><span class="pv" id="vEd">1.0</span></div><div class="sr"><span class="sm">.5</span><input type="range" id="sEd" min=".5" max="4" step=".5" value="1"><span class="sm r">4</span></div></div>
+        <div class="pr"><div class="ph"><span class="pn">강도 (% VO₂max)</span><span class="pv" id="vEi">70</span></div><div class="sr"><span class="sm">30</span><input type="range" id="sEi" min="30" max="100" step="5" value="70"><span class="sm r">100</span></div></div>
+      </div>
+    </div>
+
+    <!-- Panel 8: Disease -->
+    <div class="pan" id="p-disease">
+      <div class="si" id="dInf">간기능 장애 시 first-pass↓(F↑), CL↓(ke↓), 복수·부종→Vd↑. 중환자는 과청소율(ARC) 또는 다발성 장기부전에 따라 ke와 Vd가 반대 방향으로 극단적 변화.</div>
+      <select class="dsel" id="sDis">
+        <option value="cirrA">간경화 Child-Pugh A (경증 — 5-6점)</option>
+        <option value="cirrB">간경화 Child-Pugh B (중등도 — 7-9점)</option>
+        <option value="cirrC">간경화 Child-Pugh C (중증 — 10-15점)</option>
+        <option value="ascM">복수 — 경증 (Grade 1-2)</option>
+        <option value="ascS">복수 — 중증 (Grade 3, 긴장성)</option>
+        <option value="edmM">부종 — 경증</option>
+        <option value="edmS">부종 — 중증 (전신성)</option>
+        <option value="icuA">중환자 — 과청소율 ARC (Augmented Renal Clearance)</option>
+        <option value="icuF">중환자 — 다발성 장기부전 (MOF)</option>
+      </select>
+      <div class="dmx">
+        <div class="dmi"><span class="dml">F 보정계수</span><span class="dmv" id="dFm">×1.30</span></div>
+        <div class="dmi"><span class="dml">ke 보정계수</span><span class="dmv" id="dKm">×0.70</span></div>
+        <div class="dmi"><span class="dml">Vd 보정계수</span><span class="dmv" id="dVm">×1.20</span></div>
+      </div>
+    </div>
+
+  </div><!-- /panels -->
+
+  <!-- Controls + Metrics -->
+  <div class="ctrl">
+    <div style="font-size:11px;color:var(--txt3)">파란 실선 = 현재 시나리오 &nbsp;·&nbsp; 회색 점선 = 1차 흡수 기준선</div>
+    <label class="cmpt" id="cmptW"><input type="checkbox" id="togBl" checked> 기준선 오버레이</label>
+  </div>
+
+  <div class="mets">
+    <div class="mc"><div class="ml">Cmax</div><div><span class="mv" id="mCmax">—</span> <span class="mu">mg/L</span></div><span class="dx" id="dCmax"></span></div>
+    <div class="mc"><div class="ml">Tmax</div><div><span class="mv" id="mTmax">—</span> <span class="mu">h</span></div><span class="dx" id="dTmax"></span></div>
+    <div class="mc"><div class="ml">t½</div><div><span class="mv" id="mTh">—</span> <span class="mu">h</span></div><span class="dx" id="dTh"></span></div>
+    <div class="mc"><div class="ml">AUC∞</div><div><span class="mv" id="mAuc">—</span> <span class="mu">mg·h/L</span></div><span class="dx" id="dAuc"></span></div>
+  </div>
+
+  <!-- Chart -->
+  <div class="cw">
+    <canvas id="pkc" role="img" aria-label="농도-시간 PK 곡선"></canvas>
+  </div>
+  <div class="fnote">* Δ% = 기준선(1차 흡수, 현재 기본 파라미터) 대비 변화율 &nbsp;·&nbsp; 빨강↑ = 증가, 초록↓ = 감소</div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const b={F:.8,D:100,ka:1,Vd:50,ke:.15};
+
+const DP={
+  cirrA:{Fm:1.3, km:.7,  Vm:1.2,  i:'간경화 Child-Pugh A: first-pass↓(F×1.3), 간청소율↓(ke×0.7), 경미한 복수 Vd↑×1.2'},
+  cirrB:{Fm:1.6, km:.5,  Vm:1.5,  i:'간경화 Child-Pugh B: first-pass 현저히 감소(F×1.6), CL↓↓(ke×0.5), 복수 동반 Vd↑×1.5'},
+  cirrC:{Fm:2.0, km:.3,  Vm:2.0,  i:'간경화 Child-Pugh C: first-pass 소실(F×2.0), CL 극감(ke×0.3), 대량 복수·부종 Vd↑×2.0'},
+  ascM: {Fm:1.1, km:.9,  Vm:1.4,  i:'경증 복수: 복강 내 수분 축적 → Vd↑×1.4, F·ke 소폭 영향. 3rd space 분포↑'},
+  ascS: {Fm:1.2, km:.75, Vm:2.0,  i:'중증 긴장성 복수: 대량 복수로 Vd↑×2.0, 간기능 동반 저하 ke×0.75. 단백결합↓(hypoalbuminemia)'},
+  edmM: {Fm:1.0, km:1.0, Vm:1.25, i:'경증 부종: 세포외액↑ → 수용성 약물 Vd↑×1.25. 친지질성 약물은 영향 작음. F·ke 변화 없음'},
+  edmS: {Fm:1.0, km:.9,  Vm:1.6,  i:'중증 전신성 부종: 세포외액 대량↑ → Vd↑×1.6. 신기능 동반 저하 시 ke×0.9'},
+  icuA: {Fm:.85, km:2.5, Vm:1.5,  i:'중환자 ARC: 신기능 항진으로 ke↑↑×2.5, 수액 소생 Vd↑×1.5. GI 흡수↓(F×0.85). 혈중 농도 서브치료 위험↑'},
+  icuF: {Fm:1.4, km:.25, Vm:2.5,  i:'중환자 다발성 장기부전: CL 극감(ke×0.25), 모세혈관 누출·수액 투여 Vd↑↑×2.5, first-pass↓(F×1.4). 독성 축적 위험↑'},
+};
+
+let scen='first';
+const DT=.04;
+function TM(){return Math.max(48,Math.min(96,Math.ceil(10/b.ke)));}
+
+/* ─── RK4 Solver ─── */
+function rk4(s,t,h,f){
+  const k1=f(t,s),
+        k2=f(t+h/2,s.map((v,i)=>v+k1[i]*h/2)),
+        k3=f(t+h/2,s.map((v,i)=>v+k2[i]*h/2)),
+        k4=f(t+h,s.map((v,i)=>v+k3[i]*h));
+  return s.map((v,i)=>Math.max(0,v+h/6*(k1[i]+2*k2[i]+2*k3[i]+k4[i])));
+}
+function intg(f,ic,tm){
+  const N=Math.ceil(tm/DT),ts=[],cs=[];
+  let s=[...ic];
+  for(let i=0;i<=N;i++){
+    ts.push(+(i*DT).toFixed(3));
+    cs.push(s[s.length-1]);
+    s=rk4(s,i*DT,DT,f);
+  }
+  return{ts,cs};
+}
+
+/* ─── Baseline (1st-order) ─── */
+function bl(){
+  const{F,D,ka,Vd,ke}=b;
+  return intg((t,s)=>[-ka*s[0], ka*s[0]/Vd-ke*s[1]], [F*D,0], TM());
+}
+
+/* ─── Scenario runner ─── */
+function run(){
+  const{F,D,ka,Vd,ke}=b, tm=TM();
+  if(scen==='first') return bl();
+
+  /* 0차 흡수 */
+  if(scen==='zero'){
+    const Td=+$('sZt').value, R=F*D/Td;
+    return intg((t,s)=>[(t<=Td ? R/Vd : 0)-ke*s[0]], [0], tm);
+  }
+
+  /* Alag */
+  if(scen==='alag'){
+    const al=+$('sAl').value, N0=Math.ceil(al/DT);
+    const ts=[], cs=[];
+    for(let i=0;i<N0;i++){ts.push(+(i*DT).toFixed(3));cs.push(0);}
+    const p=intg((t,s)=>[-ka*s[0], ka*s[0]/Vd-ke*s[1]], [F*D,0], Math.max(tm-al,.5));
+    return{ts:[...ts,...p.ts.map(t=>+(t+al).toFixed(3))], cs:[...cs,...p.cs]};
+  }
+
+  /* Transit compartment */
+  if(scen==='transit'){
+    const n=+$('sTn').value, ktr=+$('sTk').value, sz=n+1, ic=Array(sz).fill(0);
+    ic[0]=F*D;
+    return intg((t,s)=>{
+      const d=Array(sz).fill(0);
+      if(n===1){
+        d[0]=-ka*s[0]; d[1]=ka*s[0]/Vd-ke*s[1];
+      } else {
+        d[0]=-ktr*s[0];
+        for(let i=1;i<n;i++) d[i]=ktr*s[i-1]-(i===n-1?ka:ktr)*s[i];
+        d[n]=ka*s[n-1]/Vd-ke*s[n];
+      }
+      return d;
+    }, ic, tm);
+  }
+
+  /* 서방정 ER: solid→gut lumen→plasma */
+  if(scen==='er'){
+    const kd=+$('sEk').value;
+    return intg((t,s)=>[
+      -kd*s[0],
+       kd*s[0]-ka*s[1],
+       F*ka*s[1]/Vd-ke*s[2]
+    ], [D,0,0], tm);
+  }
+
+  /* 기름진 음식 */
+  if(scen==='food'){
+    const ft=+$('sFt').value, kr=+$('sFk').value/100, fc=+$('sFF').value/100;
+    return intg((t,s)=>{
+      const on = ft<=0 || t>=ft;
+      const kae = on ? Math.max(.005, ka*(1-kr)) : ka;
+      const Fe  = on ? Math.min(1, F*(1+fc)) : F;
+      return[-kae*s[0], kae*s[0]*Fe/Vd-ke*s[1]];
+    }, [D,0], tm);
+  }
+
+  /* 격렬한 운동 */
+  if(scen==='exercise'){
+    const tex=+$('sEx').value, dur=+$('sEd').value, pct=+$('sEi').value/100;
+    return intg((t,s)=>{
+      const ex = t>=tex && t<tex+dur;
+      const kae = ex ? Math.max(.005, ka*(1-.6*pct)) : ka;
+      const kee = ex ? Math.max(.005, ke*(1-.4*pct)) : ke;
+      const Ve  = ex ? Vd*(1+.3*pct) : Vd;
+      return[-kae*s[0], kae*s[0]/Ve-kee*s[1]];
+    }, [F*D,0], tm);
+  }
+
+  /* 질병 상태 */
+  if(scen==='disease'){
+    const dp=DP[$('sDis').value];
+    const Fe=Math.min(1, F*dp.Fm), kee=Math.max(.001, ke*dp.km), Ve=Vd*dp.Vm;
+    return intg((t,s)=>[-ka*s[0], ka*s[0]/Ve-kee*s[1]], [Fe*D,0], tm);
+  }
+}
+
+/* ─── Metrics ─── */
+function mets(ts,cs){
+  let cm=0, tmx=0;
+  for(let i=0;i<cs.length;i++) if(cs[i]>cm){cm=cs[i];tmx=ts[i];}
+  let auc=0;
+  for(let i=1;i<cs.length;i++) auc+=(cs[i]+cs[i-1])*(ts[i]-ts[i-1])/2;
+  const N=cs.length;
+  let keApp=b.ke;
+  if(N>30 && cs[N-1]>1e-9 && cs[N-1]<cs[N-30]){
+    const k=Math.log(cs[N-30]/cs[N-1])/(ts[N-1]-ts[N-30]);
+    if(k>1e-4 && k<15 && isFinite(k)) keApp=k;
+  }
+  auc += cs[N-1]/keApp;
+  return{cm, tmx, th:Math.log(2)/keApp, auc};
+}
+
+function dlt(cur,ref){
+  if(!ref||ref<1e-9) return '';
+  const p=(cur-ref)/ref*100, pos=p>=0;
+  return `<span class="dx ${pos?'up':'dn'}">${pos?'+':''}${p.toFixed(1)}%</span>`;
+}
+
+/* ─── Chart ─── */
+const ch=new Chart($('pkc'),{
+  type:'line',
+  data:{labels:[],datasets:[
+    {label:'시나리오', data:[], borderColor:'#4f8ef7', backgroundColor:'rgba(79,142,247,0.1)', fill:true, borderWidth:2.5, pointRadius:0, tension:.35, order:1},
+    {label:'기준선',   data:[], borderColor:'rgba(255,255,255,0.2)', backgroundColor:'transparent', borderWidth:1.5, borderDash:[6,4], pointRadius:0, tension:.35, order:2}
+  ]},
+  options:{
+    responsive:true, maintainAspectRatio:false, animation:{duration:80},
+    plugins:{
+      legend:{display:false},
+      tooltip:{
+        backgroundColor:'rgba(15,17,23,0.95)',
+        borderColor:'rgba(255,255,255,0.12)',
+        borderWidth:1,
+        titleColor:'#8892a4',
+        bodyColor:'#e8eaf0',
+        titleFont:{family:"'JetBrains Mono',monospace",size:11},
+        bodyFont:{family:"'JetBrains Mono',monospace",size:11},
+        callbacks:{
+          title: x=>`t = ${(+x[0].label).toFixed(2)} h`,
+          label: x=>`${x[0].dataset.label}: ${(+x[0].raw).toFixed(4)} mg/L`
+        }
+      }
+    },
+    scales:{
+      x:{type:'linear',
+        title:{display:true,text:'Time (h)',color:'#4d5a6e',font:{size:11,family:"'Inter',sans-serif"}},
+        ticks:{color:'#4d5a6e',maxTicksLimit:10,callback:v=>v.toFixed(0),font:{size:10}},
+        grid:{color:'rgba(255,255,255,0.04)'},
+        border:{color:'rgba(255,255,255,0.06)'}
+      },
+      y:{
+        title:{display:true,text:'C (mg/L)',color:'#4d5a6e',font:{size:11,family:"'Inter',sans-serif"}},
+        ticks:{color:'#4d5a6e',font:{size:10}},
+        grid:{color:'rgba(255,255,255,0.04)'},
+        border:{color:'rgba(255,255,255,0.06)'},
+        min:0
+      }
+    }
+  }
+});
+
+/* ─── Refresh ─── */
+function refresh(){
+  const{ts,cs}=run();
+  const isBase=scen==='first';
+  const baseline=isBase?null:bl();
+  const showBl=!isBase && $('togBl').checked;
+
+  ch.data.labels=ts;
+  ch.data.datasets[0].data=cs;
+
+  if(showBl){
+    ch.data.datasets[1].data=ts.map(t=>{
+      const i=Math.min(Math.round(t/DT), baseline.cs.length-1);
+      return baseline.cs[Math.max(0,i)]||0;
+    });
+  } else {
+    ch.data.datasets[1].data=[];
+  }
+  ch.update();
+
+  const m=mets(ts,cs);
+  $('mCmax').textContent=m.cm.toFixed(3);
+  $('mTmax').textContent=m.tmx.toFixed(2);
+  $('mTh').textContent=m.th.toFixed(2);
+  $('mAuc').textContent=m.auc.toFixed(1);
+
+  if(!isBase&&baseline){
+    const bm=mets(baseline.ts,baseline.cs);
+    $('dCmax').innerHTML=dlt(m.cm,bm.cm);
+    $('dTmax').innerHTML=dlt(m.tmx,bm.tmx);
+    $('dTh').innerHTML=dlt(m.th,bm.th);
+    $('dAuc').innerHTML=dlt(m.auc,bm.auc);
+  } else {
+    ['dCmax','dTmax','dTh','dAuc'].forEach(id=>$(id).innerHTML='');
+  }
+  $('cmptW').style.visibility=isBase?'hidden':'visible';
+}
+
+/* ─── Tabs ─── */
+document.querySelectorAll('.tb').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tb').forEach(x=>x.classList.remove('a'));
+  t.classList.add('a');
+  scen=t.dataset.s;
+  document.querySelectorAll('.pan').forEach(p=>p.classList.remove('a'));
+  $('p-'+scen).classList.add('a');
+  refresh();
+}));
+
+/* ─── Base sliders ─── */
+[['sF','vF',2,'F'],['sD','vD',0,'D'],['sKa','vKa',2,'ka'],['sVd','vVd',0,'Vd'],['sKe','vKe',2,'ke']].forEach(([s,v,d,k])=>{
+  $(s).addEventListener('input',e=>{b[k]=+e.target.value;$(v).textContent=(+e.target.value).toFixed(d);refresh();});
+});
+
+/* ─── Scenario sliders ─── */
+[['sZt','vZt',1],['sAl','vAl',2],['sTn','vTn',0],['sTk','vTk',2],['sEk','vEk',2],['sEx','vEx',1],['sEd','vEd',1],['sEi','vEi',0]].forEach(([s,v,d])=>{
+  const el=$(s); if(!el) return;
+  el.addEventListener('input',e=>{$(v).textContent=(+e.target.value).toFixed(d);refresh();});
+});
+
+/* Food sliders (special sign formatting) */
+[['sFt','vFt', v=>(v>=0?'+':'')+((+v).toFixed(1))],
+ ['sFk','vFk', v=>(+v).toFixed(0)],
+ ['sFF','vFF', v=>(v>=0?'+':'')+((+v).toFixed(0))]
+].forEach(([s,v,fmt])=>{
+  const el=$(s); if(!el) return;
+  el.addEventListener('input',e=>{$(v).textContent=fmt(e.target.value);refresh();});
+});
+
+/* Disease selector */
+$('sDis').addEventListener('change',()=>{
+  const dp=DP[$('sDis').value];
+  $('dFm').textContent='×'+dp.Fm.toFixed(2);
+  $('dKm').textContent='×'+dp.km.toFixed(2);
+  $('dVm').textContent='×'+dp.Vm.toFixed(2);
+  $('dInf').textContent=dp.i;
+  refresh();
+});
+
+$('togBl').addEventListener('change',refresh);
+refresh();
+</script>
+</body>
+</html>

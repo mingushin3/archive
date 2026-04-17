@@ -1,0 +1,1526 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NONMEM-Ready: 55-Step Sequential Question Protocol</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F6F5F0;
+  --bg-card: #FFFFFF;
+  --bg-surface: #EDECEA;
+  --bg-code: #F0EDE6;
+  --text-1: #1B1918;
+  --text-2: #55524D;
+  --text-3: #8C8880;
+  --border: rgba(0,0,0,0.07);
+  --border-h: rgba(0,0,0,0.14);
+
+  --phase0: #2D7A61;  --phase0-bg: #E3F3EC;
+  --phase1a: #7C3AED; --phase1a-bg: #EDE9FE;
+  --phase1b: #6D28D9; --phase1b-bg: #EDE9FE;
+  --phase2: #DC2626;  --phase2-bg: #FEE2E2;
+  --phase3: #B45309;  --phase3-bg: #FEF3C7;
+  --phase4: #1D4ED8;  --phase4-bg: #DBEAFE;
+  --phase5: #047857;  --phase5-bg: #D1FAE5;
+  --phase6: #9D174D;  --phase6-bg: #FCE7F3;
+
+  --radius: 12px;
+  --radius-sm: 8px;
+  --font: 'DM Sans', 'Noto Sans KR', -apple-system, sans-serif;
+  --mono: 'JetBrains Mono', 'SF Mono', monospace;
+  --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.04);
+  --shadow-h: 0 4px 12px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.06);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141312; --bg-card: #1C1B19; --bg-surface: #222120; --bg-code: #2A2926;
+    --text-1: #E8E6E1; --text-2: #A8A49D; --text-3: #706C66;
+    --border: rgba(255,255,255,0.07); --border-h: rgba(255,255,255,0.14);
+    --phase0-bg: #0D2E22; --phase1a-bg: #1E1545; --phase1b-bg: #1E1545;
+    --phase2-bg: #2D0F0F; --phase3-bg: #2D1F05; --phase4-bg: #0F1D3D;
+    --phase5-bg: #052E1E; --phase6-bg: #2D0F22;
+    --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.04);
+    --shadow-h: 0 4px 12px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.06);
+  }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background: var(--bg); color: var(--text-1); line-height: 1.7; font-size: 14.5px; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 5rem; }
+
+/* ── Hero ── */
+.hero { padding: 3.5rem 0 2.5rem; border-bottom: 2px solid var(--border); margin-bottom: 2rem; }
+.hero-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--phase0); margin-bottom: 0.75rem; }
+.hero h1 { font-size: 30px; font-weight: 700; line-height: 1.25; letter-spacing: -0.02em; margin-bottom: 0.75rem; }
+.hero h1 em { font-style: normal; background: linear-gradient(135deg, var(--phase0), var(--phase1a)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero-desc { font-size: 15px; color: var(--text-2); max-width: 680px; line-height: 1.8; }
+
+/* ── Stat pills ── */
+.stats { display: flex; flex-wrap: wrap; gap: 8px; margin: 1.5rem 0 2rem; }
+.stat { background: var(--bg-card); border: 1px solid var(--border); border-radius: 100px; padding: 6px 16px; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+.stat b { font-weight: 600; }
+.stat .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* ── How-to ── */
+.howto { background: var(--bg-card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px 28px; margin-bottom: 2.5rem; }
+.howto-title { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+.howto p { color: var(--text-2); font-size: 13.5px; margin-bottom: 8px; }
+.howto code { font-family: var(--mono); font-size: 12px; background: var(--bg-code); padding: 2px 7px; border-radius: 4px; }
+
+/* ── Phase sections ── */
+.phase-section { margin-bottom: 2.5rem; }
+.phase-bar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 18px;
+  border-radius: var(--radius);
+  cursor: pointer; user-select: none;
+  position: sticky; top: 0; z-index: 20;
+  transition: box-shadow 0.2s;
+}
+.phase-bar:hover { box-shadow: var(--shadow-h); }
+.phase-bar .num {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 14px; flex-shrink: 0;
+}
+.phase-bar .info { flex: 1; }
+.phase-bar .title { font-weight: 700; font-size: 15.5px; }
+.phase-bar .sub { font-size: 12px; opacity: 0.7; }
+.phase-bar .qcount { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 100px; background: rgba(0,0,0,0.06); }
+@media (prefers-color-scheme: dark) { .phase-bar .qcount { background: rgba(255,255,255,0.08); } }
+.phase-bar .chevron { width: 18px; height: 18px; transition: transform 0.25s ease; flex-shrink: 0; }
+.phase-section.open .chevron { transform: rotate(90deg); }
+.phase-body { display: none; padding-top: 6px; }
+.phase-section.open .phase-body { display: block; }
+
+/* ── Question cards ── */
+.q-card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin: 8px 0;
+  overflow: hidden;
+  transition: box-shadow 0.15s;
+  border-left: 4px solid transparent;
+}
+.q-card:hover { box-shadow: var(--shadow-h); }
+.q-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 18px;
+  cursor: pointer; user-select: none;
+}
+.q-num {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  min-width: 36px;
+  text-align: center;
+  padding: 2px 8px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.q-title { font-weight: 500; font-size: 14px; flex: 1; }
+.q-badges { display: flex; gap: 5px; flex-shrink: 0; flex-wrap: wrap; }
+.badge {
+  font-size: 10px; font-weight: 600; padding: 2px 8px;
+  border-radius: 100px; letter-spacing: 0.02em; white-space: nowrap;
+}
+.b-must { background: #FEE2E2; color: #991B1B; }
+.b-cond { background: #FEF3C7; color: #92400E; }
+.b-auto { background: #D1FAE5; color: #065F46; }
+.b-vis  { background: #DBEAFE; color: #1E40AF; }
+.b-skip { background: var(--bg-surface); color: var(--text-3); }
+@media (prefers-color-scheme: dark) {
+  .b-must { background: #450A0A; color: #FCA5A5; }
+  .b-cond { background: #451A03; color: #FCD34D; }
+  .b-auto { background: #052E16; color: #6EE7B7; }
+  .b-vis  { background: #172554; color: #93C5FD; }
+  .b-skip { background: var(--bg-surface); color: var(--text-3); }
+}
+.q-arrow {
+  width: 14px; height: 14px; color: var(--text-3);
+  transition: transform 0.2s; flex-shrink: 0;
+}
+.q-card.open .q-arrow { transform: rotate(90deg); }
+.q-body { display: none; padding: 0 18px 18px; }
+.q-card.open .q-body { display: block; }
+
+/* ── Inside question body ── */
+.prompt-box {
+  background: var(--bg-code);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin: 8px 0 12px;
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: var(--text-1);
+  border-left: 3px solid var(--text-3);
+}
+.prompt-box strong { font-weight: 600; }
+.section-label {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--text-3); margin: 12px 0 4px;
+}
+.detail { font-size: 13px; color: var(--text-2); line-height: 1.8; }
+.detail code { font-family: var(--mono); font-size: 11.5px; background: var(--bg-code); padding: 1px 6px; border-radius: 3px; }
+.ref-tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 1px 7px; border-radius: 100px; margin-top: 8px; }
+.skip-note { font-size: 12px; color: var(--text-3); font-style: italic; margin-top: 6px; }
+
+.r-snippet {
+  background: var(--bg-code);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin: 8px 0;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.7;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  color: var(--text-2);
+}
+
+.exit-point {
+  background: var(--phase5-bg);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin: 10px 0;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+@media (prefers-color-scheme: dark) { .exit-point { background: var(--phase5-bg); } }
+
+/* ── Flow diagram ── */
+.flow { background: var(--bg-card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; margin-bottom: 2.5rem; overflow-x: auto; }
+.flow-title { font-size: 14px; font-weight: 700; margin-bottom: 14px; }
+.flow-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.flow-node {
+  padding: 5px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 600;
+  white-space: nowrap;
+}
+.flow-arrow { color: var(--text-3); font-size: 14px; }
+
+/* ── Controls ── */
+.ctrls { display: flex; gap: 8px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.btn {
+  font-family: var(--font); font-size: 12px; font-weight: 500;
+  padding: 7px 16px; border-radius: 100px;
+  border: 1px solid var(--border); background: var(--bg-card);
+  color: var(--text-2); cursor: pointer; transition: all 0.15s;
+}
+.btn:hover { border-color: var(--border-h); color: var(--text-1); }
+
+/* ── Footer ── */
+.footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-size: 11.5px; color: var(--text-3); text-align: center; }
+
+/* ── Print ── */
+@media print {
+  .phase-body, .q-body { display: block !important; }
+  .phase-bar { position: static; }
+  .ctrls { display: none; }
+  .q-card { break-inside: avoid; }
+}
+
+/* ── Summary table ── */
+.summary-tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; margin: 12px 0; }
+.summary-tbl th { text-align: left; padding: 6px 10px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-3); border-bottom: 2px solid var(--border); }
+.summary-tbl td { padding: 6px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.summary-tbl tr:last-child td { border-bottom: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ═══════════ HERO ═══════════ -->
+<div class="hero">
+  <div class="hero-eyebrow">Pharmacometrics · LLM-Driven Preprocessing Protocol</div>
+  <h1>NONMEM-Ready <em>55-Step</em> Sequential Question Protocol</h1>
+  <p class="hero-desc">
+    어떤 데이터셋이든 Q01부터 순서대로 LLM에게 물어가면, 중간에 조기 완료되거나 Q55에서 최종 완료되어 NONMEM-ready 데이터셋이 만들어지는 <strong>마법의 질문 경로</strong>.<br>
+    깨끗한 SDTM은 ~Q35에서, 비표준 Excel은 Q55까지 — 데이터 상태에 따라 경로가 달라지되 도착지는 동일하다.
+  </p>
+</div>
+
+<!-- ═══════════ STATS ═══════════ -->
+<div class="stats">
+  <div class="stat"><div class="dot" style="background:var(--phase0)"></div>총 질문 <b>55</b>개</div>
+  <div class="stat"><div class="dot" style="background:var(--phase2)"></div>필수(MUST) <b>32</b>개</div>
+  <div class="stat"><div class="dot" style="background:var(--phase3)"></div>조건부(COND) <b>15</b>개</div>
+  <div class="stat"><div class="dot" style="background:var(--phase5)"></div>자동화(AUTO) <b>8</b>개</div>
+  <div class="stat"><div class="dot" style="background:var(--phase6)"></div>Phase <b>8</b>개</div>
+</div>
+
+<!-- ═══════════ HOW TO USE ═══════════ -->
+<div class="howto">
+  <div class="howto-title">사용법</div>
+  <p><strong>Step 1.</strong> 데이터 파일을 LLM에게 업로드한다.</p>
+  <p><strong>Step 2.</strong> 아래 질문을 Q01부터 순서대로 복사하여 LLM에게 던진다. 각 질문의 <strong>프롬프트 박스</strong>를 그대로 사용하거나, 자신의 데이터에 맞게 변수명만 바꿔 사용한다.</p>
+  <p><strong>Step 3.</strong> LLM이 R 코드로 처리 결과를 돌려주면 확인 후 다음 질문으로 넘어간다. <span class="badge b-cond">COND</span> 뱃지가 붙은 질문은 해당 조건이 아니면 건너뛴다.</p>
+  <p><strong>Step 4.</strong> Q50–Q55의 최종 QC를 통과하면 NONMEM-ready 완성.</p>
+  <p style="margin-top:10px;font-size:12px;color:var(--text-3)">💡 깔끔한 SDTM 데이터 → ~Q35에서 조기 완료 가능 · 비표준 Excel → Q55까지 풀코스 · 기존 NONMEM 수정 → Q20대에서 완료 가능</p>
+</div>
+
+<!-- ═══════════ FLOW OVERVIEW ═══════════ -->
+<div class="flow">
+  <div class="flow-title">전체 흐름 개요</div>
+  <div class="flow-row">
+    <div class="flow-node" style="background:var(--phase0-bg);color:var(--phase0)">P0 수령평가</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node" style="background:var(--phase1a-bg);color:var(--phase1a)">P1a Dosing</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node" style="background:var(--phase1b-bg);color:var(--phase1b)">P1b Observations</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node" style="background:var(--phase2-bg);color:var(--phase2)">P2 TIME</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node" style="background:var(--phase3-bg);color:var(--phase3)">P3 BLQ·특수</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node" style="background:var(--phase4-bg);color:var(--phase4)">P4 공변량</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node" style="background:var(--phase5-bg);color:var(--phase5)">P5 구조완성</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node" style="background:var(--phase6-bg);color:var(--phase6)">P6 QC</div>
+  </div>
+  <div style="font-size:11.5px;color:var(--text-3);margin-top:6px">Q01–05 → Q06–15 → Q16–22 → Q23–30 → Q31–36 → Q37–43 → Q44–49 → Q50–55</div>
+</div>
+
+<!-- ═══════════ CONTROLS ═══════════ -->
+<div class="ctrls">
+  <button class="btn" onclick="toggleAllPhases(true)">모두 펼치기</button>
+  <button class="btn" onclick="toggleAllPhases(false)">모두 접기</button>
+  <button class="btn" onclick="showOnly('MUST')">필수만 보기</button>
+  <button class="btn" onclick="showOnly('ALL')">전체 보기</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PHASE 0: Raw 데이터 수령 & 평가 (Q01-Q05)             -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="phase-section" id="p0">
+  <div class="phase-bar" style="background:var(--phase0-bg);color:var(--phase0)" onclick="togglePhase(this)">
+    <div class="num" style="background:var(--phase0);color:#fff">0</div>
+    <div class="info">
+      <div class="title">Raw 데이터 수령 & 평가</div>
+      <div class="sub">데이터의 정체를 파악하고 작업 범위를 확정한다</div>
+    </div>
+    <span class="qcount">Q01–Q05</span>
+    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+  </div>
+  <div class="phase-body">
+
+    <!-- Q01 -->
+    <div class="q-card" style="border-left-color:var(--phase0)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase0-bg);color:var(--phase0)">Q01</span>
+        <span class="q-title">데이터 형태 식별 & 파일 인벤토리</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          업로드한 데이터 파일들을 확인하고, <strong>(1) 파일 형식</strong> (xpt/csv/xlsx/sas7bdat), <strong>(2) 데이터 유형</strong> (SDTM/ADaM/Raw CRF/Excel/기존 NONMEM), <strong>(3) 각 파일의 행·열 수와 변수 목록</strong>을 표로 정리해줘. 파일이 여러 개면 각각 정리하고, SDTM이면 도메인명(DM, EX, PC 등)도 식별해줘.
+        </div>
+        <div class="section-label">LLM이 확인할 것</div>
+        <div class="detail">
+          파일 확장자로 형식 판별 → <code>haven::read_xpt()</code>, <code>readr::read_csv()</code>, <code>readxl::read_excel()</code> 등 적절한 reader 선택.
+          SDTM이면 <code>DOMAIN</code> 변수 또는 파일명에서 도메인 식별. ADaM이면 <code>ADSL</code>/<code>ADPC</code>/<code>ADEX</code> 존재 확인.
+          기존 NONMEM이면 <code>EVID</code>, <code>MDV</code>, <code>AMT</code> 컬럼 존재로 판별.
+        </div>
+        <div class="ref-tag" style="background:var(--phase0-bg);color:var(--phase0)">→ Phase 0: 전체 소스 유형 분기</div>
+      </div>
+    </div>
+
+    <!-- Q02 -->
+    <div class="q-card" style="border-left-color:var(--phase0)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase0-bg);color:var(--phase0)">Q02</span>
+        <span class="q-title">Subject ID 식별 & 고유 대상자 수 확인</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          데이터에서 <strong>대상자 식별 변수</strong>(USUBJID, SUBJID, PTNO 등)를 찾고, <strong>고유 대상자 수</strong>를 세어줘. ID 형식이 문자열이면("S-001", "SITE01-003" 등) 숫자 ID로 재코딩하는 매핑 테이블도 만들어줘. 여러 파일에서 ID 교집합/차집합도 확인해줘.
+        </div>
+        <div class="section-label">LLM이 확인할 것</div>
+        <div class="detail">
+          ID 중복 없는지, 파일 간 ID 일치하는지, 숫자 변환 시 충돌 없는지. SDTM이면 <code>USUBJID</code>가 표준.
+          multi-study면 STUDYID × SUBJID 조합으로 unique ID 생성.
+        </div>
+        <div class="r-snippet">id_map &lt;- dm %&gt;% distinct(USUBJID) %&gt;% mutate(ID = row_number())</div>
+        <div class="ref-tag" style="background:var(--phase0-bg);color:var(--phase0)">→ Phase 0: Subject ID 체계 통일</div>
+      </div>
+    </div>
+
+    <!-- Q03 -->
+    <div class="q-card" style="border-left-color:var(--phase0)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase0-bg);color:var(--phase0)">Q03</span>
+        <span class="q-title">날짜/시간 변수 식별 & 형식 평가</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          모든 파일에서 <strong>날짜/시간 관련 변수</strong>를 찾고, 각각의 <strong>형식</strong>(ISO 8601? AM/PM? 날짜만? 날짜+시간?), <strong>결측률</strong>, <strong>파싱 가능 여부</strong>를 표로 정리해줘. 특히 투여 시점(EXSTDTC 등)과 채혈 시점(PCDTC 등)의 시간 정밀도(분 단위까지 있는지)를 확인해줘.
+        </div>
+        <div class="section-label">왜 중요한가</div>
+        <div class="detail">
+          TIME 변수 계산의 원재료. 시간 정밀도가 PK 분석 정밀도를 결정. PD-only면 날짜만으로 충분할 수 있음.
+          날짜/시간이 분리된 컬럼인 경우 합쳐야 함. AM/PM, locale 혼재 시 변환 로직 필요.
+        </div>
+        <div class="ref-tag" style="background:var(--phase2-bg);color:var(--phase2)">→ Phase 2 선행 조건</div>
+      </div>
+    </div>
+
+    <!-- Q04 -->
+    <div class="q-card" style="border-left-color:var(--phase0)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase0-bg);color:var(--phase0)">Q04</span>
+        <span class="q-title">핵심 소스 테이블 매핑</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          이 데이터에서 NONMEM building block 3개의 <strong>소스를 매핑</strong>해줘:<br>
+          • <strong>Dosing 소스</strong>: 어떤 파일/테이블의 어떤 변수가 투여 기록인가? (AMT, 투여일시, 투여경로)<br>
+          • <strong>Observation 소스</strong>: PK 농도(DV) 데이터는 어디에? 단위는? BLQ 표시는?<br>
+          • <strong>Covariate 소스</strong>: demographics, lab, vitals는 어디에?<br>
+          각각에 대해 [소스파일 → 핵심변수 → NONMEM 변수] 매핑 테이블을 만들어줘.
+        </div>
+        <div class="section-label">LLM이 확인할 것</div>
+        <div class="detail">
+          SDTM이면: EX→dosing, PC→observations, DM+LB+VS→covariates.<br>
+          ADaM이면: ADEX→dosing(재구성 필요), ADPC→observations, ADSL→covariates.<br>
+          Raw CRF/Excel이면: DDT(Data Definition Table) 작성이 사실상 이 단계.
+        </div>
+        <div class="ref-tag" style="background:var(--phase0-bg);color:var(--phase0)">→ Phase 0: DDT 수립 / 6대 표준 입력 확인</div>
+      </div>
+    </div>
+
+    <!-- Q05 -->
+    <div class="q-card" style="border-left-color:var(--phase0)" data-type="COND">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase0-bg);color:var(--phase0)">Q05</span>
+        <span class="q-title">기존 NONMEM 데이터셋 인수인계 체크</span>
+        <div class="q-badges"><span class="badge b-cond">COND</span><span class="badge b-skip">기존NM만</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          이 데이터셋은 기존 NONMEM 데이터셋이다. <strong>(1) TIME 기준점</strong>(reference time)이 무엇인지 역추적해줘. <strong>(2) FLAG/IGNORE/EXCL 컬럼 convention</strong>을 파악해줘. <strong>(3) $INPUT에 나열된 변수 순서</strong>를 데이터 컬럼 순서와 대조해줘. <strong>(4) 새로 추가할 데이터가 있다면 ID 충돌 방지 방안</strong>도 제안해줘.
+        </div>
+        <div class="skip-note">⏭ 기존 NONMEM 데이터를 수정/확장하는 경우에만 해당. 새로 만드는 경우 건너뛰기.</div>
+        <div class="ref-tag" style="background:var(--phase0-bg);color:var(--phase0)">→ Phase 0: 기존 데이터셋 수정/확장</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PHASE 1a: Dosing Records (Q06-Q15)                     -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="phase-section" id="p1a">
+  <div class="phase-bar" style="background:var(--phase1a-bg);color:var(--phase1a)" onclick="togglePhase(this)">
+    <div class="num" style="background:var(--phase1a);color:#fff">1a</div>
+    <div class="info">
+      <div class="title">Dosing Records 조립</div>
+      <div class="sub">EVID=1 — 전체 작업의 가장 중요한 블록</div>
+    </div>
+    <span class="qcount">Q06–Q15</span>
+    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+  </div>
+  <div class="phase-body">
+
+    <!-- Q06 -->
+    <div class="q-card" style="border-left-color:var(--phase1a)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase1a-bg);color:var(--phase1a)">Q06</span>
+        <span class="q-title">투여 기록 추출 & 기본 구조 생성</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          dosing 소스에서 <strong>투여 기록을 추출</strong>해서 다음 컬럼을 가진 dosing 데이터프레임을 만들어줘: <code>ID, DATETIME, AMT, CMT, EVID=1, MDV=1, DV=0</code>. 각 ID별 투여 횟수, 총 투여 record 수를 요약해줘.
+        </div>
+        <div class="section-label">핵심 체크</div>
+        <div class="detail">
+          EX 도메인이면 <code>EXSTDTC</code>(투여 시작), <code>EXDOSE</code>(용량) 사용.
+          실제 투여 여부 확인: <code>EXSTAT</code>이 "NOT DONE"인 건 제외.
+          모든 dosing record에 <code>EVID=1</code>, <code>MDV=1</code> 설정.
+        </div>
+        <div class="ref-tag" style="background:var(--phase1a-bg);color:var(--phase1a)">→ Phase 1: Dosing records 필수 변수</div>
+      </div>
+    </div>
+
+    <!-- Q07 -->
+    <div class="q-card" style="border-left-color:var(--phase1a)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase1a-bg);color:var(--phase1a)">Q07</span>
+        <span class="q-title">Actual vs Planned dose 확인</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          AMT에 들어간 값이 <strong>실제 투여량(actual dose)</strong>인지 <strong>계획 투여량(planned dose)</strong>인지 확인해줘. Actual과 planned가 다른 record를 찾아 목록으로 보여줘. AMT는 반드시 actual dose여야 하고, planned dose는 별도 <code>PDOSE</code> 컬럼으로 보존해줘.
+        </div>
+        <div class="detail">
+          부분 주입, 구토, dose reduction 등으로 actual ≠ planned인 경우 존재.
+          EX 도메인: <code>EXDOSE</code>가 actual이 일반적이나, <code>EXADJ</code> 등 조정 컬럼 확인.
+        </div>
+        <div class="ref-tag" style="background:var(--phase1a-bg);color:var(--phase1a)">→ Phase 1: Actual vs Planned dose</div>
+      </div>
+    </div>
+
+    <!-- Q08 -->
+    <div class="q-card" style="border-left-color:var(--phase1a)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase1a-bg);color:var(--phase1a)">Q08</span>
+        <span class="q-title">투여 경로 & RATE/DUR 설정</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          투여 경로(PO/IV bolus/IV infusion/SC/IM)를 확인하고, 경로에 맞게 <strong>RATE</strong>와 <strong>DUR</strong> 컬럼을 설정해줘:<br>
+          • 경구/SC/IM bolus → <code>RATE=0</code> (또는 생략)<br>
+          • IV bolus → <code>RATE=0</code><br>
+          • IV infusion → <code>RATE=AMT/주입시간(hr)</code> 또는 <code>RATE=-2</code> + <code>DUR=주입시간(hr)</code><br>
+          주입 시간 정보가 어디 있는지도 찾아줘.
+        </div>
+        <div class="detail">
+          EX 도메인: <code>EXROUTE</code>(경로), <code>EXSTDTC</code>~<code>EXENDTC</code> 차이로 infusion duration 계산 가능.
+          혼합 경로(예: loading IV → maintenance PO)이면 각각 다른 CMT 할당 고려.
+        </div>
+        <div class="ref-tag" style="background:var(--phase1a-bg);color:var(--phase1a)">→ Phase 1: 투여 경로별 의사결정 트리</div>
+      </div>
+    </div>
+
+    <!-- Q09 -->
+    <div class="q-card" style="border-left-color:var(--phase1a)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase1a-bg);color:var(--phase1a)">Q09</span>
+        <span class="q-title">AMT 단위 확정 & 변환</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          AMT의 <strong>단위</strong>를 확인하고 확정해줘(mg? μg? cells?). DV 단위와의 조합이 PK 파라미터 단위를 결정하므로, <strong>AMT(단위) ÷ DV(단위) → CL(단위)</strong> 관계를 명시해줘. 단위 변환이 필요하면 수행하고 변환 로직을 기록해줘.
+        </div>
+        <div class="detail">
+          가장 흔한 조합: AMT(mg), DV(ng/mL=μg/L) → CL(L/hr), V(L).<br>
+          체중 기반 투여(mg/kg)면 AMT는 absolute dose(mg)로 변환. 체중은 WT 컬럼으로 분리.
+        </div>
+        <div class="ref-tag" style="background:var(--phase1a-bg);color:var(--phase1a)">→ Phase 1: 단위 / Phase 3: 체중 기반 투여</div>
+      </div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="q-card" style="border-left-color:var(--phase1a)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase1a-bg);color:var(--phase1a)">Q10</span>
+        <span class="q-title">CMT 할당 (Dosing compartment)</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          dosing record의 <strong>CMT(compartment)</strong> 번호를 할당해줘. 일반적으로: 경구 투여 → <code>CMT=1</code> (depot/absorption compartment), IV → <code>CMT=2</code> (central). 투여 경로가 혼합이면 경로별 CMT 매핑을 명시해줘.
+        </div>
+        <div class="detail">CMT 번호는 NONMEM control stream의 <code>$MODEL</code> 정의와 반드시 일치해야 함. 여기서는 데이터 수준에서 잠정 할당하고, 최종은 모델러와 협의.</div>
+        <div class="ref-tag" style="background:var(--phase1a-bg);color:var(--phase1a)">→ Phase 1: CMT 설정</div>
+      </div>
+    </div>
+
+    <!-- Q11 -->
+    <div class="q-card" style="border-left-color:var(--phase1a)" data-type="COND">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase1a-bg);color:var(--phase1a)">Q11</span>
+        <span class="q-title">반복 투여 압축 (ADDL/II)</span>
+        <div class="q-badges"><span class="badge b-cond">COND</span><span class="badge b-skip">반복투여</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          동일 용량의 <strong>반복 투여 구간</strong>을 찾아서 <code>ADDL</code>(추가 투여 횟수)과 <code>II</code>(투여 간격, hr) 컬럼으로 압축해줘. 단, <strong>용량 변경 시점</strong>에서는 ADDL을 끊고 새 dosing record를 시작해줘. 압축 전후 총 투여 횟수가 동일한지 검증해줘.
+        </div>
+        <div class="detail">
+          예: 매일 100mg × 28일 → 1행: <code>AMT=100, ADDL=27, II=24</code>.<br>
+          Day 15에 150mg으로 변경 → 2행: Day1 <code>AMT=100, ADDL=13, II=24</code> + Day15 <code>AMT=150, ADDL=13, II=24</code>.
+        </div>
+        <div class="skip-note">⏭ Single dose study이면 건너뛰기. ADDL/II 없이 각 투여를 개별 행으로 유지해도 무방.</div>
+        <div class="ref-tag" style="background:var(--phase1a-bg);color:var(--phase1a)">→ Phase 1: 반복 투여 패턴 / ADDL/II</div>
+      </div>
+    </div>
+
+    <!-- Q12 -->
+    <div class="q-card" style="border-left-color:var(--phase1a)" data-type="COND">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase1a-bg);color:var(--phase1a)">Q12</span>
+        <span class="q-title">투여 중단/재시작 & Reset (EVID=4)</span>
+        <div class="q-badges"><span class="badge b-cond">COND</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          투여 <strong>중단 후 재시작</strong>이 있는 대상자가 있는지 확인해줘. Washout 후 재투여, 2nd course 시작 등이면 <strong>EVID=4</strong>(reset+dose)가 필요한지 판단해줘. 중단 기간을 식별하고, 재시작 시 reset 적용 여부를 결정해줘.
+        </div>
+        <div class="detail">
+          EVID=4: 모든 compartment를 0으로 초기화한 뒤 투여. 장기 washout 후 재투여에 적합.<br>
+          EVID=3: reset만 (투여 없음). 드물게 사용.
+        </div>
+        <div class="skip-note">⏭ 연속 투여 프로토콜이고 중단/재시작이 없으면 건너뛰기.</div>
+        <div class="ref-tag" style="background:var(--phase1a-bg);color:var(--phase1a)">→ Phase 1: Reset (EVID=4)</div>
+      </div>
+    </div>
+
+    <!-- Q13 -->
+    <div class="q-card" style="border-left-color:var(--phase1a)" data-type="COND">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase1a-bg);color:var(--phase1a)">Q13</span>
+        <span class="q-title">Steady-state 처리 (SS/II)</span>
+        <div class="q-badges"><span class="badge b-cond">COND</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          이전 투여 이력이 <strong>불완전</strong>한 대상자가 있는지 확인해줘 (예: 외래환자가 매일 복용 중이나 clinic visit 시 기록만 존재). 해당되면 <code>SS=1</code>, <code>II=투여간격(hr)</code>을 설정하는 dosing record를 만들어줘.
+        </div>
+        <div class="skip-note">⏭ 모든 투여가 기록된 경우(입원 환자, Phase I 등) 건너뛰기.</div>
+        <div class="ref-tag" style="background:var(--phase3-bg);color:var(--phase3)">→ Phase 3: Steady-state</div>
+      </div>
+    </div>
+
+    <!-- Q14 -->
+    <div class="q-card" style="border-left-color:var(--phase1a)" data-type="COND">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase1a-bg);color:var(--phase1a)">Q14</span>
+        <span class="q-title">특수 투여: CAR-T / 세포치료제 / 생물제제</span>
+        <div class="q-badges"><span class="badge b-cond">COND</span><span class="badge b-skip">해당시만</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          이 데이터가 <strong>세포치료제/CAR-T</strong>이면: AMT=주입 세포수(single infusion), 이후 세포 expansion은 DV(EVID=0)로 처리. DV가 투여 후 증가하는 패턴이 정상임을 인지하고, dosing record를 1회 infusion으로 설정해줘.
+        </div>
+        <div class="skip-note">⏭ 일반 소분자/항체 약물이면 건너뛰기.</div>
+        <div class="ref-tag" style="background:var(--phase1a-bg);color:var(--phase1a)">→ Phase 1: CAR-T 특수 사례</div>
+      </div>
+    </div>
+
+    <!-- Q15 -->
+    <div class="q-card" style="border-left-color:var(--phase1a)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase1a-bg);color:var(--phase1a)">Q15</span>
+        <span class="q-title">Dosing 데이터 중간 검증</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span><span class="badge b-auto">AUTO</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          지금까지 만든 dosing 데이터프레임을 검증해줘:<br>
+          ✓ 모든 행에 <code>EVID=1</code>(또는 4), <code>MDV=1</code>인가?<br>
+          ✓ <code>AMT > 0</code>인가? (AMT=0인 행 없는지)<br>
+          ✓ 모든 ID에 최소 1개 dosing record 존재하는가?<br>
+          ✓ DATETIME에 결측이 있는가? 있으면 몇 건?<br>
+          ✓ ID별 투여 횟수 요약 통계 (min, median, max)<br>
+          문제가 있으면 수정 코드도 함께 제공해줘.
+        </div>
+        <div class="ref-tag" style="background:var(--phase6-bg);color:var(--phase6)">→ Phase 6: Programmatic QC (dosing 부분)</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PHASE 1b: Observation Records (Q16-Q22)                -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="phase-section" id="p1b">
+  <div class="phase-bar" style="background:var(--phase1b-bg);color:var(--phase1b)" onclick="togglePhase(this)">
+    <div class="num" style="background:var(--phase1b);color:#fff">1b</div>
+    <div class="info">
+      <div class="title">Observation Records 조립</div>
+      <div class="sub">EVID=0 — PK/PD 관찰값 구성</div>
+    </div>
+    <span class="qcount">Q16–Q22</span>
+    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+  </div>
+  <div class="phase-body">
+
+    <!-- Q16 -->
+    <div class="q-card" style="border-left-color:var(--phase1b)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase1b-bg);color:var(--phase1b)">Q16</span>
+        <span class="q-title">PK 관찰값 추출 & DV 설정</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          observation 소스에서 PK 농도 데이터를 추출하여 <code>ID, DATETIME, DV, CMT, EVID=0, MDV, AMT=0</code> 구조의 데이터프레임을 만들어줘. <strong>DV 단위</strong>를 확정하고 문서화해줘. <code>PCSTRESN</code>(숫자 표준화)과 <code>PCORRES</code>(원본)가 다른 행이 있으면 보여줘.
+        </div>
+        <div class="detail">
+          SDTM PC 도메인: <code>PCSTRESN</code>을 DV로 사용. <code>PCSTAT="NOT DONE"</code>인 건 제외 또는 <code>MDV=1</code>.<br>
+          ADaM ADPC: <code>AVAL</code>을 DV로 사용.
+        </div>
+        <div class="ref-tag" style="background:var(--phase1b-bg);color:var(--phase1b)">→ Phase 1: Observation records 필수 변수</div>
+      </div>
+    </div>
+
+    <!-- Q17 -->
+    <div class="q-card" style="border-left-color:var(--phase1b)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase1b-bg);color:var(--phase1b)">Q17</span>
+        <span class="q-title">BLQ 식별 & 플래그 생성</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          정량한계 미만(BLQ) 데이터를 식별해줘. <code>PCSTAT</code>, <code>PCORRES</code>에서 "BLQ", "&lt;LLOQ", "NS" 등의 텍스트를 찾아 <strong><code>BLQ</code> 플래그(0/1)</strong>와 <strong><code>LLOQ</code> 값 컬럼</strong>을 생성해줘. LLOQ 값은 어디서 가져올 수 있는지 확인해줘. BLQ 비율(전체, ID별, 시점별)도 요약해줘.
+        </div>
+        <div class="detail">
+          LLOQ 값: protocol의 bioanalytical section, 또는 <code>PCLLOQ</code> 변수, 또는 PC의 <code>PCORRES</code>에서 "&lt;0.5" 같은 패턴에서 추출.
+          BLQ 비율이 Phase 3의 M-method 선택에 직접 영향.
+        </div>
+        <div class="ref-tag" style="background:var(--phase3-bg);color:var(--phase3)">→ Phase 3: BLQ 처리 선행 작업</div>
+      </div>
+    </div>
+
+    <!-- Q18 -->
+    <div class="q-card" style="border-left-color:var(--phase1b)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase1b-bg);color:var(--phase1b)">Q18</span>
+        <span class="q-title">MDV 설정 로직</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          observation record의 <strong>MDV(Missing Dependent Variable)</strong>를 설정해줘:<br>
+          • 유효한 관찰값 → <code>MDV=0</code><br>
+          • BLQ (M1 적용 시) → <code>MDV=1</code><br>
+          • 결측/미수행 → <code>MDV=1</code><br>
+          • BLQ (M3 적용 시) → <code>MDV=0</code> (censored data로 likelihood에 기여)<br>
+          현재 MDV 분포를 요약해줘.
+        </div>
+        <div class="ref-tag" style="background:var(--phase1b-bg);color:var(--phase1b)">→ Phase 1: MDV / Phase 5: EVID·MDV 조합</div>
+      </div>
+    </div>
+
+    <!-- Q19 -->
+    <div class="q-card" style="border-left-color:var(--phase1b)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase1b-bg);color:var(--phase1b)">Q19</span>
+        <span class="q-title">Observation CMT 할당</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          observation record에 <strong>CMT</strong>를 할당해줘. PK 농도 관찰이 central compartment에서 측정되므로 보통 <code>CMT=2</code>. PD endpoint가 있으면 별도 CMT 또는 <code>DVID</code>로 구분해줘.
+        </div>
+        <div class="ref-tag" style="background:var(--phase1b-bg);color:var(--phase1b)">→ Phase 1: CMT 기반 구분 / DVID</div>
+      </div>
+    </div>
+
+    <!-- Q20 -->
+    <div class="q-card" style="border-left-color:var(--phase1b)" data-type="COND">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase1b-bg);color:var(--phase1b)">Q20</span>
+        <span class="q-title">다중 분석물/다중 endpoint 처리</span>
+        <div class="q-badges"><span class="badge b-cond">COND</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          Parent + metabolite 동시 모델링이나 PK+PD 통합 모델이면: 각 endpoint에 <strong>고유 CMT 또는 DVID</strong>를 할당하고, <strong>DV 단위가 다를 경우 scaling</strong> 필요 여부를 확인해줘. endpoint 간 magnitude 차이도 보고해줘.
+        </div>
+        <div class="skip-note">⏭ 단일 분석물, 단일 endpoint이면 건너뛰기.</div>
+        <div class="ref-tag" style="background:var(--phase1b-bg);color:var(--phase1b)">→ Phase 1: Multiple endpoint 처리</div>
+      </div>
+    </div>
+
+    <!-- Q21 -->
+    <div class="q-card" style="border-left-color:var(--phase1b)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase1b-bg);color:var(--phase1b)">Q21</span>
+        <span class="q-title">Predose sample 처리</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          <strong>Predose(투여 전) 채혈</strong> record를 식별해줘. Single dose study에서 predose DV가 0이 아니면(detectable) 왜 그런지 표시해줘. Multiple dose에서 predose = trough이므로 정상적으로 DV>0일 수 있음. Predose sample의 TIME 처리 convention(TIME=0 vs TIME=-0.01)을 결정해줘.
+        </div>
+        <div class="ref-tag" style="background:var(--phase3-bg);color:var(--phase3)">→ Phase 3: Predose sample</div>
+      </div>
+    </div>
+
+    <!-- Q22 -->
+    <div class="q-card" style="border-left-color:var(--phase1b)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase1b-bg);color:var(--phase1b)">Q22</span>
+        <span class="q-title">Observation 데이터 중간 검증</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span><span class="badge b-auto">AUTO</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          observation 데이터프레임을 검증해줘:<br>
+          ✓ 모든 행에 <code>EVID=0</code>인가?<br>
+          ✓ <code>MDV=0</code>인 행의 DV가 숫자(non-missing)인가?<br>
+          ✓ 모든 ID에 최소 1개 유효 observation(MDV=0) 존재하는가?<br>
+          ✓ BLQ flag와 MDV가 일관성 있는가?<br>
+          ✓ DV 범위 요약: min, Q1, median, Q3, max<br>
+          ✓ ID별 observation 수 요약 (rich vs sparse 판단)
+        </div>
+        <div class="ref-tag" style="background:var(--phase6-bg);color:var(--phase6)">→ Phase 6: Programmatic QC (observation 부분)</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PHASE 2: TIME 변수 (Q23-Q30)                           -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="phase-section" id="p2">
+  <div class="phase-bar" style="background:var(--phase2-bg);color:var(--phase2)" onclick="togglePhase(this)">
+    <div class="num" style="background:var(--phase2);color:#fff">2</div>
+    <div class="info">
+      <div class="title">TIME 변수 — 가장 치명적인 단계</div>
+      <div class="sub">버그 #1 원인. 한 번 틀리면 전체 분석이 무의미</div>
+    </div>
+    <span class="qcount">Q23–Q30</span>
+    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+  </div>
+  <div class="phase-body">
+
+    <div class="q-card" style="border-left-color:var(--phase2)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase2-bg);color:var(--phase2)">Q23</span>
+        <span class="q-title">Reference time 정의</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          TIME 변수의 <strong>reference time(기준 시점)</strong>을 정의해줘. 표준은 <strong>각 ID의 첫 번째 투여 시점 = TIME 0</strong>. 이 reference datetime을 ID별로 추출하고, dosing 데이터에서 각 ID의 min(DATETIME)을 가져와서 <code>REF_TIME</code> 컬럼을 만들어줘.
+        </div>
+        <div class="r-snippet">ref_time &lt;- dose_df %&gt;% group_by(ID) %&gt;% summarise(REF_TIME = min(DATETIME))</div>
+        <div class="ref-tag" style="background:var(--phase2-bg);color:var(--phase2)">→ Phase 2: Reference time 선택</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase2)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase2-bg);color:var(--phase2)">Q24</span>
+        <span class="q-title">모든 DATETIME을 POSIXct로 파싱</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          dosing과 observation의 모든 날짜/시간 변수를 <strong>POSIXct</strong>로 통일 파싱해줘. <code>lubridate::ymd_hms()</code> 사용하되 <strong>timezone 인자를 명시</strong>적으로 설정해줘 (예: <code>tz="UTC"</code>). 파싱 실패 건수를 보고하고, 실패한 원본값 샘플을 보여줘.
+        </div>
+        <div class="detail">
+          Date class와 POSIXct를 혼합 연산하면 예기치 않은 결과 발생. 모든 것을 POSIXct로 통일.<br>
+          날짜만 있고 시간이 없는 경우: PK면 "HH:MM 결측" 처리(Q26), PD면 "08:00" convention 적용.
+        </div>
+        <div class="ref-tag" style="background:var(--phase2-bg);color:var(--phase2)">→ Phase 2: R datetime 파싱 주의</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase2)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase2-bg);color:var(--phase2)">Q25</span>
+        <span class="q-title">TIME(hours) 계산</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          모든 이벤트(dosing + observation)에 대해 <code>TIME = as.numeric(difftime(DATETIME, REF_TIME, units="hours"))</code>로 <strong>TIME(hours)</strong>을 계산해줘. 결과의 min, max, 음수 값 개수를 보고해줘.
+        </div>
+        <div class="r-snippet">combined_df &lt;- combined_df %&gt;%
+  left_join(ref_time, by = "ID") %&gt;%
+  mutate(TIME = as.numeric(difftime(DATETIME, REF_TIME, units = "hours")))</div>
+        <div class="ref-tag" style="background:var(--phase2-bg);color:var(--phase2)">→ Phase 2: TIME 기본 공식</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase2)" data-type="COND">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase2-bg);color:var(--phase2)">Q26</span>
+        <span class="q-title">시간 결측 Imputation & FLAG</span>
+        <div class="q-badges"><span class="badge b-cond">COND</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          <strong>시간이 결측</strong>인 record를 찾아줘. 투여 시간 누락이면 protocol 스케줄(예: 08:00)로 impute, 채혈 시간 누락이면 nominal time으로 impute. 모든 imputed record에 <code>TIMEF=1</code> (time imputation flag)을 설정해줘.
+        </div>
+        <div class="skip-note">⏭ 모든 datetime이 완전하면 건너뛰기.</div>
+        <div class="ref-tag" style="background:var(--phase2-bg);color:var(--phase2)">→ Phase 2: Missing time Imputation</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase2)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase2-bg);color:var(--phase2)">Q27</span>
+        <span class="q-title">음수 TIME 검토</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          <strong>TIME이 음수</strong>인 모든 record를 목록으로 보여줘. 각각이 <strong>의도적(predose sample)</strong>인지 <strong>오류(reference time 잘못 배정)</strong>인지 판단해줘. 의도적 predose이면 유지하되, predose가 TIME=0에서 투여와 겹치면 TIME=-0.01 등으로 미세 조정할지 결정해줘.
+        </div>
+        <div class="ref-tag" style="background:var(--phase2-bg);color:var(--phase2)">→ Phase 2: Negative TIME / TIME=0 관찰값</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase2)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase2-bg);color:var(--phase2)">Q28</span>
+        <span class="q-title">같은 TIME의 dose-obs 정렬 확인</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          동일 TIME에 dosing과 observation이 모두 있는 행을 찾고, <strong>dose record가 obs보다 반드시 앞에 오도록</strong> 정렬되어 있는지 확인해줘. 역순이면 NONMEM이 "투여 전 관찰"로 잘못 해석. 정렬 로직: <code>arrange(ID, TIME, desc(EVID))</code>.
+        </div>
+        <div class="r-snippet">combined_df &lt;- combined_df %&gt;% arrange(ID, TIME, desc(EVID))</div>
+        <div class="ref-tag" style="background:var(--phase2-bg);color:var(--phase2)">→ Phase 2: 같은 TIME에 dose + obs 정렬</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase2)" data-type="COND">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase2-bg);color:var(--phase2)">Q29</span>
+        <span class="q-title">Actual vs Nominal time 보존</span>
+        <div class="q-badges"><span class="badge b-cond">COND</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          소스 데이터에 <strong>nominal time</strong>(protocol 예정 시점)이 있으면 <code>NTIME</code> 컬럼으로 보존하고, <code>TIME</code>은 actual time으로 유지해줘. Actual과 nominal의 차이가 큰 record(예: >2시간)를 보고해줘.
+        </div>
+        <div class="skip-note">⏭ Nominal time 변수가 없거나 불필요하면 건너뛰기.</div>
+        <div class="ref-tag" style="background:var(--phase2-bg);color:var(--phase2)">→ Phase 2: Actual vs Nominal time</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase2)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase2-bg);color:var(--phase2)">Q30</span>
+        <span class="q-title">TIME 변수 최종 검증</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span><span class="badge b-auto">AUTO</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          TIME 변수를 최종 검증해줘:<br>
+          ✓ ID 내에서 TIME이 <strong>단조 비감소(non-decreasing)</strong>인가?<br>
+          ✓ 첫 dosing record의 TIME=0인 ID가 몇 %인가?<br>
+          ✓ TIME에 NA/Inf/NaN 없는가?<br>
+          ✓ TIME 범위 요약 (ID별 max TIME → 연구 기간 일치 확인)<br>
+          ✓ 비정상적으로 긴 TIME gap이 있는 ID?
+        </div>
+        <div class="ref-tag" style="background:var(--phase6-bg);color:var(--phase6)">→ Phase 6: Programmatic QC (TIME 부분)</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PHASE 3: BLQ & 특수 처리 (Q31-Q36)                     -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="phase-section" id="p3">
+  <div class="phase-bar" style="background:var(--phase3-bg);color:var(--phase3)" onclick="togglePhase(this)">
+    <div class="num" style="background:var(--phase3);color:#fff">3</div>
+    <div class="info">
+      <div class="title">BLQ & 특수 데이터 처리</div>
+      <div class="sub">M-method 적용, outlier FLAG, 특수 케이스</div>
+    </div>
+    <span class="qcount">Q31–Q36</span>
+    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+  </div>
+  <div class="phase-body">
+
+    <div class="q-card" style="border-left-color:var(--phase3)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase3-bg);color:var(--phase3)">Q31</span>
+        <span class="q-title">BLQ M-method 선택 & 적용</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          Q17에서 계산한 <strong>BLQ 비율</strong>에 따라 M-method를 선택하고 적용해줘:<br>
+          • &lt;10% → <strong>M1</strong>: BLQ 행에 <code>DV=0, MDV=1</code><br>
+          • 10-25% → M5(<code>DV=LLOQ/2, MDV=0</code>) 또는 M3 고려<br>
+          • &gt;25% → <strong>M3</strong> 강력 권장: <code>DV=0, MDV=0</code>, control stream에서 censoring 처리<br>
+          선택한 method와 적용 결과를 보고해줘.
+        </div>
+        <div class="ref-tag" style="background:var(--phase3-bg);color:var(--phase3)">→ Phase 3: BLQ M1~M7</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase3)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase3-bg);color:var(--phase3)">Q32</span>
+        <span class="q-title">Outlier 식별 & EXCL 플래그</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          약동학적으로 의심스러운 관찰값을 찾아줘: <strong>(1) 비현실적 고농도/저농도</strong>, <strong>(2) Cmax 전 시점에 비정상 고농도</strong>, <strong>(3) protocol deviation 기록</strong>. 의심 record를 <code>EXCL=1</code>(제외), <code>EXCL=0</code>(포함)으로 플래그하되, <strong>절대 행을 삭제하지 말고</strong> flag로만 처리해줘.
+        </div>
+        <div class="detail">NONMEM에서 <code>IGNORE=(EXCL.GT.0)</code>으로 제외. Sensitivity analysis에서 EXCL record 포함/제외 비교 가능.</div>
+        <div class="ref-tag" style="background:var(--phase3-bg);color:var(--phase3)">→ Phase 3: Outlier 처리</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase3)" data-type="COND">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase3-bg);color:var(--phase3)">Q33</span>
+        <span class="q-title">Log 변환 전략 결정</span>
+        <div class="q-badges"><span class="badge b-cond">COND</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          DV의 <strong>log 변환 전략</strong>을 결정해줘: 데이터 수준에서 <code>ln(DV)</code>를 취할지, control stream의 <code>$ERROR</code>에서 <code>Y=LOG(F)</code>로 처리할지. 일반적으로 <strong>control stream 처리 권장</strong>(원본 DV 보존). 만약 데이터에서 변환하면 DV=0인 record(BLQ)의 log(0)=-∞ 문제를 처리해줘.
+        </div>
+        <div class="skip-note">⏭ Log 변환을 데이터가 아닌 control stream에서 처리할 계획이면 건너뛰기.</div>
+        <div class="ref-tag" style="background:var(--phase1b-bg);color:var(--phase1b)">→ Phase 1: DV Log 변환</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase3)" data-type="COND">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase3-bg);color:var(--phase3)">Q34</span>
+        <span class="q-title">Rich vs Sparse sampling 확인</span>
+        <div class="q-badges"><span class="badge b-cond">COND</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          ID별 유효 observation 수 분포를 보고해줘. <strong>Rich (≥8)</strong>과 <strong>sparse (1-3)</strong> 비율은? Phase II/III sparse 데이터면 각 시점의 TIME 정확성이 더 중요함을 인지하고, 혼합이면 <code>RICH</code> flag 컬럼 추가를 고려해줘.
+        </div>
+        <div class="skip-note">⏭ 정보 확인용. 데이터 수정은 불필요할 수 있음.</div>
+        <div class="ref-tag" style="background:var(--phase3-bg);color:var(--phase3)">→ Phase 3: Rich vs Sparse</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase3)" data-type="COND">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase3-bg);color:var(--phase3)">Q35</span>
+        <span class="q-title">BLQ 시간 패턴 확인</span>
+        <div class="q-badges"><span class="badge b-cond">COND</span><span class="badge b-vis">VISUAL</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          BLQ 비율을 <strong>시간대별(binned TIME)</strong>로 계산하고 그래프를 그려줘. Terminal phase에서 BLQ 증가는 정상이지만, <strong>초기 시점에 BLQ</strong>가 있으면 dosing error 또는 assay issue를 의심해야 함. 비정상 패턴이 있으면 보고해줘.
+        </div>
+        <div class="skip-note">⏭ BLQ가 전혀 없으면 건너뛰기.</div>
+        <div class="ref-tag" style="background:var(--phase6-bg);color:var(--phase6)">→ Phase 6: BLQ 패턴 시각적 QC</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase3)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase3-bg);color:var(--phase3)">Q36</span>
+        <span class="q-title">Dosing + Observation 합치기</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          dosing 데이터프레임과 observation 데이터프레임을 <strong><code>bind_rows()</code></strong>로 합쳐줘. 합친 후 <code>arrange(ID, TIME, desc(EVID))</code>로 정렬. 합치기 전후 행 수를 비교하고, 컬럼이 align되었는지 확인해줘.
+        </div>
+        <div class="exit-point">🎯 깨끗한 데이터셋에서 공변량이 불필요하면, Q44(구조 완성)로 점프 가능</div>
+        <div class="ref-tag" style="background:var(--phase1a-bg);color:var(--phase1a)">→ Phase 1: 3대 building block 조립</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PHASE 4: 공변량 (Q37-Q43)                               -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="phase-section" id="p4">
+  <div class="phase-bar" style="background:var(--phase4-bg);color:var(--phase4)" onclick="togglePhase(this)">
+    <div class="num" style="background:var(--phase4);color:#fff">4</div>
+    <div class="info">
+      <div class="title">공변량(Covariate) 전략</div>
+      <div class="sub">Baseline + time-varying covariates merge</div>
+    </div>
+    <span class="qcount">Q37–Q43</span>
+    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+  </div>
+  <div class="phase-body">
+
+    <div class="q-card" style="border-left-color:var(--phase4)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase4-bg);color:var(--phase4)">Q37</span>
+        <span class="q-title">Baseline covariates 추출</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          demographics(DM/ADSL) 소스에서 <strong>baseline covariates</strong>를 추출해줘: <code>AGE, SEX, RACE, WT, HT</code> (최소). "Baseline" = 첫 투여 전 마지막 측정값. 각 covariate의 <strong>분포(summary stats)</strong>와 <strong>결측률</strong>을 보고해줘.
+        </div>
+        <div class="ref-tag" style="background:var(--phase4-bg);color:var(--phase4)">→ Phase 4: Baseline covariates 소스 & 추출</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase4)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase4-bg);color:var(--phase4)">Q38</span>
+        <span class="q-title">범주형 변수 숫자 코딩</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          <strong>문자열 범주형 변수</strong>(SEX, RACE 등)를 <strong>숫자로 코딩</strong>해줘. 코딩 규칙을 명시: 예) SEX: Male=0, Female=1. RACE: White=0, Black=1, Asian=2, Other=3. 코딩 매핑 테이블을 data specification으로 보존해줘.
+        </div>
+        <div class="detail">NONMEM은 숫자만 처리. 이진 코딩이 해석에 가장 편리.</div>
+        <div class="ref-tag" style="background:var(--phase4-bg);color:var(--phase4)">→ Phase 4: 범주형 변수 코딩</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase4)" data-type="COND">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase4-bg);color:var(--phase4)">Q39</span>
+        <span class="q-title">파생 변수 계산 (BSA, CLCR, LBW)</span>
+        <div class="q-badges"><span class="badge b-cond">COND</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          필요한 <strong>파생 공변량</strong>을 계산해줘:<br>
+          • <strong>BSA</strong>: 0.007184 × WT^0.425 × HT^0.725 (DuBois)<br>
+          • <strong>CLCR</strong>: ((140-AGE) × WT) / (72 × SCR) × (0.85 if female) (Cockcroft-Gault)<br>
+          • <strong>BMI</strong>: WT / (HT/100)^2<br>
+          필요한 원변수(SCR 등)가 있는지 먼저 확인하고, 없으면 보고해줘.
+        </div>
+        <div class="skip-note">⏭ 모델에서 파생 변수가 불필요하면 건너뛰기.</div>
+        <div class="ref-tag" style="background:var(--phase4-bg);color:var(--phase4)">→ Phase 4: 파생 변수 계산</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase4)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase4-bg);color:var(--phase4)">Q40</span>
+        <span class="q-title">Baseline covariates merge (ID 기준)</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          baseline covariates를 메인 데이터셋에 <strong>ID 기준 left_join</strong>으로 merge해줘. merge 전후 <strong>행 수가 동일</strong>한지 확인(1:many merge 되면 안 됨). merge 후 covariate 컬럼의 결측 건수 보고.
+        </div>
+        <div class="r-snippet">nrow_before &lt;- nrow(nm_df)
+nm_df &lt;- nm_df %&gt;% left_join(cov_baseline, by = "ID")
+stopifnot(nrow(nm_df) == nrow_before)  # 행 수 불변 확인</div>
+        <div class="ref-tag" style="background:var(--phase4-bg);color:var(--phase4)">→ Phase 4: Merge 전략</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase4)" data-type="COND">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase4-bg);color:var(--phase4)">Q41</span>
+        <span class="q-title">Time-varying covariates 처리</span>
+        <div class="q-badges"><span class="badge b-cond">COND</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          time-varying covariates(CLCR, ALB, 체중변화, 병용약물 등)를 <strong>LOCF(Last Observation Carried Forward)</strong>로 merge해줘. 각 record의 TIME보다 이전의 가장 가까운 측정값을 할당. 첫 투여 전 측정값이 없는 ID는 baseline 결측으로 보고해줘.
+        </div>
+        <div class="detail">
+          병용약물: CM 시작일~종료일 → 해당 기간의 모든 record에 <code>COMED=1</code>.<br>
+          R: <code>dplyr::fill(.direction="down")</code> 또는 rolling join.
+        </div>
+        <div class="skip-note">⏭ Baseline-only covariates로 충분하면 건너뛰기.</div>
+        <div class="ref-tag" style="background:var(--phase4-bg);color:var(--phase4)">→ Phase 4: Time-varying covariates / LOCF</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase4)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase4-bg);color:var(--phase4)">Q42</span>
+        <span class="q-title">Covariate 결측 처리</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          각 covariate의 <strong>결측률</strong>을 계산하고 처리 전략을 적용해줘:<br>
+          • &lt;5% → median imputation(연속형) 또는 mode(범주형)<br>
+          • 5-20% → LOCF 또는 multiple imputation 고려<br>
+          • &gt;20% → 해당 covariate 사용 재고<br>
+          NONMEM용으로 <strong>NA를 <code>-99</code></strong>로 코딩하되, impute한 값과 원래 결측을 구분하는 flag도 생성해줘.
+        </div>
+        <div class="ref-tag" style="background:var(--phase4-bg);color:var(--phase4)">→ Phase 4: 결측 처리 의사결정</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase4)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase4-bg);color:var(--phase4)">Q43</span>
+        <span class="q-title">Covariate 범위 & 이상값 확인</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span><span class="badge b-auto">AUTO</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          모든 covariate의 값이 <strong>생물학적으로 가능한 범위</strong>인지 확인해줘:<br>
+          WT ∈ [30, 250] kg, AGE ∈ [0, 120], CLCR ∈ [5, 300] mL/min, ALB ∈ [1, 6] g/dL, HT ∈ [100, 220] cm<br>
+          범위 밖 값은 목록으로 보고하고, 입력 오류 vs 실제 극단값인지 판단 근거를 제시해줘.
+        </div>
+        <div class="ref-tag" style="background:var(--phase6-bg);color:var(--phase6)">→ Phase 6: 공변량 범위 체크</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PHASE 5: 데이터셋 구조 완성 (Q44-Q49)                   -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="phase-section" id="p5">
+  <div class="phase-bar" style="background:var(--phase5-bg);color:var(--phase5)" onclick="togglePhase(this)">
+    <div class="num" style="background:var(--phase5);color:#fff">5</div>
+    <div class="info">
+      <div class="title">데이터셋 구조 완성</div>
+      <div class="sub">NONMEM이 읽을 수 있는 최종 형태로 마무리</div>
+    </div>
+    <span class="qcount">Q44–Q49</span>
+    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+  </div>
+  <div class="phase-body">
+
+    <div class="q-card" style="border-left-color:var(--phase5)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase5-bg);color:var(--phase5)">Q44</span>
+        <span class="q-title">필수 컬럼 존재 확인 & 순서 배치</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span><span class="badge b-auto">AUTO</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          다음 <strong>필수 컬럼</strong>이 모두 존재하는지 확인하고, <strong>$INPUT 호환 순서</strong>로 컬럼을 배치해줘:<br>
+          절대 필수: <code>ID, TIME, DV, AMT, CMT, EVID, MDV</code><br>
+          거의 필수: <code>RATE, ADDL, II, SS, BLQ, LLOQ</code> (해당 시)<br>
+          공변량: <code>WT, AGE, SEX, CRCL, ...</code><br>
+          관리용: <code>EXCL, STUDYID, NMSEQNO, DVID</code> (해당 시)<br>
+          누락 컬럼은 기본값으로 생성해줘.
+        </div>
+        <div class="ref-tag" style="background:var(--phase5-bg);color:var(--phase5)">→ Phase 5: 필수 컬럼 & 정렬 규칙</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase5)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase5-bg);color:var(--phase5)">Q45</span>
+        <span class="q-title">최종 정렬: ID → TIME → EVID 우선순위</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          데이터를 <strong>최종 정렬</strong>해줘: 1차 <code>ID</code> 오름차순 → 2차 <code>TIME</code> 오름차순 → 3차 같은 TIME 내에서 <code>EVID</code> 내림차순 (EVID=4 > 1 > 2 > 0). 정렬 후 <code>NMSEQNO</code>(행 번호) 컬럼도 추가해줘.
+        </div>
+        <div class="r-snippet">nm_df &lt;- nm_df %&gt;%
+  arrange(ID, TIME, desc(EVID)) %&gt;%
+  mutate(NMSEQNO = row_number())</div>
+        <div class="ref-tag" style="background:var(--phase5-bg);color:var(--phase5)">→ Phase 5: 정렬 규칙</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase5)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase5-bg);color:var(--phase5)">Q46</span>
+        <span class="q-title">NA → "." 변환 & 문자열 제거</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          <strong>(1) R의 NA를 모두 <code>.</code>(마침표)로 변환</strong>해줘.<br>
+          <strong>(2) header를 제외한 모든 값이 숫자 또는 <code>.</code></strong>인지 확인. 문자열이 남아있으면 보고하고 숫자로 변환해줘.<br>
+          <strong>(3) 소수점이 <code>.</code>(마침표)</strong>인지 확인 (유럽 locale의 콤마 소수점 주의).
+        </div>
+        <div class="ref-tag" style="background:var(--phase5-bg);color:var(--phase5)">→ Phase 5: NONMEM 포맷 규칙</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase5)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase5-bg);color:var(--phase5)">Q47</span>
+        <span class="q-title">컬럼명 규격 확인</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span><span class="badge b-auto">AUTO</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          컬럼명을 확인해줘: <strong>(1) 8자 이내</strong>인가? (구버전 호환) <strong>(2) 특수문자 없는가?</strong> (밑줄 가능하나 비권장) <strong>(3) 대문자 표기</strong>가 일반적. 위반 컬럼은 rename해줘.
+        </div>
+        <div class="ref-tag" style="background:var(--phase5-bg);color:var(--phase5)">→ Phase 5: 컬럼명 규칙</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase5)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase5-bg);color:var(--phase5)">Q48</span>
+        <span class="q-title">CSV 파일 저장</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          최종 데이터셋을 <strong>CSV</strong>로 저장해줘. 설정: <code>write.csv(nm_df, "nm_data.csv", row.names=FALSE, na=".", quote=FALSE)</code>. 파일 인코딩은 <strong>UTF-8 (BOM 없이)</strong>. 저장 후 파일을 다시 읽어서 원본과 일치하는지 확인해줘.
+        </div>
+        <div class="detail">또는 <code>NMdata::NMwriteData()</code> 사용 시 NONMEM 규칙 자동 적용.</div>
+        <div class="ref-tag" style="background:var(--phase5-bg);color:var(--phase5)">→ Phase 5: 파일 포맷</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase5)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase5-bg);color:var(--phase5)">Q49</span>
+        <span class="q-title">$INPUT 문자열 생성</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span><span class="badge b-auto">AUTO</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          NONMEM control stream에 넣을 <strong><code>$INPUT</code> 행</strong>을 자동 생성해줘. 데이터 파일의 컬럼 순서와 정확히 일치해야 함. NONMEM이 사용하지 않는 컬럼은 <code>DROP</code>으로 표시. 예:<br>
+          <code>$INPUT ID TIME DV AMT CMT EVID MDV RATE BLQ LLOQ WT AGE SEX DROP</code>
+        </div>
+        <div class="r-snippet">cat("$INPUT", paste(names(nm_df), collapse = " "), "\n")</div>
+        <div class="ref-tag" style="background:var(--phase5-bg);color:var(--phase5)">→ Phase 5: $INPUT 정합성</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PHASE 6: QC & Validation (Q50-Q55)                     -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="phase-section" id="p6">
+  <div class="phase-bar" style="background:var(--phase6-bg);color:var(--phase6)" onclick="togglePhase(this)">
+    <div class="num" style="background:var(--phase6);color:#fff">6</div>
+    <div class="info">
+      <div class="title">QC & Validation — 최종 관문</div>
+      <div class="sub">여기를 건너뛰면 NONMEM 실행 후 시간 낭비</div>
+    </div>
+    <span class="qcount">Q50–Q55</span>
+    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+  </div>
+  <div class="phase-body">
+
+    <div class="q-card" style="border-left-color:var(--phase6)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase6-bg);color:var(--phase6)">Q50</span>
+        <span class="q-title">구조적 무결성 종합 체크</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span><span class="badge b-auto">AUTO</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          최종 데이터셋에 대해 <strong>전체 구조적 QC</strong>를 한 번에 실행해줘:<br>
+          ✓ 모든 ID에 ≥1 dosing record (EVID=1 or 4)?<br>
+          ✓ 모든 ID에 ≥1 valid observation (EVID=0, MDV=0)?<br>
+          ✓ EVID=1 → AMT>0, MDV=1?<br>
+          ✓ EVID=0 → AMT=0 or .?<br>
+          ✓ 중복 행 없음? (ID+TIME+EVID+CMT 기준)<br>
+          ✓ CMT 값이 유효 범위 내?<br>
+          ✓ ADDL/II 사용 시 II>0, EVID=1 or 4?<br>
+          ✓ SS=1 → II 존재?<br>
+          ✓ 데이터에 NA/non-numeric 없음?<br>
+          ✓ Header 정확히 1줄?<br>
+          PASS/FAIL 결과를 항목별로 보고해줘.
+        </div>
+        <div class="detail"><code>NMdata::NMcheckData()</code> 사용 가능. 또는 위 체크를 직접 R로 구현.</div>
+        <div class="ref-tag" style="background:var(--phase6-bg);color:var(--phase6)">→ Phase 6: Programmatic QC 전체</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase6)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase6-bg);color:var(--phase6)">Q51</span>
+        <span class="q-title">EVID/MDV 조합 Cross-tabulation</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span><span class="badge b-auto">AUTO</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          <code>EVID</code> × <code>MDV</code> × <code>BLQ</code>(해당 시) <strong>교차표</strong>를 만들어줘. 각 조합의 행 수를 세고, <strong>비정상 조합</strong>(예: EVID=1이면서 MDV=0, EVID=0이면서 AMT>0)이 있으면 경고해줘.
+        </div>
+        <div class="r-snippet">nm_df %&gt;% count(EVID, MDV, BLQ) %&gt;% print(n = Inf)</div>
+        <div class="ref-tag" style="background:var(--phase5-bg);color:var(--phase5)">→ Phase 5: EVID·MDV 조합 패턴</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase6)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase6-bg);color:var(--phase6)">Q52</span>
+        <span class="q-title">Individual PK-Time Profile 플롯</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span><span class="badge b-vis">VISUAL</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          <strong>모든 ID</strong>에 대해 <strong>DV vs TIME</strong> 개인별 프로파일을 그려줘 (linear + log scale). 투여 시점을 <strong>세로선 또는 화살표</strong>로 표시해줘. facet_wrap으로 ID별 패널. 다음 red flag를 눈으로 확인:<br>
+          🚩 투여 직후 농도=0 → dosing record 누락 또는 TIME 오류<br>
+          🚩 지속 증가 (비축적 상황) → TIME reference 오류<br>
+          🚩 극단 농도값 → 단위 오류 또는 입력 오류
+        </div>
+        <div class="ref-tag" style="background:var(--phase6-bg);color:var(--phase6)">→ Phase 6: 시각적 QC ①② Individual profiles</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase6)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase6-bg);color:var(--phase6)">Q53</span>
+        <span class="q-title">Spaghetti Plot & Covariate 분포</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span><span class="badge b-vis">VISUAL</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          <strong>(1) Spaghetti plot:</strong> 전체 ID overlay (DV vs TIME, linear + log). 전반적 PK 경향, 극단 ID, dose-proportionality 시각적 확인.<br>
+          <strong>(2) Covariate 분포:</strong> 연속형은 histogram/boxplot, 범주형은 bar chart. 이상치 패턴 확인.
+        </div>
+        <div class="ref-tag" style="background:var(--phase6-bg);color:var(--phase6)">→ Phase 6: 시각적 QC ③⑤ Spaghetti + Covariate</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase6)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase6-bg);color:var(--phase6)">Q54</span>
+        <span class="q-title">Data Specification 문서 생성</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          <strong>Data Specification</strong> 문서를 생성해줘. 각 컬럼에 대해:<br>
+          • 컬럼명 / 설명 / 단위 / 데이터 타입(numeric) / 결측 코딩 / 값 범위<br>
+          • 코딩 규칙 (SEX: 0=M, 1=F 등)<br>
+          • BLQ 처리 방법 / AMT 단위 / DV 단위 / TIME 기준점<br>
+          • 제외 기준 요약 (몇 명/몇 record, 이유)<br>
+          • 총 대상자 수, 총 record 수, dosing/obs record 수
+        </div>
+        <div class="ref-tag" style="background:var(--phase6-bg);color:var(--phase6)">→ Phase 6: Data Specification Document</div>
+      </div>
+    </div>
+
+    <div class="q-card" style="border-left-color:var(--phase6)" data-type="MUST">
+      <div class="q-head" onclick="toggleQ(this)">
+        <span class="q-num" style="background:var(--phase6-bg);color:var(--phase6)">Q55</span>
+        <span class="q-title">최종 산출물 체크리스트 & 완료 선언</span>
+        <div class="q-badges"><span class="badge b-must">MUST</span></div>
+        <svg class="q-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="q-body">
+        <div class="prompt-box">
+          <strong>최종 산출물이 모두 준비되었는지</strong> 체크해줘:<br>
+          ☐ NONMEM-ready 데이터 파일 (<code>.csv</code>)<br>
+          ☐ $INPUT 문자열 (control stream에 복사 가능)<br>
+          ☐ R 전처리 스크립트 (재현 가능)<br>
+          ☐ Data Specification 문서<br>
+          ☐ QC 플롯 모음 (individual profiles, spaghetti, covariate distributions, BLQ 패턴)<br>
+          ☐ 제외 기준 요약<br>
+          모두 ✅이면 <strong>🎉 NONMEM-ready 완성!</strong>
+        </div>
+        <div class="exit-point" style="font-size:14px;font-weight:700;text-align:center;padding:16px">
+          🎉 NONMEM-Ready Dataset Complete
+        </div>
+        <div class="ref-tag" style="background:var(--phase6-bg);color:var(--phase6)">→ Phase 6: 최종 산출물 & 문서화</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════ SUMMARY TABLE ═══════════ -->
+<div class="howto" style="margin-top:2rem">
+  <div class="howto-title">조기 완료 가이드 — 데이터 상태별 예상 종료 지점</div>
+  <table class="summary-tbl">
+    <tr><th>데이터 유형</th><th>예상 종료</th><th>건너뛸 수 있는 질문</th></tr>
+    <tr><td>깨끗한 SDTM (표준 PK)</td><td>~Q35</td><td>Q05, Q12-14, Q20, Q26, Q29, Q33-34, Q39, Q41</td></tr>
+    <tr><td>ADaM + SDTM 병행</td><td>~Q40</td><td>Q05, Q14</td></tr>
+    <tr><td>Raw CRF/EDC export</td><td>Q55 (풀코스)</td><td>Q05 정도만</td></tr>
+    <tr><td>Investigator Excel</td><td>Q55 (풀코스)</td><td>Q05 정도만</td></tr>
+    <tr><td>기존 NONMEM 수정</td><td>~Q30</td><td>Q06-14의 대부분, 수정 범위에 따라 다름</td></tr>
+    <tr><td>PK+PD 통합</td><td>Q55</td><td>거의 없음 — 특히 Q20 필수</td></tr>
+    <tr><td>CAR-T / 세포치료제</td><td>Q55</td><td>Q11, Q13. 단 Q14 필수</td></tr>
+  </table>
+</div>
+
+<!-- ═══════════ TOP 10 MISTAKES REFERENCE ═══════════ -->
+<div class="howto" style="margin-top:1rem">
+  <div class="howto-title">Top 10 실무 실수 → 해당 질문 매핑</div>
+  <table class="summary-tbl">
+    <tr><th>#</th><th>실수</th><th>방지 질문</th></tr>
+    <tr><td>1</td><td>TIME reference 불일치</td><td>Q23, Q25, Q30</td></tr>
+    <tr><td>2</td><td>같은 TIME에 obs가 dose 앞에 정렬</td><td>Q28, Q45</td></tr>
+    <tr><td>3</td><td>AMT에 planned dose 사용</td><td>Q07</td></tr>
+    <tr><td>4</td><td>NA를 "."으로 미변환</td><td>Q46, Q48</td></tr>
+    <tr><td>5</td><td>단위 불일치</td><td>Q09, Q16</td></tr>
+    <tr><td>6</td><td>BLQ를 DV=0, MDV=0으로 방치</td><td>Q17, Q18, Q31</td></tr>
+    <tr><td>7</td><td>ADDL/II에서 용량 변경 무시</td><td>Q11</td></tr>
+    <tr><td>8</td><td>Covariate merge 후 행 수 변동</td><td>Q40</td></tr>
+    <tr><td>9</td><td>$INPUT 순서 불일치</td><td>Q44, Q49</td></tr>
+    <tr><td>10</td><td>Outlier를 행 삭제로 처리</td><td>Q32</td></tr>
+  </table>
+</div>
+
+
+<div class="footer">
+  NONMEM-Ready 55-Step Sequential Question Protocol v1.0 · Generated 2026-04-13 · Based on NONMEM Data Preprocessing Decision Map v2.0<br>
+  Designed for LLM-driven pharmacometrics data preprocessing workflows
+</div>
+
+</div><!-- end .wrap -->
+
+<script>
+function togglePhase(bar) { bar.closest('.phase-section').classList.toggle('open'); }
+function toggleQ(head) { head.closest('.q-card').classList.toggle('open'); }
+function toggleAllPhases(open) {
+  document.querySelectorAll('.phase-section').forEach(p => {
+    if (open) p.classList.add('open'); else p.classList.remove('open');
+  });
+  document.querySelectorAll('.q-card').forEach(c => {
+    if (open) c.classList.add('open'); else c.classList.remove('open');
+  });
+}
+function showOnly(type) {
+  document.querySelectorAll('.q-card').forEach(c => {
+    if (type === 'ALL') { c.style.display = ''; return; }
+    c.style.display = c.dataset.type === type ? '' : 'none';
+  });
+  document.querySelectorAll('.phase-section').forEach(p => p.classList.add('open'));
+}
+</script>
+</body>
+</html>

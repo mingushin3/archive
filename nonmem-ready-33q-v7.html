@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NONMEM-Ready: 33-Step Question Sequence v7.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300;0,7..72,400;0,7..72,500;0,7..72,600;0,7..72,700;1,7..72,400;1,7..72,500&family=DM+Mono:wght@400;500&family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FBFAF7;--card:#FFFFFF;--surf:#F2F1EC;--code:#ECEADE;
+  --t1:#18170F;--t2:#52514A;--t3:#8C8B84;
+  --bdr:rgba(0,0,0,.06);--bdr-h:rgba(0,0,0,.13);
+  --p0:#1B6B4F;--p0b:#DFF3EA;
+  --p1:#5B3CC4;--p1b:#EEEBFE;
+  --p2:#B83A2A;--p2b:#FCE9E6;
+  --p3:#A3640A;--p3b:#FDF2DA;
+  --p4:#1858A8;--p4b:#E2EEFB;
+  --p5:#0F6949;--p5b:#DDFAED;
+  --p6:#923574;--p6b:#F9E8F4;
+  --p7:#6D5520;--p7b:#F8F2E4;
+  --acc:#6D28D9;--accb:#F0EBFE;
+  --r:8px;--rs:5px;
+  --f:'Literata','Noto Sans KR',Georgia,serif;
+  --fs:'Noto Sans KR','Literata',-apple-system,sans-serif;
+  --mono:'DM Mono','SF Mono',monospace;
+  --sh:0 1px 2px rgba(0,0,0,.04),0 0 0 .5px rgba(0,0,0,.05);
+  --shh:0 3px 10px rgba(0,0,0,.06),0 0 0 .5px rgba(0,0,0,.08);
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#131210;--card:#1B1A17;--surf:#222120;--code:#2A2926;
+  --t1:#E6E4DD;--t2:#A5A29B;--t3:#6E6C66;
+  --bdr:rgba(255,255,255,.06);--bdr-h:rgba(255,255,255,.12);
+  --p0b:#0C2E20;--p1b:#1D1545;--p2b:#2D0F0C;--p3b:#2D1F05;--p4b:#0E1D3D;--p5b:#052E1E;--p6b:#2D0F22;--p7b:#2D2510;--accb:#1E1045;
+  --sh:0 1px 2px rgba(0,0,0,.3),0 0 0 .5px rgba(255,255,255,.04);
+  --shh:0 3px 10px rgba(0,0,0,.4),0 0 0 .5px rgba(255,255,255,.06);
+}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--fs);background:var(--bg);color:var(--t1);line-height:1.78;font-size:14px;-webkit-font-smoothing:antialiased}
+.w{max-width:860px;margin:0 auto;padding:2rem 1.5rem 5rem}
+.hero{padding:3rem 0 2.5rem;border-bottom:1.5px solid var(--bdr);margin-bottom:2rem}
+.hero-ey{font-family:var(--fs);font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--p0);margin-bottom:.6rem}
+.hero h1{font-family:var(--f);font-size:28px;font-weight:600;line-height:1.28;letter-spacing:-.015em;margin-bottom:.6rem}
+.hero h1 em{font-style:normal;background:linear-gradient(135deg,var(--p0),var(--acc));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-d{font-size:13.5px;color:var(--t2);max-width:680px;line-height:1.85}
+.vb{display:inline-block;background:linear-gradient(135deg,var(--p0),var(--acc));color:#fff;font-size:10px;font-weight:700;padding:2px 9px;border-radius:100px;letter-spacing:.04em;margin-left:6px;vertical-align:middle}
+.stats{display:flex;flex-wrap:wrap;gap:7px;margin:1.25rem 0 1.75rem}
+.stat{background:var(--card);border:1px solid var(--bdr);border-radius:100px;padding:5px 14px;font-size:12px;display:flex;align-items:center;gap:5px}
+.stat b{font-weight:600}
+.stat .dot{width:7px;height:7px;border-radius:50%}
+.ib{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:20px 24px;margin-bottom:1.75rem}
+.ib-t{font-family:var(--f);font-size:15px;font-weight:600;margin-bottom:8px}
+.ib p{color:var(--t2);font-size:13px;margin-bottom:6px}
+.ib code{font-family:var(--mono);font-size:11.5px;background:var(--code);padding:1px 6px;border-radius:3px}
+.flow{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:18px 20px;margin-bottom:1.75rem;overflow-x:auto}
+.flow-t{font-family:var(--f);font-size:14px;font-weight:600;margin-bottom:10px}
+.flow-r{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.flow-n{padding:4px 10px;border-radius:5px;font-size:10.5px;font-weight:600;white-space:nowrap}
+.flow-a{color:var(--t3);font-size:12px}
+.ctrls{display:flex;gap:6px;margin-bottom:1.25rem;flex-wrap:wrap}
+.btn{font-family:var(--fs);font-size:11px;font-weight:500;padding:5px 14px;border-radius:100px;border:1px solid var(--bdr);background:var(--card);color:var(--t2);cursor:pointer;transition:all .12s}
+.btn:hover{border-color:var(--bdr-h);color:var(--t1)}
+.ps{margin-bottom:2rem}
+.pb{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:var(--r);cursor:pointer;user-select:none;position:sticky;top:0;z-index:20;transition:box-shadow .15s}
+.pb:hover{box-shadow:var(--shh)}
+.pb .n{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+.pb .inf{flex:1}
+.pb .tt{font-family:var(--f);font-weight:600;font-size:15px;line-height:1.3}
+.pb .st{font-size:11.5px;opacity:.65;margin-top:1px}
+.pb .qc{font-size:10px;font-weight:600;padding:2px 9px;border-radius:100px;background:rgba(0,0,0,.05)}
+@media(prefers-color-scheme:dark){.pb .qc{background:rgba(255,255,255,.07)}}
+.pb .chv{width:16px;height:16px;transition:transform .2s ease;flex-shrink:0}
+.ps.open .chv{transform:rotate(90deg)}
+.pbd{display:none;padding-top:4px}
+.ps.open .pbd{display:block}
+.qc_{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);margin:7px 0;overflow:hidden;transition:box-shadow .12s;border-left:3px solid transparent}
+.qc_:hover{box-shadow:var(--shh)}
+.qh{display:flex;align-items:center;gap:8px;padding:11px 14px;cursor:pointer;user-select:none}
+.qn{font-family:var(--mono);font-size:12px;font-weight:500;min-width:32px;text-align:center;padding:2px 6px;border-radius:5px;flex-shrink:0}
+.qt{font-family:var(--f);font-weight:500;font-size:13.5px;flex:1;line-height:1.45}
+.qbg{display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap}
+.bd{font-size:9.5px;font-weight:600;padding:2px 7px;border-radius:100px;letter-spacing:.02em;white-space:nowrap}
+.b-m{background:#FEE2E2;color:#991B1B}
+.b-c{background:#FEF3C7;color:#92400E}
+.b-g{background:var(--p5b);color:var(--p5)}
+@media(prefers-color-scheme:dark){.b-m{background:#450A0A;color:#FCA5A5}.b-c{background:#451A03;color:#FCD34D}.b-g{background:#052E1E;color:#6EE7B7}}
+.qa{width:13px;height:13px;color:var(--t3);transition:transform .15s;flex-shrink:0}
+.qc_.open .qa{transform:rotate(90deg)}
+.qb{display:none;padding:0 14px 16px}
+.qc_.open .qb{display:block}
+.sig{background:linear-gradient(135deg,rgba(109,40,217,.03),rgba(27,107,79,.03));border:1px solid rgba(109,40,217,.1);border-radius:var(--rs);padding:12px 14px;margin:6px 0 10px;font-size:12.5px;line-height:1.85;color:var(--t2)}
+.sig-t{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--acc);margin-bottom:3px}
+.prm{background:var(--code);border-radius:var(--rs);padding:12px 14px;margin:6px 0 10px;font-size:12.5px;line-height:1.8;color:var(--t1);border-left:2.5px solid var(--acc)}
+.prm-t{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--acc);margin-bottom:3px}
+.done{background:var(--p5b);border:1px solid rgba(15,105,73,.12);border-radius:var(--rs);padding:10px 14px;margin:6px 0;font-size:12px;line-height:1.8}
+.done-t{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--p5);margin-bottom:3px}
+.skip{background:var(--p3b);border:1px solid rgba(163,100,10,.1);border-radius:var(--rs);padding:8px 12px;margin:6px 0;font-size:12px;line-height:1.75}
+.skip-t{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--p3);margin-bottom:3px}
+.craft{background:linear-gradient(135deg,rgba(109,40,217,.04),rgba(27,107,79,.04));border:1px solid rgba(109,40,217,.1);border-radius:var(--rs);padding:10px 14px;margin:6px 0;font-size:12px;line-height:1.85;color:var(--t2)}
+.craft-t{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--acc);margin-bottom:3px}
+.rpkg{background:var(--surf);border-radius:var(--rs);padding:8px 12px;margin:6px 0;font-size:11.5px}
+.rpkg-t{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--p4);margin-bottom:3px}
+.rpkg code{font-family:var(--mono);font-size:11px;background:var(--code);padding:1px 5px;border-radius:3px}
+.ptbl{width:100%;border-collapse:collapse;font-size:12px;margin:10px 0}
+.ptbl th{text-align:left;padding:5px 8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--t3);border-bottom:1.5px solid var(--bdr)}
+.ptbl td{padding:5px 8px;border-bottom:.5px solid var(--bdr);vertical-align:top}
+.ptbl tr:last-child td{border-bottom:none}
+.footer{margin-top:2.5rem;padding-top:1.25rem;border-top:1px solid var(--bdr);font-size:11px;color:var(--t3);text-align:center;line-height:1.7}
+@media print{.pbd,.qb{display:block!important}.pb{position:static}.ctrls{display:none}.qc_{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="w">
+
+<div class="hero">
+  <div class="hero-ey">Pharmacometrics · LLM-Driven Data Wrangling Protocol</div>
+  <h1>NONMEM-Ready <em>33-Step</em> Question Sequence <span class="vb">v7.0</span></h1>
+  <p class="hero-d">
+    v6 30-Step의 효율(통합 질문·QC Gate·📦 R 매핑) + v6 42-Step의 완결성(Population Screening·PRED Check)을 융합한 최종본.<br>
+    데이터를 정리하는 사람이 아니라 <strong>모델과 데이터의 계약서를 작성하는 사람</strong>이 되어라.
+  </p>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="dot" style="background:var(--acc)"></div>총 질문 <b>33</b>개</div>
+  <div class="stat"><div class="dot" style="background:var(--p2)"></div>필수 <b>27</b>개</div>
+  <div class="stat"><div class="dot" style="background:var(--p3)"></div>조건부 <b>6</b>개</div>
+  <div class="stat"><div class="dot" style="background:var(--p6)"></div>Phase <b>8</b>개</div>
+</div>
+
+<div class="ib">
+  <div class="ib-t">사용법</div>
+  <p><strong>원칙:</strong> <span style="color:var(--acc);font-weight:600">📋 프롬프트</span>를 LLM에 복사·붙여넣고 변수명을 교체 → R 코드 실행 → <span style="color:var(--p5);font-weight:600">✅ 완료 조건</span> 충족 시 다음으로.</p>
+  <p><strong>QC Gate:</strong> <span class="bd b-g">GATE</span> 표시 질문은 PASS해야 다음 Phase 진입 가능.</p>
+  <p><strong>v6→v7:</strong> Population Screening(Q19) ★복원, PRED Check(Q29) ★복원, 독립 QC(Q33) ★신설. Dosing QC Gate를 독립 질문(Q09)으로 분리.</p>
+</div>
+
+<div class="flow">
+  <div class="flow-t">전체 흐름</div>
+  <div class="flow-r">
+    <div class="flow-n" style="background:var(--p0b);color:var(--p0)">P0 역설계</div><div class="flow-a">→</div>
+    <div class="flow-n" style="background:var(--p1b);color:var(--p1)">P1 Dosing</div><div class="flow-a">→</div>
+    <div class="flow-n" style="background:var(--p2b);color:var(--p2)">P2 Obs</div><div class="flow-a">→</div>
+    <div class="flow-n" style="background:var(--p3b);color:var(--p3)">P3 Merge&TIME</div><div class="flow-a">→</div>
+    <div class="flow-n" style="background:var(--p4b);color:var(--p4)">P4 BLQ&Screen</div><div class="flow-a">→</div>
+    <div class="flow-n" style="background:var(--p5b);color:var(--p5)">P5 Covariate</div><div class="flow-a">→</div>
+    <div class="flow-n" style="background:var(--p6b);color:var(--p6)">P6 포맷&QC</div><div class="flow-a">→</div>
+    <div class="flow-n" style="background:var(--p7b);color:var(--p7)">P7 문서화</div>
+  </div>
+  <div style="font-size:10.5px;color:var(--t3);margin-top:4px">Q01–03 → Q04–09 → Q10–12 → Q13–16 → Q17–20 → Q21–24 → Q25–29 → Q30–33</div>
+</div>
+
+<div class="ctrls">
+  <button class="btn" onclick="toggleAll(true)">모두 펼치기</button>
+  <button class="btn" onclick="toggleAll(false)">모두 접기</button>
+  <button class="btn" onclick="showOnly('MUST')">필수만</button>
+  <button class="btn" onclick="showOnly('ALL')">전체</button>
+</div>
+
+<div id="content"></div>
+
+<div class="ib" style="margin-top:2rem">
+  <div class="ib-t">🔨 장인의 4대 원칙</div>
+  <table class="ptbl">
+    <tr><th>원칙</th><th>설명</th><th>핵심 질문</th></tr>
+    <tr><td><strong>역설계</strong></td><td>Target model 구조에서 출발해 데이터를 맞춘다</td><td>Q01, Q06, Q29</td></tr>
+    <tr><td><strong>방어적 프로그래밍</strong></td><td>모든 조작에 검증 + ungroup() + unit test</td><td>Q07, Q09, Q14</td></tr>
+    <tr><td><strong>편집증적 QC</strong></td><td>merge 전후 행수, anti_join, PRED Check, Population Screening</td><td>Q14, Q19, Q22, Q27, Q29</td></tr>
+    <tr><td><strong>완벽한 재현성</strong></td><td>100% 스크립트화, 모듈 파이프라인, 수동 수정 0건</td><td>Q31, Q32, Q33</td></tr>
+  </table>
+</div>
+
+<div class="footer">
+  NONMEM-Ready 33-Step Question Sequence v7.0 · Generated 2026-04-15 · PIPET Lab<br>
+  v6 30-Step(효율) + v6 42-Step(엄밀성) 융합 · Population Screening·PRED Check 복원 · 독립 QC 신설
+</div>
+
+</div>
+<script>
+const Q=[
+// ═══════ P0 ═══════
+{p:"P0",pt:"역설계 & 데이터 파악",pst:"R을 열기 전에 머릿속에 Control Stream을 그려라",pc:"var(--p0)",pcb:"var(--p0b)",qs:[
+{n:"Q01",t:"내가 짜야 할 NONMEM Control Stream은 어떤 구조인가?",tp:"MUST",
+sig:`장인은 R 스크립트 열기 전에 <strong>NONMEM Control Stream을 먼저 설계</strong>한다. 이 결정이 <strong>CMT 번호, EVID 패턴, 데이터 구조 전체</strong>를 규정한다. 여기서 출발하지 않으면 반드시 재작업이 발생한다. 데이터에서 출발하는 것이 아니라, <strong>모델이 요구하는 구조에서 역산해 데이터를 설계</strong>한다.`,
+prm:`이 연구의 protocol/SAP 정보를 기반으로 다음을 정리해줘:<br>(1) 투여 설계 요약: single/multiple dose, dose levels, 투여 경로, 투여 간격, 채혈 스케줄<br>(2) Base Model 구조 제안: compartment 수, 흡수 모델, 예상 <code>$SUBROUTINES</code><br>(3) <strong>CMT 번호 매핑 테이블</strong>: dose CMT, obs CMT, PD CMT(해당시)<br>(4) EVID 사용 패턴: 0,1만 쓸 건지, 2/3/4도 필요한지<br>(5) 필수 공변량 사전 목록`,
+done:`□ CMT 번호 매핑 테이블 확정<br>□ EVID 사용 패턴 결정<br>□ 필수 공변량 목록 나열<br>□ 예상 모델 구조(ADVAN) 선언`,
+skip:`건너뛸 수 없음.`,
+craft:`<strong>경구?</strong> → depot(CMT=1)+central(CMT=2), ADVAN2/4. <strong>IV bolus?</strong> → central만, ADVAN1. <strong>IV infusion?</strong> → ADVAN1, RATE=-2+DUR. <strong>PD도?</strong> → 별도 CMT 또는 DVID 분기. CMT가 ADVAN과 불일치하면 <strong>에러 없이 돌아가면서</strong> 엉뚱한 결과를 낸다.`,
+rpkg:`<code>—</code> 프로토콜 검토 단계. 코딩 없음.`},
+
+{n:"Q02",t:"데이터 인벤토리: 파일·ID·날짜·3-block 소스매핑이 완료되었는가?",tp:"MUST",
+sig:`데이터가 SDTM/ADaM/Raw/기존NM인지에 따라 <strong>전체 작업량이 결정</strong>된다. ID 매핑, 날짜 파싱, 3대 building block(Dosing/Observation/Covariate) 소스를 일괄 확정해야 이후 경로가 명확해진다.`,
+prm:`<strong>[파일 인벤토리]</strong><br>(1) 파일별: 파일명/형식/행수/열수/핵심변수. <code>head(5)</code>, <code>str()</code>, <code>sapply(is.na)</code><br>(2) 대상자: <code>n_distinct()</code>, 문자열 ID → 숫자: <code>id_map <- distinct(USUBJID) %>% mutate(ID=row_number())</code><br>(3) 파일 간 ID 불일치: <code>anti_join()</code><br><br><strong>[날짜/시간]</strong><br>(4) 모든 datetime 변수: 형식/정밀도/결측률/lubridate 파싱 함수. 대표값 5개 테스트<br><br><strong>[3-block 소스 매핑]</strong><br>(5) <code>tribble()</code> 4열 테이블: 소스파일→소스변수→NONMEM변수→변환규칙`,
+done:`□ 모든 파일 로드 + 유형 판정<br>□ id_map 생성, ID 불일치 0건 or 파악<br>□ datetime 파싱 전략 결정<br>□ 3-block 소스 매핑 완성`,
+skip:`건너뛸 수 없음.`,craft:null,
+rpkg:`<code>readr</code> read_csv · <code>readxl</code> read_excel · <code>haven</code> read_sas/read_xpt · <code>dplyr</code> n_distinct/anti_join · <code>janitor</code> clean_names · <code>lubridate</code> ymd_hms`},
+
+{n:"Q03",t:"기존 데이터 인수인계 또는 다중 Study 병합이 필요한가?",tp:"COND",
+sig:`기존 데이터 인수인계 시 TIME reference·FLAG convention·$INPUT 순서 파악이 선행. Multi-study pooling 시 <strong>단위 불일치·LLOQ 차이·ID 충돌</strong> 3대 함정이 있다.`,
+prm:`<strong>[인수인계]</strong> TIME 기준점 역추적, FLAG convention, $INPUT 순서, ID offset=<code>max(ID)+1000</code><br><strong>[Multi-study]</strong> STUDYID 생성, AMT/DV 단위·LLOQ 비교, ID offset, Study별 요약`,
+done:`□ TIME reference + ID offset 결정<br>□ 단위 일치 확인/변환<br>□ ID 충돌 없음`,
+skip:`신규 단일 study → <strong>Q04로 이동</strong>`,craft:null,
+rpkg:`<code>dplyr</code> bind_rows/case_when`}
+]},
+
+// ═══════ P1 ═══════
+{p:"P1",pt:"Dosing Records 조립 (EVID=1)",pst:"여기가 틀리면 모델이 돌아도 결과가 의미 없다",pc:"var(--p1)",pcb:"var(--p1b)",qs:[
+{n:"Q04",t:"실제 투여 기록만 골라내고, AMT를 actual dose로 확정했는가?",tp:"MUST",
+sig:`투여 기록에 <code>EXSTAT='NOT DONE'</code> 등 미투여 기록이 섞여 있다. AMT에 planned dose가 들어가면 CL/V가 체계적으로 편향된다. <strong>Top 3 실무 실수</strong>.`,
+prm:`(1) <code>dose_df</code>: ID, DATETIME, AMT, CMT, EVID=1, MDV=1, DV=0<br>(2) 제외: EXSTAT 필터링 → 사유별 record 수<br>(3) <strong>AMT = actual dose</strong>: <code>mutate(AMT=실제투여량변수)</code><br>(4) <code>PDOSE</code>로 planned 보존, 불일치 비율 보고<br>(5) ID별 투여 횟수: <code>count(ID) %>% summary()</code>`,
+done:`□ dose_df 생성, 미투여 제외<br>□ AMT=actual, PDOSE 보존<br>□ 모든 ID ≥1 투여`,
+skip:`건너뛸 수 없음.`,
+craft:`부분 주입 중단·구토 → 제외가 아니라 <strong>AMT를 actual로 조정</strong>.`,
+rpkg:`<code>dplyr</code> filter/mutate/case_when/count`},
+
+{n:"Q05",t:"AMT 단위·경로별 RATE/DUR·단위 표준화가 완료되었는가?",tp:"MUST",
+sig:`<code>CL=AMT/AUC</code>이므로 AMT 단위가 파라미터 해석에 직결. ng/mL↔μg/mL 1000배 오류는 <strong>CL이 1000배 틀린 결과가 출판</strong>된다. mg/kg 투여는 absolute dose(mg)로 변환 필수.`,
+prm:`<strong>[단위]</strong> (1) AMT summary, unique values (2) 단위 관계식: "AMT(___)/DV(___)→CL(___),V(___)" (3) mg/kg→absolute: <code>mutate(AMT=AMT_MGKG*WT)</code> (4) 단위 혼재: <code>count(UNIT)</code>→UNIT_CONV_FLAG<br><strong>[RATE/DUR]</strong> (5) 경로 분포 (6) PO/SC/IM/bolus→RATE=0 (7) IV infusion→RATE=-2, DUR=difftime. DUR≤0 경고`,
+done:`□ AMT 단위 확정, 관계식 명시<br>□ 단위 혼재 해결 (해당시)<br>□ RATE/DUR 완료, DUR>0`,
+skip:`건너뛸 수 없음.`,craft:null,
+rpkg:`<code>dplyr</code> mutate/case_when · <code>lubridate</code> difftime`},
+
+{n:"Q06",t:"Dosing CMT를 할당했는가?",tp:"MUST",
+sig:`Q01의 CMT 체계를 실데이터에 적용. <strong>Oral인데 CMT=2(Central)로 넣으면 흡수 과정 없이 직접 투입</strong> — NONMEM이 에러 없이 돌아가면서 PRED가 비정상적으로 높게 나온다.`,
+prm:`<code>dose_df <- dose_df %>% mutate(CMT=case_when(ROUTE=='PO'~1, ROUTE=='IV'~2, TRUE~NA_real_))</code><br>CMT별 count + NA 경고 + Q01 매핑 대조`,
+done:`□ 모든 dosing에 CMT 할당 (NA 없음)<br>□ Q01 사전 결정 일치`,
+skip:`건너뛸 수 없음.`,craft:null,
+rpkg:`<code>dplyr</code> mutate/case_when/count`},
+
+{n:"Q07",t:"반복 투여를 ADDL/II로 압축할 수 있는가?",tp:"COND",
+sig:`ADDL 전제 조건: ① 용량 동일 ② 간격 일정 ③ 사이에 공변량 변화 없음. 위반 시 NONMEM이 변경 전 용량으로 계속 투여. <strong>반드시 가상 환자 1명 unit test 선행</strong>.`,
+prm:`가상환자(100mg QD 7일→200mg QD 7일) 테스트 후 전체 적용:<br>(1) 용량 변경 시점에서 그룹 분리 (2) ADDL=횟수-1, II=간격(hr) (3) <code>sum(ADDL+1)</code>==원래 record 수`,
+done:`□ Unit test PASS<br>□ 총 투여 횟수 일치<br>□ 용량 변경 시점 분리 확인`,
+skip:`Single dose → <strong>Q08로</strong>`,
+craft:`II 단위=TIME 단위. 28일 중 dose reduction/eGFR 변화/투여시각 변동이 있었는지 반드시 확인. 불확실하면 개별 record가 안전.`,
+rpkg:`<code>dplyr</code> group_by/mutate/lag/lead/cumsum`},
+
+{n:"Q08",t:"SS, Reset(EVID=3/4) 등 특수 투여 처리가 필요한가?",tp:"COND",
+sig:`<strong>SS:</strong> 투여 이력 불완전 시 SS=1+II. <strong>Reset(EVID=4):</strong> washout 후 재투여. <strong>EVID=2:</strong> turnover model input.`,
+prm:`<strong>[SS]</strong> <code>mutate(SS=ifelse(조건,1,0), II=ifelse(SS==1,간격,0))</code>. SS=1이면 II>0<br><strong>[Reset]</strong> 투여 gap>5반감기 → EVID=4`,
+done:`□ SS/Reset 적용 (또는 해당 없음)`,
+skip:`연속 투여+중단 없음 → <strong>Q09로</strong>`,craft:null,
+rpkg:`<code>dplyr</code> mutate/if_else`},
+
+{n:"Q09",t:"[Dosing QC Gate] 6-point 자동 검증을 통과했는가?",tp:"MUST",
+sig:`Phase 1의 <strong>최종 관문</strong>. 여기서 PASS하지 않으면 이후 모든 작업이 잘못된 dosing 위에 쌓인다. 장인은 각 building block 완성마다 반드시 자동 검증을 돌린다.`,
+prm:`<code>dose_df</code>에 대해 6개 자동 검증, 각 PASS/FAIL:<br>① 모든 행 EVID∈{1,3,4}, MDV=1?<br>② EVID=1/4이면 AMT>0?<br>③ 모든 ID에 ≥1 dosing?<br>④ DATETIME에 NA=0?<br>⑤ ADDL 시 <code>sum(AMT*(ADDL+1))</code>=예상 누적?<br>⑥ ID별 투여 횟수 요약`,
+done:`□ <strong>6항목 모두 PASS</strong> → P2 진입 가능`,
+skip:`건너뛸 수 없음.`,craft:null,
+rpkg:`<code>base</code> stopifnot · <code>dplyr</code> group_by/summarise`}
+]},
+
+// ═══════ P2 ═══════
+{p:"P2",pt:"Observation Records 조립 (EVID=0)",pst:"DV, BLQ, MDV — 관찰값의 정확한 세팅",pc:"var(--p2)",pcb:"var(--p2b)",qs:[
+{n:"Q10",t:"PK 농도(DV)를 추출하고 단위를 확정했는가?",tp:"MUST",
+sig:`DV는 NONMEM이 fitting하는 값. Q05 AMT 단위와 조합되어 CL/V 단위를 결정한다.`,
+prm:`<code>obs_df <- pc %>% left_join(id_map) %>% mutate(DV=PCSTRESN, CMT=2, EVID=0, AMT=0)</code><br>(1) DV 단위 + AMT 관계식 (2) PCSTRESN≠PCORRES 불일치 (3) NOT DONE→MDV=1 (4) DV summary+히스토그램`,
+done:`□ obs_df 생성, DV 단위 확정<br>□ NOT DONE 처리<br>□ 극단값 없음`,
+skip:`건너뛸 수 없음.`,craft:null,
+rpkg:`<code>dplyr</code> left_join/mutate · <code>ggplot2</code> geom_histogram`},
+
+{n:"Q11",t:"BLQ를 식별하고, BLQ flag와 LLOQ 컬럼을 만들었는가?",tp:"MUST",
+sig:`BLQ를 DV=0+MDV=0으로 방치하면 terminal phase 편향. 여기서는 flag와 LLOQ만 만든다. M-method 처리는 Q17.`,
+prm:`<code>obs_df <- obs_df %>% mutate(BLQ=case_when(PCSTAT=='BLQ'~1, PCORRES %in% c('BLQ','<LLOQ','NS')~1, TRUE~0), LLOQ=[값])</code><br>BLQ 비율: 전체/ID별/binned TIME/dose group`,
+done:`□ BLQ(0/1), LLOQ 컬럼 생성<br>□ BLQ 비율 보고 (Q17 결정에 사용)`,
+skip:`BLQ 0건 → BLQ=0 채우고 Q17 건너뜀.`,craft:null,
+rpkg:`<code>dplyr</code> mutate/case_when/group_by/summarise`},
+
+{n:"Q12",t:"MDV + Predose + 다중 Endpoint + [Obs QC Gate]가 완료되었는가?",tp:"MUST",
+sig:`MDV=0이면 likelihood 포함. BLQ는 일단 MDV=1(M1 기본). 결측 PK도 MDV=1+MISS_REASON flag(interpolation 절대 금지). 다중 endpoint면 DVID 분기. 이 질문에 <strong>Obs QC Gate</strong> 내장.`,
+prm:`<strong>[MDV+결측]</strong> <code>mutate(MDV=case_when(BLQ==1~1, is.na(DV)~1, TRUE~0), MISS_REASON=case_when(...))</code><br><strong>[Predose]</strong> predose DV>0(single dose) 경고. TIME=-0.01 미세 조정<br><strong>[다중endpoint]</strong> DVID 할당, DV magnitude 비교<br><strong>[Obs QC Gate]</strong> ① 모든 행 EVID=0 ② MDV=0이면 DV 양수 ③ 모든 ID ≥1 유효 obs ④ rich/sparse 비율`,
+done:`□ MDV 설정, MDV=0+DV=NA 0건<br>□ 결측 PK에 MISS_REASON flag<br>□ Predose+endpoint 처리<br>□ <strong>Obs QC Gate 4항목 PASS</strong>`,
+skip:`다중 endpoint 없으면 해당 부분만 생략.`,craft:null,
+rpkg:`<code>dplyr</code> mutate/case_when/count`}
+]},
+
+// ═══════ P3 ═══════
+{p:"P3",pt:"Merge & TIME — 가장 치명적인 단계",pst:"버그 #1 원인. 한 번 틀리면 전체 분석이 무의미",pc:"var(--p3)",pcb:"var(--p3b)",qs:[
+{n:"Q13",t:"Reference Time을 확정하고 POSIXct로 파싱했는가?",tp:"MUST",
+sig:`표준: 각 ID의 첫 투여 시점 = TIME 0. 모든 datetime을 POSIXct(tz='UTC')로 통일. Date+POSIXct 혼합은 예기치 않은 결과.`,
+prm:`(1) 모든 DATETIME → <code>ymd_hms(tz='UTC')</code>. 파싱 실패 건수<br>(2) <code>ref_time <- dose_df %>% group_by(ID) %>% summarise(REF=min(DATETIME)) %>% ungroup()</code><br>(3) 모든 ID에 REF 존재 확인`,
+done:`□ POSIXct 파싱, 실패 0건<br>□ REF_TIME 테이블 생성, 모든 ID 존재`,
+skip:`건너뛸 수 없음.`,
+craft:`다기관 국제 연구: timezone 불일치. 장기 연구: DST 1시간 오차.`,
+rpkg:`<code>lubridate</code> ymd_hms · <code>dplyr</code> group_by/summarise/ungroup`},
+
+{n:"Q14",t:"Dose+Obs를 합치고, TIME을 계산하고, 7-point 검증을 통과했는가?",tp:"MUST",
+sig:`두 building block을 <strong>여기서 한 번만 합친다</strong>. 합치기 검증은 방어적 프로그래밍의 핵심. <code>ungroup()</code> 빠뜨림도 흔한 함정.`,
+prm:`<strong>[합치기+TIME]</strong><br><code>nm_df <- bind_rows(dose_df,obs_df) %>% left_join(ref_time) %>% mutate(TIME=as.numeric(difftime(DATETIME,REF,units='hours')))</code><br><strong>[7-point]</strong><br>① 행수 산술 ② 중복행(get_dupes) ③ anti_join 누락 ID ④ EVID 분포 비교 ⑤ is.grouped_df→FALSE ⑥ EVID×MDV 교차표 비정상 ⑦ 음수 TIME 각각 판정`,
+done:`□ nm_df 생성<br>□ 7-point 모두 PASS<br>□ 음수 TIME 전부 검토·판정`,
+skip:`건너뛸 수 없음.`,craft:null,
+rpkg:`<code>dplyr</code> bind_rows/left_join/mutate · <code>janitor</code> get_dupes · <code>base</code> as.numeric`},
+
+{n:"Q15",t:"시간 결측 Imputation과 TIMEF flag가 완료되었는가?",tp:"COND",
+sig:`날짜만 있고 시간 없으면 TIME 불가. impute 후 <code>TIMEF=1</code> flag 필수. NTIME(nominal) 보존 → |TIME-NTIME|>2hr로 프로토콜 편차 식별.`,
+prm:`(1) 시각 NA 목록 (2) 투여→protocol nominal, 채혈→nominal sampling (3) TIMEF=1 (4) NTIME 보존 (5) imputed 수 보고`,
+done:`□ 시각 결측 imputed, TIMEF+NTIME 생성`,
+skip:`datetime 완전 → <strong>Q16으로</strong>`,craft:null,
+rpkg:`<code>dplyr</code> mutate/if_else · <code>lubridate</code> ymd_hms`},
+
+{n:"Q16",t:"정렬(dose→obs), TAD 계산, TIME 5-point 최종 검증이 완료되었는가?",tp:"MUST",
+sig:`NONMEM은 동일 TIME에서 <strong>파일 순서대로 처리</strong>. dose가 obs 앞에 와야 한다. 역순이면 첫 투여 직후 농도=0 예측. <strong>Top 2 실무 실수</strong>.`,
+prm:`<strong>[정렬]</strong> <code>arrange(ID,TIME,desc(EVID))</code>. 동일 TIME 역순 0건 확인<br><strong>[TAD]</strong> ADDL/II 반영 TAD. ID 1-2명 대조표 검증<br><strong>[5-point]</strong> ① 단조 비감소 ② 첫 dosing=0 ③ NA/Inf=0 ④ 범위≈프로토콜 ⑤ TAD≥0`,
+done:`□ 정렬: ID↑→TIME↑→EVID↓<br>□ TAD 생성, TAD≥0<br>□ 5-point 모두 PASS`,
+skip:`건너뛸 수 없음.`,craft:null,
+rpkg:`<code>dplyr</code> arrange/group_by/mutate/lag`}
+]},
+
+// ═══════ P4 ═══════
+{p:"P4",pt:"BLQ 처리·FLAG·Population Screening·EDA",pst:"M-method + 행 삭제 금지 + 분석 대상 확정 + 시각적 검증",pc:"var(--p4)",pcb:"var(--p4b)",qs:[
+{n:"Q17",t:"BLQ를 어떤 M-method로 최종 처리하는가?",tp:"MUST",
+sig:`Q11 비율 기반: <5%→M1, 5-25%→M3/M5, >25%→M3, trough 집중→반드시 M3. M3는 Laplacian/SAEM 필요.`,
+prm:`<strong>[M1]</strong> DV=0, MDV=1 <strong>[M3]</strong> DV=0, MDV=0+BLQ=1 → $ERROR: <code>IF(BLQ.EQ.1) YLO=0; YHI=LLOQ</code> <strong>[M5]</strong> DV=LLOQ/2, MDV=0<br>최종 <code>table(BLQ,MDV)</code>`,
+done:`□ M-method 선택+근거 문서화<br>□ DV/MDV 재설정<br>□ M3 시 $ERROR snippet`,
+skip:`BLQ 0건 → <strong>Q18로</strong>`,craft:null,
+rpkg:`<code>dplyr</code> mutate/case_when · <code>base</code> table`},
+
+{n:"Q18",t:"이상치 EXCL flag + 결측 PK MDV=1 처리가 완료되었는가?",tp:"MUST",
+sig:`<strong>절대 행을 삭제하지 않는다</strong>. EXCL=1 flag → <code>IGNORE=(EXCL.GT.0)</code> 하나로 base/sensitivity run 전환. 행 삭제=원본 복원 불가+sensitivity 불가.`,
+prm:`<strong>[Outlier]</strong> (1) DV>Cmax×5, DV<0 (2) 비논리 패턴 (3) Protocol deviation<br><code>mutate(EXCL=ifelse(조건,1,0), EXCLR=case_when(...))</code><br><strong>[결측PK]</strong> EVID=0+DV=NA → MDV=1, MISS_REASON flag`,
+done:`□ EXCL/EXCLR 생성, 행 삭제 0건<br>□ 의심 0건이어도 EXCL=0 컬럼 존재`,
+skip:`건너뛸 수 없음.`,
+craft:`이상값 발견 → 본인 판단 수정 금지, DM에게 query. 수정은 스크립트에 하드코딩.`,
+rpkg:`<code>dplyr</code> mutate/if_else/case_when`},
+
+{n:"Q19",t:"★ Population Screening — 분석 대상을 확정했는가?",tp:"MUST",
+sig:`최종 분석 대상 결정은 <strong>데이터 전처리의 일부</strong>다. 투여 기록 없음, 유효 obs<2, 모든 샘플 BQL인 대상자는 모델이 정보를 추출할 수 없다. <strong>제외 근거를 Analysis Dataset Creation Report에 기록</strong>해야 하며, 규제 제출 시 감사 대상이다. <em>v6 30-Step에 없었던 가장 중요한 복원 항목.</em>`,
+prm:`(1) ID별 요약: <code>nm_df %>% group_by(ID) %>% summarise(n_dose=sum(EVID==1), n_obs=sum(EVID==0&MDV==0), all_blq=all(BLQ[EVID==0]==1))</code><br>(2) 제외 후보: <code>filter(n_dose==0 | n_obs<2 | all_blq)</code><br>(3) 해당 ID EXCL=1 + 사유 기록<br>(4) <strong>Subject Disposition Flowchart 데이터</strong>: 스크리닝 N→등록 N→PK 분석 N<br>(5) 최종 분석 대상자 수 확정`,
+done:`□ 제외 ID 식별+EXCL 플래깅<br>□ 제외 사유 기록<br>□ Disposition flowchart 데이터 생성<br>□ 최종 분석 N 확정`,
+skip:`건너뛸 수 없음.`,craft:null,
+rpkg:`<code>dplyr</code> group_by/summarise/filter/mutate`},
+
+{n:"Q20",t:"탐색적 시각화(EDA)로 데이터를 검증했는가?",tp:"MUST",
+sig:`EDA 없이 NONMEM 투입은 FDA 리뷰어가 가장 먼저 지적하는 오류. Dose-normalized plot으로 <strong>비선형 PK 발견 시 Q01 target model 재검토</strong>. covariate merge 전 깨끗한 상태에서 판단해야 한다.`,
+prm:`(1) DV/AMT vs TAD spaghetti(log), dose group 색상 → 용량 비례성<br>(2) 전체 DV vs TIME (linear+log), <code>geom_vline()</code><br>(3) BLQ비율 vs binned TIME: terminal 증가=정상, 초기=의심<br>(4) 비선형 PK 시 Q01 재검토`,
+done:`□ Dose-normalized+spaghetti 검토<br>□ 용량 비례성 판단 기록<br>□ Q01 모델 일치 확인 (or 수정 계획)`,
+skip:`건너뛸 수 없음.`,
+craft:`Red Flags: 투여 직후 DV=0→dosing 누락/TIME 오류. 비축적 지속증가→reference 문제. 같은 시점 극단 차이→단위 오류.`,
+rpkg:`<code>ggplot2</code> geom_line/geom_point/scale_y_log10/facet_wrap · <code>patchwork</code>`}
+]},
+
+// ═══════ P5 ═══════
+{p:"P5",pt:"공변량(Covariate) 추출·merge·검증",pst:"Baseline + time-varying + merge 후 행수 불변 = 생명",pc:"var(--p5)",pcb:"var(--p5b)",qs:[
+{n:"Q21",t:"Baseline Covariates를 추출하고, 파생변수를 계산했는가?",tp:"MUST",
+sig:`"Baseline"=첫 투여 전 마지막 측정값. 규제 제출 시 Baseline 정의를 SAP와 일치시켜야 한다. SCr 단위 μmol/L→mg/dL(÷88.4)이 가장 흔한 오류. eGFR 공식(CKD-EPI vs MDRD) 선택도 모델 결과에 영향.`,
+prm:`(1) <code>cov_df</code>: ID당 1행 (2) Baseline 기준 변수별 명시(Screening?Day1?) (3) summary+결측률 (4) 극단값: WT∈[30,250], AGE∈[0,120], SCr>0<br><strong>[파생]</strong> BSA(DuBois), CLCR(CG, 여성×0.85), BMI. 계산불가 ID 목록`,
+done:`□ cov_df ID당 1행, 분포+결측률<br>□ 극단값 식별<br>□ 파생변수 완료, SCr 단위 확인`,
+skip:`공변량 없으면 생략 (WT는 거의 항상 필요).`,craft:null,
+rpkg:`<code>dplyr</code> left_join/select/distinct/mutate · <code>base</code> pmin/pmax`},
+
+{n:"Q22",t:"범주형 코딩 후 ID merge — 행수가 변했는가?",tp:"MUST",
+sig:`NONMEM은 숫자만 처리. merge 시 1:many→행 증폭, key 불일치→행 소실. <strong>Top 8 실무 실수</strong>.`,
+prm:`<strong>[범주형]</strong> <code>mutate(SEX=ifelse(SEX=='M',0,1))</code>. tribble 매핑<br><strong>[Merge]</strong> (1) stopifnot(nrow(cov_df)==n_distinct(cov_df$ID)) (2) nrow_before (3) left_join (4) stopifnot(nrow==nrow_before) (5) Baseline ID내 불변: <code>n_distinct()>1</code>인 ID 탐지`,
+done:`□ 범주형→숫자, 매핑 기록<br>□ <strong>행수 불변 PASS</strong><br>□ Baseline ID내 불변`,
+skip:`건너뛸 수 없음.`,craft:null,
+rpkg:`<code>dplyr</code> mutate/left_join/group_by · <code>base</code> stopifnot · <code>tibble</code> tribble`},
+
+{n:"Q23",t:"Time-varying Covariates를 LOCF로 처리해야 하는가?",tp:"COND",
+sig:`eGFR·ALT·병용약물 등 변화 공변량은 LOCF가 표준. <strong>TVC 미처리→CL 변화가 랜덤효과에 흡수→해석 오류의 원천</strong>. 첫 관측 이전: baseline 사용?NA? 명시적 결정 필수.`,
+prm:`(1) ID·TIME 정렬 (2) <code>tidyr::fill(.direction='down')</code> (3) 전후 NA 비교 (4) 급격 변화 플래깅 (5) 병용약물 COMED=1 구간 (6) merge 후 행수 불변`,
+done:`□ LOCF 완료, NA 없음<br>□ 급격 변화 검토<br>□ 행수 불변`,
+skip:`TVC 없거나 baseline만 → <strong>Q24로</strong>`,
+craft:`첫 관측 이전: baseline?NA? 이 결정을 명시 문서화.`,
+rpkg:`<code>tidyr</code> fill · <code>dplyr</code> arrange/left_join`},
+
+{n:"Q24",t:"공변량 결측 imputation + 생물학적 범위 검증이 완료되었는가?",tp:"MUST",
+sig:`NONMEM에 빈 셀 불가. 연속형: median+FLAG_IMP_*. 범주형: 최빈값. WT=0, AGE=200 등은 data entry error — <strong>본인 수정 금지, DM query</strong>.`,
+prm:`<strong>[Impute]</strong> (1) 결측비율 (2) median+FLAG_IMP (3) 범주형: 최빈값 (4) 전후 분포<br><strong>[범위]</strong> (5) WT/AGE/CLCR/SCr/ALB 범위 (6) 상관 산점도 (7) 이상치→DM query`,
+done:`□ 모든 공변량 NA=0<br>□ FLAG 존재<br>□ 불가능값 0건 (or DM query)<br>□ Data Handling Spec에 기록`,
+skip:`결측 0건→impute 생략, <strong>범위 검증은 반드시</strong>.`,craft:null,
+rpkg:`<code>dplyr</code> mutate/across/summarise · <code>tidyr</code> replace_na · <code>ggplot2</code> geom_boxplot`}
+]},
+
+// ═══════ P6 ═══════
+{p:"P6",pt:"포맷·QC·PRED Check",pst:"NONMEM이 읽을 수 있는 형태 + 12-point QC + 데이터 구조의 최종 검증",pc:"var(--p6)",pcb:"var(--p6b)",qs:[
+{n:"Q25",t:"필수 컬럼·$INPUT 순서·NMSEQNO가 확정되었는가?",tp:"MUST",
+sig:`$INPUT 순서=데이터 컬럼 순서. 불일치 시 변수 값이 뒤바뀌는 <strong>silent error</strong>.`,
+prm:`(1) required 체크: <code>setdiff(c('ID','TIME','DV','AMT','CMT','EVID','MDV'), names(nm_df))</code><br>(2) select 순서 (3) <code>arrange(ID,TIME,desc(EVID)) %>% mutate(NMSEQNO=row_number())</code> (4) head 육안`,
+done:`□ 필수 컬럼 존재<br>□ 순서=$INPUT 대응<br>□ NMSEQNO 생성`,
+skip:`건너뛸 수 없음.`,craft:null,
+rpkg:`<code>dplyr</code> select/relocate/arrange/mutate`},
+
+{n:"Q26",t:"NA→'.', header 규격, CSV+round-trip이 완료되었는가?",tp:"MUST",
+sig:`NONMEM: 숫자 또는 '.'. 한글/BOM→중단. 컬럼명 8자·대문자·특수문자 없음. 저장 후 round-trip test 필수.`,
+prm:`(1) toupper (2) 8자/특수문자 탐지 (3) non-ASCII grep (4) factor/character 잔존 (5) <code>write.csv(na='.',quote=FALSE)</code> (6) round-trip: read→dim/head (7) readLines(3줄)`,
+done:`□ 규격 준수<br>□ CSV+round-trip PASS`,
+skip:`건너뛸 수 없음.`,craft:null,
+rpkg:`<code>readr</code> write_csv(na='.') · <code>base</code> toupper/grep/readLines`},
+
+{n:"Q27",t:"$INPUT/$DATA 생성 + 12-point 구조 QC가 PASS인가?",tp:"MUST",
+sig:`이 검사를 자동화하면 런타임 에러 90% 예방. NMcheckData 가능하면 이중 검증.`,
+prm:`<strong>[$I/$D]</strong> cat($INPUT), IGNORE=(EXCL.GT.0), 변수수=컬럼수<br><strong>[12-point]</strong> ①≥1 dosing ②≥1 obs ③EVID=1→AMT>0,MDV=1 ④EVID=0→AMT=0 ⑤중복 없음 ⑥CMT 유효 ⑦ADDL→II>0 ⑧SS→II ⑨NA/non-numeric=0 ⑩Header 1줄 ⑪첫record=dosing ⑫non-ASCII=0`,
+done:`□ $INPUT/$DATA 생성<br>□ <strong>12-point 모두 PASS</strong>`,
+skip:`건너뛸 수 없음.`,
+craft:`$INPUT↔컬럼 순서 불일치=<strong>Top 9 실무 실수</strong>. 에러 없이 값이 뒤바뀐다.`,
+rpkg:`<code>base</code> cat/stopifnot · <code>NMdata</code> NMcheckData`},
+
+{n:"Q28",t:"개인별 PK 플롯 육안 검토 + 누적투여량 CRF 대조가 완료되었는가?",tp:"MUST",
+sig:`자동 검증으로 잡을 수 없는 것을 눈으로 잡는다. <strong>전체 ID를 다 봐야 한다.</strong> 누적투여량이 CRF와 불일치하면 dosing record 누락/중복→CL/V 직접 왜곡.`,
+prm:`<strong>[플롯]</strong> (1) facet_wrap(~ID) DV vs TIME(log), geom_vline (2) AMT vs TIME scatter (3) Covariate pairs plot (4) Red flag ID 목록<br><strong>[투여량]</strong> (5) <code>sum(AMT[EVID==1]*(ADDL+1))</code>, ID별 테이블, CRF 대조`,
+done:`□ 전체 ID 검토<br>□ Red flag 문서화<br>□ 누적투여량=CRF (불일치→원인 파악)`,
+skip:`건너뛸 수 없음.`,craft:null,
+rpkg:`<code>ggplot2</code> facet_wrap/geom_vline · <code>dplyr</code> group_by/summarise`},
+
+{n:"Q29",t:"★ PRED Check — 단순 모델로 데이터 구조를 검증했는가?",tp:"MUST",
+sig:`자동 QC와 시각적 QC를 모두 통과해도, <strong>NONMEM이 실제로 데이터를 어떻게 해석하는지</strong>는 모델을 돌려봐야 안다. 이것은 <strong>모델 평가가 아니라 데이터 구조 검증</strong>이다. 여기서 발견하는 오류가 <strong>가장 치명적이고 발견하기 어려운</strong> 것들이다. <em>v6 30-Step에 완전히 부재했던 가장 치명적 복원 항목.</em>`,
+prm:`(1) 가장 단순한 control stream: ADVAN2(PO) or ADVAN1(IV), 1-comp, FO, 문헌 초기값<br>(2) NONMEM 실행 (또는 <code>mrgsolve</code>/<code>RxODE</code> simulation)<br>(3) PRED vs DV scatter + 개인별 PRED vs TIME<br>(4) <strong>이상 패턴 4종:</strong><br>&nbsp;&nbsp;• 모든 ID PRED≈0 → <strong>AMT 단위 오류 or CMT 오류</strong><br>&nbsp;&nbsp;• 특정 ID PRED 무한 상승 → <strong>TIME 역전 or 중복 EVID=1</strong><br>&nbsp;&nbsp;• 흡수 피크 없이 감소만 → <strong>Depot CMT 누락, oral→central</strong><br>&nbsp;&nbsp;• Trough=0 → <strong>ADDL/II 구간 투여 누락</strong>`,
+done:`□ 단순 모델 실행 완료<br>□ 4종 이상 패턴 없음<br>□ 이상 발견 시 원인 추적+수정 완료`,
+skip:`NONMEM 미설치 → mrgsolve/RxODE 대체 가능. <strong>모델링 자체를 건너뛰는 것은 불가.</strong>`,
+craft:`CMT=2로 넣어야 할 oral이 depot 없이 central로 들어가면, PRED가 실측보다 높게 나오는 것으로만 나타나고 — NONMEM은 에러 없이 돌아간다. 이것을 잡는 마지막 기회다.`,
+rpkg:`<code>mrgsolve</code> mread/mrgsim/ev · 또는 NONMEM ADVAN1/2 최소 control stream`}
+]},
+
+// ═══════ P7 ═══════
+{p:"P7",pt:"문서화 & 최종 산출물",pst:"재현성·traceability가 없으면 규제 제출도 학위 심사도 불가",pc:"var(--p7)",pcb:"var(--p7b)",qs:[
+{n:"Q30",t:"Data Handling Spec + Sensitivity Analysis Plan이 작성되었는가?",tp:"MUST",
+sig:`모든 전처리 의사결정의 근거 문서. <strong>누가 봐도 동일 결과를 재현</strong>할 수 있어야 하며, 규제 제출 시 필수. 장인은 전처리 단계에서 이미 <strong>미래의 sensitivity analysis를 설계</strong>한다.`,
+prm:`<strong>[Spec]</strong> Rmd 9개 섹션: 출처·제외기준(EXCL+Disposition Flowchart)·TIME방법(TIMEF)·BQL(M-method 근거)·결측imputation(FLAG_IMP)·이상치이력·최종요약(N)·컬럼정의·단위관계식<br><strong>[Sensitivity]</strong> FLAG 요약 테이블(FLAG명/목적/수/%) + 각 run의 $DATA IGNORE 조건문 + 예상 N`,
+done:`□ Spec 완성, 모든 결정에 근거<br>□ FLAG 요약 + sensitivity 조건문`,
+skip:`탐색적→간소화 가능. BQL+제외기준은 최소 기록.`,craft:null,
+rpkg:`<code>rmarkdown</code> render · <code>knitr</code> kable`},
+
+{n:"Q31",t:"모듈 파이프라인 + raw→csv 재현 + 수작업 검증이 완료되었는가?",tp:"MUST",
+sig:`<strong>100% 스크립트화, 수동 수정 0건</strong>. Excel 셀 1개 수정=traceability 파괴. 수작업 검증은 <strong>최후의 방어선</strong>.`,
+prm:`<strong>[모듈]</strong> 01_PK.R / 02_Dosing.R / 03_Merge_Time.R / 04_BLQ_Flag_Screen.R / 05_Cov.R / 06_Format.R / 07_QC.R + 00_Master.R<br><strong>[재현]</strong> <code>rm(list=ls()); source('00_Master.R')</code> → md5 비교<br><strong>[수작업]</strong> 임의 ID 2명(정상+protocol deviation). raw→최종 TIME/AMT/DV/ADDL/II 한 줄씩 대조`,
+done:`□ 모듈+Master 존재<br>□ md5 일치<br>□ 수동 수정 0건<br>□ 수작업 2명 PASS`,
+skip:`건너뛸 수 없음.`,craft:null,
+rpkg:`<code>base</code> source · <code>tools</code> md5sum`},
+
+{n:"Q32",t:"최종 산출물 8개가 모두 갖춰졌는가? → NONMEM-Ready 완성",tp:"MUST",
+sig:`전체 전처리의 완료 지점. 8개 산출물이 모두 존재하고 재현 가능해야 NONMEM에 투입할 수 있다.`,
+prm:`☐ NONMEM-ready CSV<br>☐ $INPUT+$DATA 문자열<br>☐ R 스크립트 (재현·모듈화)<br>☐ Data Handling Specification<br>☐ QC 플롯 모음 (individual·spaghetti·dose-normalized·dose-time·covariate)<br>☐ Subject Disposition Flowchart<br>☐ Sensitivity plan+FLAG 요약<br>☐ Data review meeting notes 템플릿`,
+done:`모두 ✅ → 🎉 <strong>NONMEM-Ready Dataset Complete</strong><br>다음: <code>NMdata::NMscanData()</code>로 output 역추적.`,
+skip:`건너뛸 수 없음.`,craft:null,
+rpkg:`<code>NMdata</code> NMscanData/NMcheckData`},
+
+{n:"Q33",t:"★ 독립 QC (2인 검증)를 수행했는가?",tp:"COND",
+sig:`다른 사람이 동일 raw data에서 독립적으로 코딩 후 결과를 대조하는 것이 gold standard. 규제 제출용이면 MUST로 격상. 탐색적이면 생략 가능. <em>두 BASE 버전 모두에 없었던 신규 항목.</em>`,
+prm:`(1) 독립 프로그래머가 동일 raw→최종 CSV 생성<br>(2) record 수 대조<br>(3) BLQ flag 수 일치<br>(4) 누적 투여량 일치<br>(5) 최종 CSV 파일 비교 (diff 또는 all.equal)`,
+done:`□ 독립 코딩 결과와 일치<br>□ 불일치 시 원인 추적+합의 완료<br>□ QC 서명 완료`,
+skip:`탐색적 분석 or 인력 부족 → 생략 가능. 규제 제출이면 <strong>반드시 수행</strong>.`,craft:null,
+rpkg:`<code>base</code> all.equal · <code>tools</code> md5sum`}
+]}
+];
+
+function renderAll(){
+  const c=document.getElementById('content');c.innerHTML='';
+  Q.forEach(ph=>{
+    let h=`<div class="ps" id="${ph.p}"><div class="pb" style="background:${ph.pcb};color:${ph.pc}" onclick="tp(this)"><div class="n" style="background:${ph.pc};color:#fff">${ph.p.replace('P','')}</div><div class="inf"><div class="tt">${ph.pt}</div><div class="st">${ph.pst}</div></div><span class="qc">${ph.qs[0].n}–${ph.qs[ph.qs.length-1].n}</span><svg class="chv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></div><div class="pbd">`;
+    ph.qs.forEach(q=>{
+      const bc=q.tp==='MUST'?'var(--acc)':ph.pc;
+      const badge=q.tp==='MUST'?'<span class="bd b-m">MUST</span>':'<span class="bd b-c">COND</span>';
+      const isGate=q.n==='Q09'||q.t.includes('QC Gate');
+      const gateBadge=isGate?'<span class="bd b-g">GATE</span>':'';
+      const craftH=q.craft?`<div class="craft"><div class="craft-t">🔨 장인 노트</div>${q.craft}</div>`:'';
+      const rpkgH=q.rpkg?`<div class="rpkg"><div class="rpkg-t">📦 R 도구</div>${q.rpkg}</div>`:'';
+      h+=`<div class="qc_" style="border-left-color:${bc}" data-type="${q.tp}"><div class="qh" onclick="tq(this)"><span class="qn" style="background:${ph.pcb};color:${ph.pc}">${q.n}</span><span class="qt">${q.t}</span><div class="qbg">${badge}${gateBadge}</div><svg class="qa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div><div class="qb"><div class="sig"><div class="sig-t">🔍 의의</div>${q.sig}</div><div class="prm"><div class="prm-t">📋 R 코드 요청 프롬프트</div>${q.prm}</div>${rpkgH}<div class="done"><div class="done-t">✅ 완료 조건</div>${q.done}</div><div class="skip"><div class="skip-t">⏭ 건너뛰기</div>${q.skip}</div>${craftH}</div></div>`;
+    });
+    h+=`</div></div>`;c.innerHTML+=h;
+  });
+}
+function tp(b){b.closest('.ps').classList.toggle('open')}
+function tq(h){h.closest('.qc_').classList.toggle('open')}
+function toggleAll(o){document.querySelectorAll('.ps').forEach(p=>{o?p.classList.add('open'):p.classList.remove('open')});document.querySelectorAll('.qc_').forEach(c=>{o?c.classList.add('open'):c.classList.remove('open')})}
+function showOnly(t){document.querySelectorAll('.qc_').forEach(c=>{if(t==='ALL'){c.style.display='';return}c.style.display=c.dataset.type===t?'':'none'});document.querySelectorAll('.ps').forEach(p=>p.classList.add('open'))}
+renderAll();
+</script>
+</body>
+</html>

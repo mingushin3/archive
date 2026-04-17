@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="타임박스">
+<meta name="theme-color" id="themeColorMeta" content="#1c1c1e">
+<title>Time Box Planner</title>
+<style>
+
+/* ═══════════════════════════════════════════════
+   1. CSS VARIABLES & RESET
+═══════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:         #f2f2f7;
+  --bg-card:    #ffffff;
+  --bg-input:   #ffffff;
+  --border:     #c6c6c8;
+  --border2:    #e5e5ea;
+  --text:       #1c1c1e;
+  --text2:      #3c3c43;
+  --text3:      #8e8e93;
+  --accent:     #007aff;
+  --accent2:    #34c759;
+  --danger:     #ff3b30;
+  --hdr-bg:     #1c1c1e;
+  --hdr-text:   #f2f2f7;
+  --nav-bg:     rgba(242,242,247,0.85);
+  --nav-border: rgba(0,0,0,0.12);
+  --shadow:     0 1px 3px rgba(0,0,0,0.1);
+
+  --cat-work:     #1d4ed8;
+  --cat-study:    #15803d;
+  --cat-health:   #dc2626;
+  --cat-personal: #7c3aed;
+  --cat-admin:    #d97706;
+  --cat-routine:  #6b7280;
+
+  --safe-t: env(safe-area-inset-top,    0px);
+  --safe-b: env(safe-area-inset-bottom, 20px);
+  --safe-l: env(safe-area-inset-left,   0px);
+  --safe-r: env(safe-area-inset-right,  0px);
+  --nav-h:  49px;
+  --hdr-h:  52px;
+  --radius: 12px;
+  --ease:   cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+[data-theme="dark"] {
+  --bg:         #000000;
+  --bg-card:    #1c1c1e;
+  --bg-input:   #2c2c2e;
+  --border:     #38383a;
+  --border2:    #2c2c2e;
+  --text:       #f2f2f7;
+  --text2:      #ebebf5;
+  --text3:      #8e8e93;
+  --accent:     #0a84ff;
+  --accent2:    #32d74b;
+  --danger:     #ff453a;
+  --hdr-bg:     #1c1c1e;
+  --hdr-text:   #f2f2f7;
+  --nav-bg:     rgba(28,28,30,0.9);
+  --nav-border: rgba(255,255,255,0.08);
+  --shadow:     0 1px 3px rgba(0,0,0,0.4);
+}
+
+html { height: 100%; }
+body {
+  height: 100%;
+  overflow: hidden;
+  font-family: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior: none;
+}
+
+/* ═══════════════════════════════════════════════
+   2. APP SHELL
+═══════════════════════════════════════════════ */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  height: 100dvh;
+  padding-top: var(--safe-t);
+}
+
+/* ─── Header ─── */
+.app-header {
+  flex-shrink: 0;
+  height: var(--hdr-h);
+  background: var(--hdr-bg);
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  gap: 4px;
+  position: relative;
+  z-index: 20;
+}
+
+.hdr-date-nav {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.date-arrow {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.75);
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s;
+  line-height: 1;
+}
+.date-arrow:active { background: rgba(255,255,255,0.15); }
+
+.date-display { text-align: center; min-width: 130px; cursor: pointer; }
+.date-main {
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+}
+.date-sub {
+  color: rgba(255,255,255,0.55);
+  font-size: 11px;
+  margin-top: 1px;
+}
+
+.hdr-btn {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.8);
+  font-size: 19px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.hdr-btn:active { background: rgba(255,255,255,0.15); }
+
+/* ─── Tab Panels ─── */
+.tab-panels {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.tab-panel {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px 16px;
+  padding-bottom: calc(var(--nav-h) + var(--safe-b) + 12px);
+  display: none;
+  overscroll-behavior: contain;
+}
+.tab-panel.active { display: block; }
+
+/* ─── Bottom Nav ─── */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--nav-h) + var(--safe-b));
+  padding-bottom: var(--safe-b);
+  background: var(--nav-bg);
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  border-top: 0.5px solid var(--nav-border);
+  display: flex;
+  z-index: 20;
+}
+
+.nav-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  cursor: pointer;
+  color: var(--text3);
+  transition: color 0.2s;
+  padding: 0;
+  font-family: inherit;
+}
+.nav-btn.active { color: var(--accent); }
+.nav-icon { font-size: 23px; line-height: 1; }
+.nav-label { font-size: 10px; font-weight: 600; letter-spacing: -0.2px; }
+
+/* Save status */
+.save-status {
+  position: fixed;
+  bottom: calc(var(--nav-h) + var(--safe-b));
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 10.5px;
+  color: var(--text3);
+  background: var(--bg);
+  padding: 3px 8px;
+  border-top: 0.5px solid var(--border2);
+  z-index: 15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ═══════════════════════════════════════════════
+   3. SHARED COMPONENTS
+═══════════════════════════════════════════════ */
+.section-hdr {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text3);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  padding: 0 4px;
+  margin: 20px 0 7px;
+}
+.section-hdr:first-child { margin-top: 4px; }
+
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow);
+}
+
+.action-btn {
+  flex: 1;
+  min-width: 0;
+  padding: 13px 10px;
+  border-radius: 10px;
+  border: none;
+  background: var(--bg-card);
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--text2);
+  cursor: pointer;
+  text-align: center;
+  box-shadow: var(--shadow);
+  transition: opacity 0.15s;
+}
+.action-btn:active { opacity: 0.6; }
+.action-btn.blue   { color: var(--accent); }
+.action-btn.green  { color: var(--accent2); }
+.action-btn.red    { color: var(--danger); }
+
+.btn-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+/* Install banner */
+.install-banner {
+  background: linear-gradient(135deg, #1c1c1e, #2c2c2e);
+  color: white;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+  box-shadow: var(--shadow);
+}
+.install-banner strong { display: block; font-size: 14px; margin-bottom: 4px; font-weight: 800; }
+.banner-close {
+  display: inline-block;
+  margin-top: 8px;
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: white;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* ═══════════════════════════════════════════════
+   4. PLAN PANEL
+═══════════════════════════════════════════════ */
+.pri-row {
+  display: flex;
+  align-items: center;
+  border-bottom: 0.5px solid var(--border2);
+  min-height: 50px;
+}
+.pri-row:last-child { border-bottom: none; }
+
+.pri-num {
+  width: 42px;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text3);
+  flex-shrink: 0;
+}
+
+.pri-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 14px 16px 14px 2px;
+  font-size: 16px;
+  font-family: inherit;
+  color: var(--text);
+  min-height: 50px;
+  caret-color: var(--accent);
+}
+.pri-input::placeholder { color: var(--text3); }
+
+.dump-area {
+  width: 100%;
+  min-height: 150px;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 14px 16px;
+  font-size: 16px;
+  font-family: inherit;
+  color: var(--text);
+  line-height: 1.8;
+  resize: none;
+  display: block;
+  caret-color: var(--accent);
+}
+.dump-area::placeholder { color: var(--text3); }
+
+/* ═══════════════════════════════════════════════
+   5. TIMEBOX PANEL
+═══════════════════════════════════════════════ */
+
+/* Sticky category selector */
+.cat-selector {
+  position: sticky;
+  top: -12px;
+  z-index: 10;
+  background: var(--bg);
+  padding: 8px 0 10px;
+  margin: -12px -16px 8px;
+  padding-left: 16px;
+  padding-right: 16px;
+  border-bottom: 0.5px solid var(--border2);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.cat-chips {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+.cat-chips::-webkit-scrollbar { display: none; }
+
+.cat-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-card);
+  border-radius: 20px;
+  padding: 6px 11px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text2);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.18s;
+  font-family: inherit;
+}
+.cat-chip.active {
+  color: #fff;
+  border-color: transparent;
+}
+.cat-chip[data-cat=""].active     { background: #4b5563; }
+.cat-chip[data-cat="work"].active     { background: var(--cat-work); }
+.cat-chip[data-cat="study"].active    { background: var(--cat-study); }
+.cat-chip[data-cat="health"].active   { background: var(--cat-health); }
+.cat-chip[data-cat="personal"].active { background: var(--cat-personal); }
+.cat-chip[data-cat="admin"].active    { background: var(--cat-admin); }
+.cat-chip[data-cat="routine"].active  { background: var(--cat-routine); }
+
+.chip-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.chip-dot[data-cat=""]        { background: #9ca3af; }
+.chip-dot[data-cat="work"]    { background: var(--cat-work); }
+.chip-dot[data-cat="study"]   { background: var(--cat-study); }
+.chip-dot[data-cat="health"]  { background: var(--cat-health); }
+.chip-dot[data-cat="personal"]{ background: var(--cat-personal); }
+.chip-dot[data-cat="admin"]   { background: var(--cat-admin); }
+.chip-dot[data-cat="routine"] { background: var(--cat-routine); }
+
+/* Period groups */
+.period-header {
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+}
+.p-dawn   { background: #EEF2FF; color: #4338ca; }
+.p-am     { background: #F0FDF4; color: #166534; }
+.p-pm     { background: #FFFBEB; color: #92400e; }
+.p-eve    { background: #FFF1F2; color: #9f1239; }
+.p-night  { background: #F5F3FF; color: #5b21b6; }
+
+[data-theme="dark"] .p-dawn  { background: #1e1b4b; color: #a5b4fc; }
+[data-theme="dark"] .p-am    { background: #052e16; color: #86efac; }
+[data-theme="dark"] .p-pm    { background: #451a03; color: #fcd34d; }
+[data-theme="dark"] .p-eve   { background: #4c0519; color: #fda4af; }
+[data-theme="dark"] .p-night { background: #2e1065; color: #c4b5fd; }
+
+/* Slot rows */
+.slot-row {
+  display: flex;
+  align-items: center;
+  min-height: 50px;
+  border-bottom: 0.5px solid var(--border2);
+  position: relative;
+  transition: background 0.18s;
+}
+.slot-row:last-child { border-bottom: none; }
+
+/* Left color bar */
+.slot-row::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  transition: background 0.18s;
+}
+.slot-row[data-cat="work"]::before     { background: var(--cat-work); }
+.slot-row[data-cat="study"]::before    { background: var(--cat-study); }
+.slot-row[data-cat="health"]::before   { background: var(--cat-health); }
+.slot-row[data-cat="personal"]::before { background: var(--cat-personal); }
+.slot-row[data-cat="admin"]::before    { background: var(--cat-admin); }
+.slot-row[data-cat="routine"]::before  { background: var(--cat-routine); }
+
+.slot-row[data-cat="work"]     { background: rgba(29,78,216,0.07); }
+.slot-row[data-cat="study"]    { background: rgba(21,128,61,0.07); }
+.slot-row[data-cat="health"]   { background: rgba(220,38,38,0.07); }
+.slot-row[data-cat="personal"] { background: rgba(124,58,237,0.07); }
+.slot-row[data-cat="admin"]    { background: rgba(217,119,6,0.07); }
+.slot-row[data-cat="routine"]  { background: rgba(107,114,128,0.07); }
+
+[data-theme="dark"] .slot-row[data-cat="work"]     { background: rgba(29,78,216,0.18); }
+[data-theme="dark"] .slot-row[data-cat="study"]    { background: rgba(21,128,61,0.18); }
+[data-theme="dark"] .slot-row[data-cat="health"]   { background: rgba(220,38,38,0.18); }
+[data-theme="dark"] .slot-row[data-cat="personal"] { background: rgba(124,58,237,0.18); }
+[data-theme="dark"] .slot-row[data-cat="admin"]    { background: rgba(217,119,6,0.18); }
+[data-theme="dark"] .slot-row[data-cat="routine"]  { background: rgba(107,114,128,0.18); }
+
+/* Color dot button */
+.slot-cat-btn {
+  width: 44px;
+  height: 50px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+}
+.slot-cat-btn:active { opacity: 0.5; }
+
+.slot-cat-dot {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--border);
+  border: 2px solid transparent;
+  transition: all 0.18s;
+  flex-shrink: 0;
+}
+
+.slot-row[data-cat="work"]     .slot-cat-dot { background: var(--cat-work);     border-color: rgba(255,255,255,0.3); }
+.slot-row[data-cat="study"]    .slot-cat-dot { background: var(--cat-study);    border-color: rgba(255,255,255,0.3); }
+.slot-row[data-cat="health"]   .slot-cat-dot { background: var(--cat-health);   border-color: rgba(255,255,255,0.3); }
+.slot-row[data-cat="personal"] .slot-cat-dot { background: var(--cat-personal); border-color: rgba(255,255,255,0.3); }
+.slot-row[data-cat="admin"]    .slot-cat-dot { background: var(--cat-admin);    border-color: rgba(255,255,255,0.3); }
+.slot-row[data-cat="routine"]  .slot-cat-dot { background: var(--cat-routine);  border-color: rgba(255,255,255,0.3); }
+
+.time-label {
+  width: 30px;
+  flex-shrink: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text3);
+  text-align: center;
+  user-select: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.slot-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0 12px 0 6px;
+  font-size: 16px; /* must be ≥16 to prevent iOS auto-zoom */
+  font-family: inherit;
+  color: var(--text);
+  height: 50px;
+  min-width: 0;
+  caret-color: var(--accent);
+}
+.slot-input::placeholder { color: var(--text3); font-size: 14px; }
+
+/* Current time line */
+.now-line {
+  height: 0;
+  border: none;
+  border-top: 2px solid var(--danger);
+  position: relative;
+  margin: 0;
+  opacity: 0.8;
+  pointer-events: none;
+}
+.now-line::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: -5px;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--danger);
+}
+
+/* Category stats */
+.cat-stats {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow);
+}
+.stats-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 12px;
+}
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.stat-row:last-child { margin-bottom: 0; }
+.stat-label { font-size: 12px; font-weight: 700; width: 68px; flex-shrink: 0; }
+.stat-track { flex: 1; height: 7px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+.stat-fill  { height: 100%; border-radius: 4px; transition: width 0.5s var(--ease); }
+.stat-time  { font-size: 11.5px; font-weight: 700; color: var(--text3); width: 34px; text-align: right; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+
+/* ═══════════════════════════════════════════════
+   6. REVIEW PANEL
+═══════════════════════════════════════════════ */
+.review-ta {
+  width: 100%;
+  min-height: 90px;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 14px 16px;
+  font-size: 16px;
+  font-family: inherit;
+  color: var(--text);
+  line-height: 1.7;
+  resize: none;
+  display: block;
+  caret-color: var(--accent);
+}
+.review-ta::placeholder { color: var(--text3); }
+
+/* ═══════════════════════════════════════════════
+   7. WEEKLY PANEL
+═══════════════════════════════════════════════ */
+.week-card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  margin-bottom: 8px;
+}
+.week-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 0.5px solid var(--border2);
+}
+.week-title { font-size: 14px; font-weight: 800; color: var(--text); }
+.week-nav-btn {
+  background: none; border: none;
+  font-size: 20px; color: var(--text3);
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 8px; cursor: pointer;
+  transition: background 0.15s;
+  font-family: inherit;
+}
+.week-nav-btn:active { background: var(--bg); }
+
+.week-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+.week-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 2px;
+  border-right: 0.5px solid var(--border2);
+  cursor: pointer;
+  min-height: 70px;
+  gap: 3px;
+  transition: background 0.15s;
+}
+.week-day:last-child { border-right: none; }
+.week-day:active { background: var(--bg); }
+.week-day.is-today { background: rgba(0,122,255,0.05); }
+.week-day.is-selected { background: rgba(0,122,255,0.1); }
+
+.wd-name { font-size: 9.5px; font-weight: 700; color: var(--text3); text-transform: uppercase; }
+.wd-num {
+  font-size: 15px; font-weight: 700; color: var(--text);
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+}
+.week-day.is-today .wd-num { background: var(--accent); color: #fff; }
+.wd-dots { display: flex; gap: 2px; flex-wrap: wrap; justify-content: center; max-width: 28px; }
+.wd-dot { width: 5px; height: 5px; border-radius: 50%; }
+
+.week-detail-item {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: opacity 0.15s;
+}
+.week-detail-item:active { opacity: 0.7; }
+.detail-date { font-size: 11.5px; font-weight: 700; color: var(--text3); margin-bottom: 5px; }
+.detail-pri  { font-size: 14px; color: var(--text); padding: 2px 0; }
+
+/* ═══════════════════════════════════════════════
+   8. SETTINGS SHEET
+═══════════════════════════════════════════════ */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 50;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s;
+}
+.overlay.open { opacity: 1; pointer-events: all; }
+
+.settings-sheet {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--bg);
+  border-radius: 20px 20px 0 0;
+  padding: 0 0 calc(16px + var(--safe-b));
+  z-index: 51;
+  transform: translateY(100%);
+  transition: transform 0.38s var(--ease);
+  max-height: 90dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.settings-sheet.open { transform: translateY(0); }
+
+.sheet-handle {
+  width: 36px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 12px auto 0;
+}
+
+.sheet-title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px 8px;
+}
+.sheet-title { font-size: 18px; font-weight: 800; color: var(--text); }
+.sheet-close {
+  background: var(--bg-input);
+  border: none;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  font-size: 14px; font-weight: 700;
+  color: var(--text3);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-family: inherit;
+}
+
+.setting-group {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  margin: 8px 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 16px;
+  min-height: 50px;
+  border-bottom: 0.5px solid var(--border2);
+  gap: 12px;
+}
+.setting-row:last-child { border-bottom: none; }
+.setting-label { font-size: 15px; font-weight: 600; color: var(--text); }
+.setting-sub   { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+/* iOS toggle */
+.toggle { position: relative; width: 51px; height: 31px; flex-shrink: 0; }
+.toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-track {
+  position: absolute; inset: 0;
+  background: var(--border);
+  border-radius: 16px;
+  transition: background 0.22s;
+  cursor: pointer;
+}
+.toggle input:checked + .toggle-track { background: var(--accent2); }
+.toggle-thumb {
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 27px; height: 27px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.35);
+  transition: transform 0.22s var(--ease);
+  pointer-events: none;
+}
+.toggle input:checked ~ .toggle-thumb { transform: translateX(20px); }
+
+.time-input {
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 15px;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg-input);
+  outline: none;
+  flex-shrink: 0;
+}
+.time-input:focus { border-color: var(--accent); }
+
+.notif-permission-btn {
+  width: calc(100% - 32px);
+  margin: 8px 16px;
+  padding: 14px;
+  border-radius: var(--radius);
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  display: block;
+}
+.notif-permission-btn:active { opacity: 0.8; }
+.notif-permission-btn.granted { background: var(--accent2); }
+.notif-permission-btn.denied  { background: var(--danger); }
+
+/* ═══════════════════════════════════════════════
+   9. DESKTOP LAYOUT (≥768px)
+═══════════════════════════════════════════════ */
+@media (min-width: 768px) {
+  html, body { overflow: auto; }
+  #app { height: auto; min-height: 100dvh; max-width: 1280px; margin: 0 auto; }
+  .tab-panels { overflow: visible; position: static; height: auto; }
+  .tab-panel { position: static; display: none; overflow: visible; padding-bottom: 24px; }
+  .tab-panel.active { display: block; }
+  .bottom-nav { display: none; }
+  .save-status { bottom: 0; }
+
+  #panel-plan {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 0 20px;
+    padding: 16px 20px;
+    grid-template-rows: auto 1fr;
+  }
+  #panel-plan .section-hdr { grid-column: 1; }
+  #panel-plan .section-hdr:nth-of-type(2) { grid-column: 1; }
+
+  .desktop-tabs {
+    display: flex;
+    background: var(--hdr-bg);
+    border-bottom: 0.5px solid rgba(255,255,255,0.1);
+  }
+  .desktop-tab {
+    padding: 9px 18px;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.55);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    font-family: inherit;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .desktop-tab.active { color: #fff; border-bottom-color: #fff; }
+}
+
+/* ═══════════════════════════════════════════════
+   10. PRINT
+═══════════════════════════════════════════════ */
+@media print {
+  html, body { overflow: auto; }
+  .bottom-nav, .save-status, .hdr-btn, .cat-selector,
+  .install-banner, .settings-sheet, .overlay,
+  .desktop-tabs, .date-arrow { display: none !important; }
+  .tab-panel { display: block !important; position: static !important; padding: 0 !important; }
+  .app-header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ════════ HEADER ════════ -->
+  <header class="app-header">
+    <button class="hdr-btn" id="themeBtn" onclick="toggleTheme()" title="테마 전환">🌙</button>
+    <div class="hdr-date-nav">
+      <button class="date-arrow" onclick="changeDate(-1)" aria-label="이전날">‹</button>
+      <div class="date-display" onclick="goToday()">
+        <div class="date-main" id="dateMain">—</div>
+        <div class="date-sub"  id="dateSub">—</div>
+      </div>
+      <button class="date-arrow" onclick="changeDate(+1)" aria-label="다음날">›</button>
+    </div>
+    <button class="hdr-btn" onclick="openSettings()" title="설정">⚙️</button>
+  </header>
+
+  <!-- Desktop tab nav (hidden on mobile) -->
+  <div class="desktop-tabs" id="desktopTabs" style="display:none">
+    <button class="desktop-tab active" data-tab="plan"   onclick="switchTab('plan',this)">📋 계획</button>
+    <button class="desktop-tab"        data-tab="time"   onclick="switchTab('time',this)">⏱ 타임박스</button>
+    <button class="desktop-tab"        data-tab="review" onclick="switchTab('review',this)">💬 회고</button>
+    <button class="desktop-tab"        data-tab="week"   onclick="switchTab('week',this)">📅 주간</button>
+  </div>
+
+  <!-- ════════ TAB PANELS ════════ -->
+  <div class="tab-panels">
+
+    <!-- ── 계획 탭 ── -->
+    <div class="tab-panel active" id="panel-plan">
+
+      <div class="install-banner" id="installBanner" style="display:none">
+        <strong>📱 앱으로 설치하기</strong>
+        Safari → 하단 공유(□↑) → <b>홈 화면에 추가</b> → <b>웹 앱으로 열기</b> 켜기<br>
+        설치 후 매일 알림을 받을 수 있습니다.
+        <br><button class="banner-close" onclick="this.closest('.install-banner').style.display='none'">닫기</button>
+      </div>
+
+      <div class="section-hdr">⭐ 오늘의 우선순위 3가지</div>
+      <div class="card">
+        <div class="pri-row">
+          <div class="pri-num">①</div>
+          <input class="pri-input" type="text" id="pri1" placeholder="오늘 가장 중요한 것…" autocomplete="off" autocorrect="off">
+        </div>
+        <div class="pri-row">
+          <div class="pri-num">②</div>
+          <input class="pri-input" type="text" id="pri2" placeholder="" autocomplete="off" autocorrect="off">
+        </div>
+        <div class="pri-row">
+          <div class="pri-num">③</div>
+          <input class="pri-input" type="text" id="pri3" placeholder="" autocomplete="off" autocorrect="off">
+        </div>
+      </div>
+
+      <div class="section-hdr">🧠 브레인덤프 — 쏟아내기</div>
+      <div class="card">
+        <textarea class="dump-area" id="dump" rows="6"
+          placeholder="머릿속의 모든 것을 자유롭게 쏟아내세요.&#10;할 일, 걱정, 아이디어, 미루던 것 모두 OK…"></textarea>
+      </div>
+    </div>
+
+    <!-- ── 타임박스 탭 ── -->
+    <div class="tab-panel" id="panel-time">
+
+      <!-- Sticky category selector -->
+      <div class="cat-selector">
+        <div class="cat-chips" id="catChips">
+          <button class="cat-chip active" data-cat="" onclick="selectCat(this)">
+            <span class="chip-dot" data-cat=""></span>지우기
+          </button>
+          <button class="cat-chip" data-cat="work" onclick="selectCat(this)">
+            <span class="chip-dot" data-cat="work"></span>연구/업무
+          </button>
+          <button class="cat-chip" data-cat="study" onclick="selectCat(this)">
+            <span class="chip-dot" data-cat="study"></span>공부/학습
+          </button>
+          <button class="cat-chip" data-cat="health" onclick="selectCat(this)">
+            <span class="chip-dot" data-cat="health"></span>운동/건강
+          </button>
+          <button class="cat-chip" data-cat="personal" onclick="selectCat(this)">
+            <span class="chip-dot" data-cat="personal"></span>개인/휴식
+          </button>
+          <button class="cat-chip" data-cat="admin" onclick="selectCat(this)">
+            <span class="chip-dot" data-cat="admin"></span>행정/잡무
+          </button>
+          <button class="cat-chip" data-cat="routine" onclick="selectCat(this)">
+            <span class="chip-dot" data-cat="routine"></span>식사/이동
+          </button>
+        </div>
+      </div>
+
+      <div id="timeGridContainer" style="margin-bottom:12px"></div>
+
+      <div class="cat-stats" id="catStats" style="display:none">
+        <div class="stats-title">📊 오늘 카테고리별 시간</div>
+        <div id="statsContent"></div>
+      </div>
+    </div>
+
+    <!-- ── 회고 탭 ── -->
+    <div class="tab-panel" id="panel-review">
+
+      <div class="section-hdr">✅ 잘한 것</div>
+      <div class="card">
+        <textarea class="review-ta" id="rev1" placeholder="오늘 잘 해낸 것들…" rows="3"></textarea>
+      </div>
+
+      <div class="section-hdr">🔧 개선할 것</div>
+      <div class="card">
+        <textarea class="review-ta" id="rev2" placeholder="내일은 이렇게 바꿔보자…" rows="3"></textarea>
+      </div>
+
+      <div class="section-hdr">🎯 내일의 한 가지</div>
+      <div class="card">
+        <textarea class="review-ta" id="rev3" placeholder="내일 가장 중요한 단 하나…" rows="3"></textarea>
+      </div>
+
+      <div class="section-hdr">🗂 데이터 관리</div>
+      <div class="btn-row">
+        <button class="action-btn blue" onclick="copyYesterday()">📋 어제 계획 복사</button>
+        <button class="action-btn blue" onclick="exportJSON()">⬇ 백업 내보내기</button>
+      </div>
+      <div class="btn-row">
+        <button class="action-btn" onclick="document.getElementById('importInput').click()">⬆ 백업 가져오기</button>
+        <button class="action-btn red" onclick="clearAllData()">🗑 전체 삭제</button>
+      </div>
+      <input type="file" id="importInput" accept=".json" style="display:none" onchange="importJSON(this)">
+      <div style="height:8px"></div>
+      <button class="action-btn" style="width:100%;border-radius:10px;padding:14px" onclick="window.print()">🖨 인쇄</button>
+    </div>
+
+    <!-- ── 주간 탭 ── -->
+    <div class="tab-panel" id="panel-week">
+      <div class="week-card">
+        <div class="week-nav">
+          <button class="week-nav-btn" onclick="changeWeek(-1)">‹</button>
+          <div class="week-title" id="weekTitle">—</div>
+          <button class="week-nav-btn" onclick="changeWeek(+1)">›</button>
+        </div>
+        <div class="week-days" id="weekDays"></div>
+      </div>
+      <div class="section-hdr" id="weekDetailHdr">날짜별 우선순위</div>
+      <div id="weekDetails"></div>
+    </div>
+
+  </div><!-- /tab-panels -->
+
+  <!-- ════════ BOTTOM NAV ════════ -->
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="nav-btn active" data-tab="plan"   onclick="switchTab('plan',   this)">
+      <span class="nav-icon">📋</span><span class="nav-label">계획</span>
+    </button>
+    <button class="nav-btn"        data-tab="time"   onclick="switchTab('time',   this)">
+      <span class="nav-icon">⏱</span><span class="nav-label">타임박스</span>
+    </button>
+    <button class="nav-btn"        data-tab="review" onclick="switchTab('review', this)">
+      <span class="nav-icon">💬</span><span class="nav-label">회고</span>
+    </button>
+    <button class="nav-btn"        data-tab="week"   onclick="switchTab('week',   this)">
+      <span class="nav-icon">📅</span><span class="nav-label">주간</span>
+    </button>
+  </nav>
+
+  <div class="save-status" id="saveStatus">자동저장 대기 중</div>
+</div>
+
+<!-- ════════ SETTINGS SHEET ════════ -->
+<div class="overlay" id="overlay" onclick="closeSettings()"></div>
+<div class="settings-sheet" id="settingsSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title-bar">
+    <div class="sheet-title">⚙️ 설정</div>
+    <button class="sheet-close" onclick="closeSettings()">✕</button>
+  </div>
+
+  <div class="setting-group">
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">다크 모드</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="darkToggle" onchange="setTheme(this.checked)">
+        <div class="toggle-track"></div>
+        <div class="toggle-thumb"></div>
+      </label>
+    </div>
+  </div>
+
+  <div class="setting-group">
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">📣 매일 알림 시각</div>
+        <div class="setting-sub">홈화면 추가 + iOS 16.4+ 필요</div>
+      </div>
+      <input type="time" class="time-input" id="notifTime" value="21:00" onchange="onNotifTimeChange()">
+    </div>
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">알림 활성화</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="notifToggle" onchange="onNotifToggle(this)">
+        <div class="toggle-track"></div>
+        <div class="toggle-thumb"></div>
+      </label>
+    </div>
+  </div>
+
+  <button class="notif-permission-btn" id="notifPermBtn" onclick="requestNotifPermission()">
+    🔔 알림 권한 요청
+  </button>
+
+  <div style="height: 8px"></div>
+</div>
+
+<script>
+'use strict';
+
+// ══════════════════════════════════════════════════════════
+//  CONSTANTS
+// ══════════════════════════════════════════════════════════
+
+const SLOTS = [
+  {h:'04',p:'dawn'},{h:'05',p:'dawn'},{h:'06',p:'dawn'}, null,
+  {h:'07',p:'am'},{h:'08',p:'am'},{h:'09',p:'am'},
+  {h:'10',p:'am'},{h:'11',p:'am'},{h:'12',p:'am'}, null,
+  {h:'13',p:'pm'},{h:'14',p:'pm'},{h:'15',p:'pm'},
+  {h:'16',p:'pm'},{h:'17',p:'pm'},{h:'18',p:'pm'}, null,
+  {h:'19',p:'eve'},{h:'20',p:'eve'},{h:'21',p:'eve'},
+  {h:'22',p:'eve'},{h:'23',p:'eve'}, null,
+  {h:'00',p:'night'},{h:'01',p:'night'},
+];
+
+const PERIOD_LABELS = {
+  dawn:'🌅 새벽 04–06', am:'☀️ 오전 07–12',
+  pm:'🌤 오후 13–18',   eve:'🌆 저녁 19–23', night:'🌙 심야 00–01',
+};
+
+const CAT_NAMES   = { work:'연구/업무', study:'공부/학습', health:'운동/건강', personal:'개인/휴식', admin:'행정/잡무', routine:'식사/이동' };
+const CAT_COLORS  = { work:'#1d4ed8', study:'#15803d', health:'#dc2626', personal:'#7c3aed', admin:'#d97706', routine:'#6b7280' };
+const CAT_CYCLE   = ['', 'work', 'study', 'health', 'personal', 'admin', 'routine'];
+const DAY_NAMES   = ['월','화','수','목','금','토','일'];
+
+// ══════════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════════
+let currentDate = toDateStr(new Date());
+let activeCat   = '';
+let weekOffset  = 0;
+let notifTimer  = null;
+let saveTimer   = null;
+
+// ══════════════════════════════════════════════════════════
+//  DATE UTILS
+// ══════════════════════════════════════════════════════════
+function toDateStr(d) {
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+function pad(n) { return String(n).padStart(2,'0'); }
+function parseDate(s) { const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+
+function updateDateDisplay() {
+  const d    = parseDate(currentDate);
+  const days = ['일','월','화','수','목','금','토'];
+  const today = toDateStr(new Date());
+  const yesterday = (() => { const x=new Date(); x.setDate(x.getDate()-1); return toDateStr(x); })();
+  const tomorrow  = (() => { const x=new Date(); x.setDate(x.getDate()+1); return toDateStr(x); })();
+  let badge = '';
+  if (currentDate === today)     badge = ' · 오늘';
+  if (currentDate === yesterday) badge = ' · 어제';
+  if (currentDate === tomorrow)  badge = ' · 내일';
+  document.getElementById('dateMain').textContent = `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`;
+  document.getElementById('dateSub').textContent  = `${days[d.getDay()]}요일${badge}`;
+}
+
+function changeDate(delta) {
+  const d = parseDate(currentDate);
+  d.setDate(d.getDate() + delta);
+  currentDate = toDateStr(d);
+  updateDateDisplay();
+  load();
+}
+
+function goToday() {
+  currentDate = toDateStr(new Date());
+  updateDateDisplay();
+  load();
+}
+
+// ══════════════════════════════════════════════════════════
+//  STORAGE
+// ══════════════════════════════════════════════════════════
+const KEY = d => 'tbp_' + d;
+
+function saveRaw(date, data) {
+  try { localStorage.setItem(KEY(date), JSON.stringify(data)); return true; }
+  catch(e) { return false; }
+}
+function loadRaw(date) {
+  try { const r = localStorage.getItem(KEY(date)); return r ? JSON.parse(r) : null; }
+  catch(e) { return null; }
+}
+function getAllRaw() {
+  const all = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith('tbp_')) {
+      try { all[k] = JSON.parse(localStorage.getItem(k)); } catch(e) {}
+    }
+  }
+  return all;
+}
+
+// ══════════════════════════════════════════════════════════
+//  TAB NAVIGATION
+// ══════════════════════════════════════════════════════════
+function switchTab(tab, triggerBtn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn, .desktop-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+  document.querySelectorAll(`[data-tab="${tab}"]`).forEach(b => b.classList.add('active'));
+  if (tab === 'time') { updateStats(); setTimeout(scrollToNow, 80); }
+  if (tab === 'week') renderWeek();
+}
+
+// ══════════════════════════════════════════════════════════
+//  THEME
+// ══════════════════════════════════════════════════════════
+function toggleTheme() {
+  const dark = document.documentElement.dataset.theme !== 'dark';
+  setTheme(dark);
+}
+function setTheme(dark) {
+  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+  document.getElementById('themeBtn').textContent  = dark ? '☀️' : '🌙';
+  document.getElementById('darkToggle').checked    = dark;
+  document.getElementById('themeColorMeta').content = dark ? '#1c1c1e' : '#1c1c1e';
+  localStorage.setItem('tbp_theme', dark ? 'dark' : 'light');
+}
+
+// ══════════════════════════════════════════════════════════
+//  GRID BUILDER
+// ══════════════════════════════════════════════════════════
+function buildGrid() {
+  const container = document.getElementById('timeGridContainer');
+  container.innerHTML = '';
+  let curPeriod = null, curCard = null;
+
+  SLOTS.forEach(slot => {
+    if (!slot) { curPeriod = null; curCard = null; return; }
+    if (slot.p !== curPeriod) {
+      curPeriod = slot.p;
+      const hdr = document.createElement('div');
+      hdr.className = `period-header p-${slot.p}`;
+      hdr.textContent = PERIOD_LABELS[slot.p];
+      container.appendChild(hdr);
+      curCard = document.createElement('div');
+      curCard.className = 'card';
+      curCard.style.marginBottom = '0';
+      container.appendChild(curCard);
+    }
+    curCard.appendChild(makeSlotRow(slot.h, '00'));
+    curCard.appendChild(makeSlotRow(slot.h, '30'));
+  });
+}
+
+function makeSlotRow(h, m) {
+  const key = h + m;
+  const row = document.createElement('div');
+  row.className = 'slot-row';
+  row.id = 'row-' + key;
+  row.dataset.cat = '';
+  row.dataset.key = key;
+
+  // Color dot button
+  const btn = document.createElement('button');
+  btn.className = 'slot-cat-btn';
+  btn.innerHTML = '<div class="slot-cat-dot"></div>';
+  btn.setAttribute('aria-label', '카테고리 적용');
+  btn.addEventListener('click', e => { e.stopPropagation(); applyActiveCat(key); });
+
+  // Time label
+  const lbl = document.createElement('span');
+  lbl.className = 'time-label';
+  if (m === '00') {
+    lbl.textContent = h;
+    lbl.style.fontWeight = '800';
+  } else {
+    lbl.textContent = ':30';
+    lbl.style.fontSize = '10.5px';
+  }
+
+  // Input
+  const inp = document.createElement('input');
+  inp.type = 'text';
+  inp.className = 'slot-input';
+  inp.id = 'i' + key;
+  inp.autocomplete = 'off';
+  inp.autocorrect = 'off';
+  inp.autocapitalize = 'off';
+  inp.spellcheck = false;
+  inp.addEventListener('input', debouncedSave);
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      inp.blur();
+      const nk = nextSlotKey(key);
+      if (nk) document.getElementById('i' + nk)?.focus();
+    }
+  });
+
+  row.appendChild(btn);
+  row.appendChild(lbl);
+  row.appendChild(inp);
+  return row;
+}
+
+function nextSlotKey(key) {
+  const all = SLOTS.filter(Boolean).flatMap(s => [s.h+'00', s.h+'30']);
+  const i = all.indexOf(key);
+  return i >= 0 && i < all.length - 1 ? all[i+1] : null;
+}
+
+// ══════════════════════════════════════════════════════════
+//  CATEGORY MANAGEMENT
+// ══════════════════════════════════════════════════════════
+function selectCat(btn) {
+  document.querySelectorAll('.cat-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeCat = btn.dataset.cat;
+}
+
+function applyActiveCat(key) {
+  const row = document.getElementById('row-' + key);
+  if (!row) return;
+  row.dataset.cat = activeCat;
+  debouncedSave();
+  // Micro feedback: brief scale animation
+  const dot = row.querySelector('.slot-cat-dot');
+  if (dot) { dot.style.transform = 'scale(1.4)'; setTimeout(() => dot.style.transform = '', 180); }
+}
+
+// ══════════════════════════════════════════════════════════
+//  SAVE / LOAD
+// ══════════════════════════════════════════════════════════
+function debouncedSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(save, 500);
+}
+
+function save() {
+  const slots = {};
+  SLOTS.filter(Boolean).forEach(s => {
+    ['00','30'].forEach(m => {
+      const key = s.h + m;
+      const inp = document.getElementById('i' + key);
+      const row = document.getElementById('row-' + key);
+      if (!inp) return;
+      slots[key] = { text: inp.value, cat: row?.dataset.cat || '' };
+    });
+  });
+
+  const data = {
+    date: currentDate,
+    pri1: $v('pri1'), pri2: $v('pri2'), pri3: $v('pri3'),
+    dump: $v('dump'),
+    rev1: $v('rev1'), rev2: $v('rev2'), rev3: $v('rev3'),
+    slots,
+  };
+
+  const ok  = saveRaw(currentDate, data);
+  const now = new Date();
+  const t   = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  setStatus(ok ? `💾 자동저장 완료 — ${t}` : '⚠️ 저장 실패 (저장 공간 부족?)');
+  updateStats();
+}
+
+function $v(id) { return document.getElementById(id)?.value || ''; }
+
+function load() {
+  clearForm();
+  const data = loadRaw(currentDate);
+  if (!data) { setStatus('새 날짜 — 아직 저장된 내용 없음'); updateStats(); return; }
+
+  ['pri1','pri2','pri3','dump','rev1','rev2','rev3'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = data[id] || '';
+  });
+
+  if (data.slots) {
+    Object.entries(data.slots).forEach(([key, sd]) => {
+      const inp = document.getElementById('i' + key);
+      const row = document.getElementById('row-' + key);
+      if (inp) inp.value = sd.text || '';
+      if (row) row.dataset.cat = sd.cat || '';
+    });
+  }
+  setStatus('✅ 저장된 데이터 불러옴');
+  updateStats();
+}
+
+function clearForm() {
+  ['pri1','pri2','pri3','dump','rev1','rev2','rev3'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  SLOTS.filter(Boolean).forEach(s => {
+    ['00','30'].forEach(m => {
+      const key = s.h + m;
+      const inp = document.getElementById('i' + key);
+      const row = document.getElementById('row-' + key);
+      if (inp) inp.value = '';
+      if (row) row.dataset.cat = '';
+    });
+  });
+}
+
+function setStatus(msg) {
+  document.getElementById('saveStatus').textContent = msg;
+}
+
+// ══════════════════════════════════════════════════════════
+//  YESTERDAY COPY
+// ══════════════════════════════════════════════════════════
+function copyYesterday() {
+  const d = parseDate(currentDate);
+  d.setDate(d.getDate() - 1);
+  const ydata = loadRaw(toDateStr(d));
+  if (!ydata) { alert('어제 저장된 데이터가 없습니다.'); return; }
+  if (!confirm('어제 계획을 오늘로 복사합니다.\n(이미 입력된 내용은 유지됩니다)')) return;
+
+  // Copy priorities if empty
+  ['pri1','pri2','pri3'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && !el.value && ydata[id]) el.value = ydata[id];
+  });
+  // Copy slots if empty
+  if (ydata.slots) {
+    Object.entries(ydata.slots).forEach(([key, sd]) => {
+      const inp = document.getElementById('i' + key);
+      const row = document.getElementById('row-' + key);
+      if (inp && !inp.value && sd.text) inp.value = sd.text;
+      if (row && !row.dataset.cat && sd.cat) row.dataset.cat = sd.cat;
+    });
+  }
+  save();
+  alert('어제 계획을 복사했습니다! ✅');
+}
+
+// ══════════════════════════════════════════════════════════
+//  CATEGORY STATS
+// ══════════════════════════════════════════════════════════
+function updateStats() {
+  const counts = {};
+  SLOTS.filter(Boolean).forEach(s => {
+    ['00','30'].forEach(m => {
+      const row = document.getElementById('row-' + s.h + m);
+      if (!row) return;
+      const cat = row.dataset.cat;
+      if (cat) counts[cat] = (counts[cat] || 0) + 1;
+    });
+  });
+
+  const statsEl = document.getElementById('catStats');
+  if (Object.keys(counts).length === 0) { statsEl.style.display = 'none'; return; }
+
+  statsEl.style.display = 'block';
+  const maxC = Math.max(...Object.values(counts));
+
+  document.getElementById('statsContent').innerHTML =
+    Object.entries(counts).sort((a,b) => b[1]-a[1]).map(([cat, cnt]) => {
+      const h = Math.floor(cnt/2), mins = (cnt%2)*30;
+      const timeStr = h > 0 ? (mins > 0 ? `${h}h${mins}m` : `${h}h`) : `${mins}m`;
+      const pct = (cnt / maxC * 100).toFixed(0);
+      return `<div class="stat-row">
+        <div class="stat-label" style="color:${CAT_COLORS[cat]}">${CAT_NAMES[cat]}</div>
+        <div class="stat-track"><div class="stat-fill" style="width:${pct}%;background:${CAT_COLORS[cat]}"></div></div>
+        <div class="stat-time">${timeStr}</div>
+      </div>`;
+    }).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+//  CURRENT TIME LINE
+// ══════════════════════════════════════════════════════════
+function scrollToNow() {
+  const now = new Date();
+  const h   = pad(now.getHours());
+  const m   = now.getMinutes() < 30 ? '00' : '30';
+  const row = document.getElementById('row-' + h + m);
+  if (row) row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function insertNowLine() {
+  // Remove existing
+  document.querySelectorAll('.now-line').forEach(el => el.remove());
+  const now = new Date();
+  const h   = pad(now.getHours());
+  const m   = now.getMinutes() < 30 ? '00' : '30';
+  const row = document.getElementById('row-' + h + m);
+  if (row) {
+    const line = document.createElement('div');
+    line.className = 'now-line';
+    row.parentNode.insertBefore(line, row);
+  }
+  setTimeout(insertNowLine, 60000); // update every minute
+}
+
+// ══════════════════════════════════════════════════════════
+//  WEEKLY VIEW
+// ══════════════════════════════════════════════════════════
+function getWeekDates(offset = 0) {
+  const today = new Date();
+  const dow   = today.getDay();
+  const mon   = new Date(today);
+  mon.setDate(today.getDate() - ((dow + 6) % 7) + offset * 7);
+  return Array.from({length: 7}, (_, i) => {
+    const d = new Date(mon); d.setDate(mon.getDate() + i); return toDateStr(d);
+  });
+}
+
+function renderWeek() {
+  const dates = getWeekDates(weekOffset);
+  const today = toDateStr(new Date());
+  const first = parseDate(dates[0]);
+  const last  = parseDate(dates[6]);
+  document.getElementById('weekTitle').textContent =
+    `${first.getMonth()+1}/${first.getDate()} – ${last.getMonth()+1}/${last.getDate()}`;
+
+  const container = document.getElementById('weekDays');
+  container.innerHTML = '';
+
+  dates.forEach((date, idx) => {
+    const d    = parseDate(date);
+    const data = loadRaw(date);
+    const cats = new Set();
+    if (data?.slots) Object.values(data.slots).forEach(s => { if (s.cat) cats.add(s.cat); });
+
+    const div = document.createElement('div');
+    div.className = 'week-day' +
+      (date === today        ? ' is-today'    : '') +
+      (date === currentDate  ? ' is-selected' : '');
+    div.onclick = () => {
+      currentDate = date;
+      updateDateDisplay();
+      load();
+      switchTab('plan', document.querySelector('.nav-btn[data-tab="plan"]'));
+    };
+
+    div.innerHTML = `
+      <div class="wd-name">${DAY_NAMES[idx]}</div>
+      <div class="wd-num">${d.getDate()}</div>
+      <div class="wd-dots">
+        ${[...cats].map(c => `<div class="wd-dot" style="background:${CAT_COLORS[c]}"></div>`).join('')}
+      </div>`;
+    container.appendChild(div);
+  });
+
+  // Detail list
+  const detailEl = document.getElementById('weekDetails');
+  detailEl.innerHTML = '';
+  dates.forEach((date, idx) => {
+    const data = loadRaw(date);
+    const pris = [data?.pri1, data?.pri2, data?.pri3].filter(Boolean);
+    if (!pris.length) return;
+    const d    = parseDate(date);
+    const item = document.createElement('div');
+    item.className = 'week-detail-item';
+    item.onclick = () => {
+      currentDate = date;
+      updateDateDisplay();
+      load();
+      switchTab('plan', document.querySelector('.nav-btn[data-tab="plan"]'));
+    };
+    item.innerHTML = `
+      <div class="detail-date">${d.getMonth()+1}/${d.getDate()} ${DAY_NAMES[idx]}요일${date===today?' · 오늘':''}</div>
+      ${pris.map(p => `<div class="detail-pri">• ${p}</div>`).join('')}`;
+    detailEl.appendChild(item);
+  });
+}
+
+function changeWeek(delta) {
+  weekOffset += delta;
+  renderWeek();
+}
+
+// ══════════════════════════════════════════════════════════
+//  NOTIFICATIONS
+// ══════════════════════════════════════════════════════════
+function onNotifTimeChange() {
+  localStorage.setItem('tbp_notif_time', document.getElementById('notifTime').value);
+  if (document.getElementById('notifToggle').checked) scheduleNotification();
+}
+
+function onNotifToggle(el) {
+  localStorage.setItem('tbp_notif_on', el.checked ? '1' : '0');
+  if (el.checked) scheduleNotification(); else clearTimeout(notifTimer);
+}
+
+async function requestNotifPermission() {
+  if (!('Notification' in window)) {
+    alert('이 브라우저는 알림을 지원하지 않습니다.\niPhone: Safari → 홈화면에 추가 → 웹 앱으로 열기');
+    return;
+  }
+  const result = await Notification.requestPermission();
+  updateNotifBtn(result);
+  if (result === 'granted') {
+    document.getElementById('notifToggle').checked = true;
+    localStorage.setItem('tbp_notif_on', '1');
+    scheduleNotification();
+    new Notification('⏱ 타임박스 플래너', { body: '알림이 설정되었습니다! 🎉', tag: 'test' });
+  }
+}
+
+function updateNotifBtn(permission) {
+  const btn = document.getElementById('notifPermBtn');
+  if (permission === 'granted') {
+    btn.textContent = '✅ 알림 허용됨';
+    btn.className   = 'notif-permission-btn granted';
+  } else if (permission === 'denied') {
+    btn.textContent = '❌ 알림 차단됨 (설정에서 허용)';
+    btn.className   = 'notif-permission-btn denied';
+  } else {
+    btn.textContent = '🔔 알림 권한 요청';
+    btn.className   = 'notif-permission-btn';
+  }
+}
+
+function scheduleNotification() {
+  clearTimeout(notifTimer);
+  const [h, m] = (localStorage.getItem('tbp_notif_time') || '21:00').split(':').map(Number);
+  const now    = new Date();
+  const target = new Date();
+  target.setHours(h, m, 0, 0);
+  if (target <= now) target.setDate(target.getDate() + 1);
+  const delay = target - now;
+  notifTimer = setTimeout(() => {
+    if (Notification.permission === 'granted') {
+      new Notification('⏱ 타임박스 플래너', {
+        body: '오늘 하루 계획을 세워보세요! 타임박스를 채워보세요 💪',
+        icon: '/icons/icon-192.png',
+        tag: 'daily-reminder',
+        renotify: true,
+      });
+    }
+    scheduleNotification(); // reschedule tomorrow
+  }, delay);
+}
+
+// ══════════════════════════════════════════════════════════
+//  EXPORT / IMPORT / CLEAR
+// ══════════════════════════════════════════════════════════
+function exportJSON() {
+  const all   = getAllRaw();
+  const today = toDateStr(new Date());
+  const blob  = new Blob([JSON.stringify(all, null, 2)], { type: 'application/json' });
+  const url   = URL.createObjectURL(blob);
+  const a     = Object.assign(document.createElement('a'), { href: url, download: `timebox_${today}.json` });
+  a.click();
+  URL.revokeObjectURL(url);
+  setStatus('⬇ 백업 파일 저장 완료');
+}
+
+function importJSON(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      Object.entries(data).forEach(([k,v]) => { if (k.startsWith('tbp_')) localStorage.setItem(k, JSON.stringify(v)); });
+      load();
+      setStatus(`⬆ 가져오기 완료 — ${Object.keys(data).length}개 날짜 병합`);
+    } catch(err) { alert('가져오기 실패: 올바른 JSON 파일이 아닙니다.'); }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+function clearAllData() {
+  if (!confirm('모든 데이터를 삭제합니다.\n이 작업은 되돌릴 수 없습니다.')) return;
+  const keys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k?.startsWith('tbp_') && k !== 'tbp_theme' && k !== 'tbp_notif_time' && k !== 'tbp_notif_on') keys.push(k);
+  }
+  keys.forEach(k => localStorage.removeItem(k));
+  clearForm();
+  setStatus('🗑 전체 삭제 완료');
+}
+
+// ══════════════════════════════════════════════════════════
+//  SETTINGS SHEET
+// ══════════════════════════════════════════════════════════
+function openSettings()  {
+  document.getElementById('settingsSheet').classList.add('open');
+  document.getElementById('overlay').classList.add('open');
+}
+function closeSettings() {
+  document.getElementById('settingsSheet').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+
+// ══════════════════════════════════════════════════════════
+//  DESKTOP DETECTION
+// ══════════════════════════════════════════════════════════
+function checkDesktop() {
+  const isDesktop = window.innerWidth >= 768;
+  document.getElementById('desktopTabs').style.display = isDesktop ? 'flex' : 'none';
+  document.getElementById('bottomNav').style.display   = isDesktop ? 'none' : 'flex';
+}
+
+// ══════════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════════
+function init() {
+  // Theme
+  const savedTheme = localStorage.getItem('tbp_theme');
+  if (savedTheme === 'dark') setTheme(true);
+
+  // Grid
+  buildGrid();
+
+  // Input listeners
+  ['pri1','pri2','pri3','dump','rev1','rev2','rev3'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', debouncedSave);
+  });
+
+  // Date & load
+  updateDateDisplay();
+  load();
+
+  // Now line
+  insertNowLine();
+
+  // Notification restore
+  const notifTime = localStorage.getItem('tbp_notif_time') || '21:00';
+  document.getElementById('notifTime').value = notifTime;
+  const notifOn = localStorage.getItem('tbp_notif_on') === '1';
+  document.getElementById('notifToggle').checked = notifOn;
+  if ('Notification' in window) {
+    updateNotifBtn(Notification.permission);
+    if (notifOn && Notification.permission === 'granted') scheduleNotification();
+  }
+
+  // PWA install banner
+  const isStandalone = window.navigator.standalone ||
+    window.matchMedia('(display-mode: standalone)').matches;
+  if (!isStandalone) {
+    document.getElementById('installBanner').style.display = 'block';
+  }
+
+  // Desktop tabs
+  checkDesktop();
+  window.addEventListener('resize', checkDesktop);
+}
+
+document.addEventListener('DOMContentLoaded', init);
+
+</script>
+</body>
+</html>
