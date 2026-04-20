@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>계량약리학의 BIG IDEA · Top 15</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Noto+Serif+KR:wght@300;400;600&display=swap');
+
+  :root {
+    --ink: #0d0d0c;
+    --ink2: #3a3a38;
+    --ink3: #6b6b67;
+    --paper: #f9f7f2;
+    --paper2: #f2efe8;
+    --rule: #dedad2;
+    --s-col: #8b4513;
+    --s-bg: #fdf3ec;
+    --a-col: #1a4a7a;
+    --a-bg: #eef4fb;
+    --b-col: #2d6a4f;
+    --b-bg: #edf7f2;
+    --warn: #b45309;
+    --warn-bg: #fffbeb;
+    --big: #2c1810;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Serif KR', Georgia, serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .masthead {
+    background: var(--big);
+    color: #f9f0e6;
+    padding: 2.5rem 2rem 2rem;
+  }
+
+  .masthead-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: #c8a882;
+    margin-bottom: .75rem;
+  }
+
+  .masthead h1 {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: clamp(1.5rem, 5vw, 2.4rem);
+    font-weight: 400;
+    line-height: 1.2;
+    color: #f5ece0;
+    margin-bottom: 1.2rem;
+  }
+
+  .masthead h1 em {
+    font-style: italic;
+    color: #e8c99a;
+  }
+
+  .formula-box {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    background: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 4px;
+    padding: .4rem .9rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 11.5px;
+    color: #d4bfa0;
+    flex-wrap: wrap;
+  }
+
+  .formula-vars {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 1.2rem;
+    margin-top: .75rem;
+  }
+
+  .formula-vars span {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: #a08060;
+  }
+
+  /* BIG IDEA SECTION */
+  .big-idea {
+    background: #fff;
+    border-left: 4px solid var(--big);
+    margin: 1.5rem 1rem;
+    padding: 1.25rem 1.5rem;
+    border-radius: 0 6px 6px 0;
+  }
+
+  .big-idea-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--big);
+    margin-bottom: .6rem;
+  }
+
+  .big-idea-headline {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: clamp(1.1rem, 3.5vw, 1.45rem);
+    line-height: 1.45;
+    color: var(--big);
+    margin-bottom: 1rem;
+    font-weight: 400;
+  }
+
+  .big-idea-body {
+    font-size: 13.5px;
+    line-height: 1.85;
+    color: var(--ink2);
+  }
+
+  .big-idea-body p + p { margin-top: .8rem; }
+
+  .excluded-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+    margin: .75rem 0;
+  }
+
+  .excl-tag {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    background: var(--paper2);
+    border: 1px solid var(--rule);
+    color: var(--ink2);
+    padding: 3px 9px;
+    border-radius: 3px;
+  }
+
+  .tension-note {
+    background: var(--warn-bg);
+    border: 1px solid #fde68a;
+    border-radius: 4px;
+    padding: .7rem 1rem;
+    margin: .75rem 0 0;
+    font-size: 12px;
+    color: var(--warn);
+    line-height: 1.65;
+  }
+
+  /* TABLE */
+  .table-wrap {
+    padding: 0 1rem 2rem;
+  }
+
+  .tier-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--ink3);
+    padding: 1.1rem 0 .4rem;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: .5rem;
+  }
+
+  .card {
+    background: #fff;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 1rem 1.1rem .85rem;
+    margin-bottom: 7px;
+    position: relative;
+  }
+
+  .card.s-tier { border-left: 3px solid var(--s-col); }
+  .card.a-tier { border-left: 3px solid var(--a-col); }
+  .card.b-tier { border-left: 3px solid var(--b-col); }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 7px;
+  }
+
+  .rank-bubble {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 11.5px;
+    font-weight: 500;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .s-tier .rank-bubble { background: #fde8cc; color: var(--s-col); }
+  .a-tier .rank-bubble { background: #d6e8f7; color: var(--a-col); }
+  .b-tier .rank-bubble { background: #d0eedf; color: var(--b-col); }
+
+  .card-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.4;
+    margin-bottom: 3px;
+  }
+
+  .card-why {
+    font-size: 12px;
+    color: var(--ink3);
+    line-height: 1.6;
+  }
+
+  .card-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    flex-shrink: 0;
+    align-items: flex-start;
+  }
+
+  .badge {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    padding: 2px 7px;
+    border-radius: 3px;
+    white-space: nowrap;
+    border: 1px solid transparent;
+  }
+
+  .badge-red { background: #fef2f2; color: #c0392b; border-color: #fca5a5; }
+  .badge-amber { background: var(--warn-bg); color: var(--warn); border-color: #fcd34d; }
+  .badge-green { background: #f0fdf4; color: #166534; border-color: #86efac; }
+  .badge-blue { background: #eff6ff; color: #1d4ed8; border-color: #93c5fd; }
+  .badge-gray { background: var(--paper2); color: var(--ink3); border-color: var(--rule); }
+
+  .pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 6px 0;
+  }
+
+  .pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 10.5px;
+    color: var(--ink3);
+    background: var(--paper2);
+    border: 1px solid var(--rule);
+    padding: 1.5px 6px;
+    border-radius: 3px;
+  }
+
+  .score-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 7px;
+  }
+
+  .score-bar-bg {
+    flex: 1;
+    height: 3px;
+    background: var(--paper2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .score-bar { height: 3px; border-radius: 2px; }
+  .s-tier .score-bar { background: var(--s-col); }
+  .a-tier .score-bar { background: var(--a-col); }
+  .b-tier .score-bar { background: var(--b-col); }
+
+  .score-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 16px;
+    font-weight: 500;
+    min-width: 55px;
+    text-align: right;
+  }
+
+  .s-tier .score-num { color: var(--s-col); }
+  .a-tier .score-num { color: var(--a-col); }
+  .b-tier .score-num { color: var(--b-col); }
+
+  .action-line {
+    font-size: 12px;
+    color: var(--ink2);
+    line-height: 1.7;
+    border-top: 1px solid var(--rule);
+    padding-top: 7px;
+    margin-top: 4px;
+  }
+
+  .action-line strong { color: var(--ink); }
+
+  .decay-warn {
+    font-size: 11px;
+    color: var(--warn);
+    background: var(--warn-bg);
+    border: 1px solid #fde68a;
+    border-radius: 3px;
+    padding: 3px 8px;
+    margin-top: 5px;
+    display: inline-block;
+  }
+
+  .big-a-note {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--b-col);
+    background: var(--b-bg);
+    border: 1px solid #a7f3d0;
+    border-radius: 3px;
+    padding: 2px 7px;
+    margin-top: 5px;
+    display: inline-block;
+  }
+
+  .footer-note {
+    margin: 1.5rem 1rem 2rem;
+    padding: 1rem 1.2rem;
+    background: #fff;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--ink2);
+    line-height: 1.8;
+  }
+
+  .footer-note strong { color: var(--ink); font-weight: 600; }
+
+  .new-tag {
+    display: inline-block;
+    font-size: 9px;
+    font-family: 'DM Mono', monospace;
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #86efac;
+    padding: 1px 5px;
+    border-radius: 2px;
+    vertical-align: middle;
+    margin-left: 4px;
+  }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="masthead-label">Pharmacometrics · Career Strategy · 2026</div>
+  <h1>계량약리학이 세상에 절실히 원하는<br><em>단 하나의 BIG IDEA</em></h1>
+  <div class="formula-box">Score&nbsp;=&nbsp;[A × B × C × (1−D)] × E<sup style="font-size:9px">V</sup></div>
+  <div class="formula-vars">
+    <span>A = BIG IDEA 기여 효용</span>
+    <span>B = 현재 착수 가능성</span>
+    <span>C = 비교우위</span>
+    <span>(1−D) = 비대체성</span>
+    <span>E = 생태계 레버리지</span>
+    <span>V = AI 속도 지수</span>
+  </div>
+</div>
+
+<div class="big-idea">
+  <div class="big-idea-label">The BIG IDEA · Translation Problem</div>
+  <div class="big-idea-headline">세상은 새로운 약이 아니라,<br>이미 있는 약을 올바른 용량으로<br>올바른 사람에게 투여하는 과학을 원한다.</div>
+
+  <div class="big-idea-body">
+    <p>인류는 이미 수천 개의 효과적인 약을 가지고 있다. 그러나 그 약들의 용량 기준은 대부분 <strong>'임상시험에 참여할 수 있었던 사람들'</strong>을 기반으로 만들어졌다. 그리고 그 약을 가장 필요로 하는 사람들 상당수가 그 임상시험에서 체계적으로 배제되어 왔다.</p>
+
+    <div class="excluded-list">
+      <span class="excl-tag">소아 환자</span>
+      <span class="excl-tag">임산부·수유부</span>
+      <span class="excl-tag">희귀질환 환자</span>
+      <span class="excl-tag">CKD·간부전 환자</span>
+      <span class="excl-tag">고령 다약제 환자</span>
+      <span class="excl-tag">LMIC 결핵·HIV 환자</span>
+      <span class="excl-tag">첨단 신모달리티 수혜자</span>
+    </div>
+
+    <p>계량약리학(PBPK, PopPK, 모델기반 외삽, 가상 임상시험, MIDD)은 이 <strong>번역(Translation) 문제</strong>를 해결하기 위한 유일한 과학적 도구다. 연구된 집단에서 얻은 약동학 정보를, 연구되지 못한 집단에 과학적으로 추론하여 전달하는 것. 이것이 계량약리학이 세상에 존재해야 하는 가장 본질적인 이유다.</p>
+
+    <div class="tension-note">
+      <strong>정직한 긴장:</strong> 글로벌 효용(A)이 가장 큰 영역은 결핵·HIV 등 LMIC 집단이다(A=10). 그러나 현재의 임상·규제 경력 포지셔닝에서 비교우위(C)는 그 방향이 아니다. 아래 순위는 이 현실을 가감 없이 반영했다. 15번 항목의 해설을 참고할 것.
+    </div>
+  </div>
+</div>
+
+<div class="table-wrap">
+
+  <div class="tier-label">S-Tier · 창이 닫히기 전 즉각 착수 (Score ≥ 2,000)</div>
+
+  <!-- #1 -->
+  <div class="card s-tier">
+    <div class="card-top">
+      <div class="rank-bubble">1</div>
+      <div style="flex:1;min-width:0">
+        <div class="card-title">MFDS 첨단바이오의약품(CAR-T) PK/PD 평가 가이드라인 구조 선점</div>
+        <div class="card-why">BIG IDEA 연결: 세포치료제는 투여 과학 자체가 미완인 신모달리티. 지금 쓰이는 가이드라인이 향후 수만 명의 CAR-T 투여 방식을 결정한다 — 전형적 번역 문제의 최전선. TC011 CSR 실무 + MFDS 접근권 + 계량약리학 수련의 삼각 교집합은 전 세계에 수십 명 수준</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-red">즉시</span>
+        <span class="badge badge-amber">규제 포획</span>
+      </div>
+    </div>
+    <div class="pills">
+      <span class="pill">A=8</span><span class="pill">B=9</span><span class="pill">C=10</span>
+      <span class="pill">(1−D)=0.88</span><span class="pill">E=3.0</span><span class="pill">V=1.8</span>
+    </div>
+    <div class="score-bar-wrap">
+      <div class="score-bar-bg"><div class="score-bar" style="width:100%"></div></div>
+      <span class="score-num">4,575</span>
+    </div>
+    <div class="action-line"><strong>첫 번째 행동:</strong> TC011 CSR 작업 중 식별한 MFDS 가이드라인 공백 → FDA/EMA 대응 문서 LLM 비교 분석 → 교수님께 "한국에만 존재하는 공백 3가지" 제안 메모</div>
+  </div>
+
+  <!-- #2 -->
+  <div class="card s-tier">
+    <div class="card-top">
+      <div class="rank-bubble">2</div>
+      <div style="flex:1;min-width:0">
+        <div class="card-title">CAR-T CK/PD 방법론 포지션 페이퍼 <span class="new-tag">우선 실행</span></div>
+        <div class="card-why">가이드라인 공식화 이전에 CPT:PSP 등 국제 저널에 타임스탬프 선점. 1번과 동일한 기술 기반이되, 오늘 당장 시작 가능. "이 번역 기준을 제안한 사람"이라는 서사 자본이 1번의 규제 채택 속도를 높이는 선행 투자</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-red">즉시</span>
+        <span class="badge badge-gray">서사 자본</span>
+      </div>
+    </div>
+    <div class="pills">
+      <span class="pill">A=7</span><span class="pill">B=9</span><span class="pill">C=9</span>
+      <span class="pill">(1−D)=0.85</span><span class="pill">E=2.5</span><span class="pill">V=1.6</span>
+    </div>
+    <div class="score-bar-wrap">
+      <div class="score-bar-bg"><div class="score-bar" style="width:57%"></div></div>
+      <span class="score-num">2,588</span>
+    </div>
+    <div class="action-line"><strong>첫 번째 행동:</strong> "Korean regulatory gaps for CAR-T PK evaluation" 초안 → bioRxiv preprint 선공개 → CPT:PSP 투고</div>
+  </div>
+
+  <div class="tier-label">A-Tier · 12개월 내 착수 (Score 500–1,999)</div>
+
+  <!-- #3 -->
+  <div class="card a-tier">
+    <div class="card-top">
+      <div class="rank-bubble">3</div>
+      <div style="flex:1;min-width:0">
+        <div class="card-title">MFDS·FDA·EMA 첨단바이오 PK 가이드라인 국제 비교 분석 논문</div>
+        <div class="card-why">한국어+영어 이중 역량 + MFDS 내부 접근권 = 국제 규제 기관이 한국 규제 환경을 이해할 수 있는 유일한 창구. ISoP/PAGE에서 "Korean regulatory expert" 각인 효과. 1·2번의 국제 공동 저자 유치를 가속하는 중간 단계</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-blue">6–12개월</span>
+        <span class="badge badge-gray">국제 포지셔닝</span>
+      </div>
+    </div>
+    <div class="pills">
+      <span class="pill">A=6</span><span class="pill">B=7</span><span class="pill">C=9</span>
+      <span class="pill">(1−D)=0.80</span><span class="pill">E=2.5</span><span class="pill">V=1.7</span>
+    </div>
+    <div class="score-bar-wrap">
+      <div class="score-bar-bg"><div class="score-bar" style="width:34%"></div></div>
+      <span class="score-num">1,536</span>
+    </div>
+    <div class="action-line"><strong>첫 번째 행동:</strong> FDA/EMA CAR-T 가이드라인 전문 수집 → MFDS 대응 문서 비교 표 → 규제 공백·차이 3가지 추출 → Clinical Pharmacokinetics 투고 계획</div>
+  </div>
+
+  <!-- #4 -->
+  <div class="card a-tier">
+    <div class="card-top">
+      <div class="rank-bubble">4</div>
+      <div style="flex:1;min-width:0">
+        <div class="card-title">비정형 EMR/RWD → NONMEM 데이터셋 LLM 자동변환 파이프라인</div>
+        <div class="card-why">BIG IDEA 연결: 배제된 집단(소아, 노인, 희귀질환)에 대한 RWD 연구를 가속하는 인프라. 8년 임상 차트 리터러시 + NONMEM 포맷 내부자 지식은 빅테크가 단기간 대체 불가. 단, AI 발전으로 D(t) 급등 예정</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-blue">2–6개월</span>
+        <span class="badge badge-gray">인프라</span>
+      </div>
+    </div>
+    <div class="pills">
+      <span class="pill">A=7</span><span class="pill">B=8</span><span class="pill">C=9</span>
+      <span class="pill">(1−D)=0.65</span><span class="pill">E=2.0</span><span class="pill">V=1.9</span>
+    </div>
+    <div class="score-bar-wrap">
+      <div class="score-bar-bg"><div class="score-bar" style="width:27%"></div></div>
+      <span class="score-num">1,222</span>
+    </div>
+    <div class="action-line"><strong>첫 번째 행동:</strong> 가상 비정형 환자 기록 50건 생성 → NONMEM AMT/TIME/DV/MDV 자동변환 프롬프트 최적화 → 오류율 측정·문서화</div>
+    <div class="decay-warn">⚠ D(t) 급등 주의 — 18개월 후 Score 약 50% 감소. Data Moat 설계 병행 필수</div>
+  </div>
+
+  <!-- #5 -->
+  <div class="card a-tier">
+    <div class="card-top">
+      <div class="rank-bubble">5</div>
+      <div style="flex:1;min-width:0">
+        <div class="card-title">한국인(아시아인) 특이 PK 공변량 데이터베이스 구축</div>
+        <div class="card-why">BIG IDEA 연결: 서양 임상시험 기반 용량이 한국/아시아 인구에 그대로 적용되는 번역 오류. 한국 MFDS 접근권 + 내국인 코호트 데이터 접근은 해외 연구자가 복제할 수 없는 비교우위. 이 DB는 후속 모든 PopPK 연구의 공변량 기반이 됨</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-blue">6–12개월</span>
+        <span class="badge badge-gray">데이터 모트</span>
+      </div>
+    </div>
+    <div class="pills">
+      <span class="pill">A=7</span><span class="pill">B=7</span><span class="pill">C=9</span>
+      <span class="pill">(1−D)=0.80</span><span class="pill">E=2.0</span><span class="pill">V=1.5</span>
+    </div>
+    <div class="score-bar-wrap">
+      <div class="score-bar-bg"><div class="score-bar" style="width:22%"></div></div>
+      <span class="score-num">998</span>
+    </div>
+    <div class="action-line"><strong>첫 번째 행동:</strong> 국내 출판 PopPK 논문에서 한국인 특이 공변량(유전형, 체성분, 식이) 메타분석 → 부재 변수 목록화 → 건보공단 코호트 데이터 접근 타당성 검토</div>
+  </div>
+
+  <!-- #6 -->
+  <div class="card a-tier">
+    <div class="card-top">
+      <div class="rank-bubble">6</div>
+      <div style="flex:1;min-width:0">
+        <div class="card-title">신장(CKD)/간부전 환자 PBPK 기반 용량 가이드라인 재정립</div>
+        <div class="card-why">BIG IDEA 연결: 만성 장기 장애 환자는 임상시험에서 체계적으로 배제. eGFR/CrCl 공식과 실제 약화 간 괴리를 8년간 현장에서 목격한 임상 내부자만이 제기할 수 있는 질문. PBPK 역량이 쌓이는 박사 과정 중반 이후 착수 적절</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-blue">6–12개월</span>
+        <span class="badge badge-gray">규제 과학</span>
+      </div>
+    </div>
+    <div class="pills">
+      <span class="pill">A=8</span><span class="pill">B=7</span><span class="pill">C=8</span>
+      <span class="pill">(1−D)=0.75</span><span class="pill">E=2.0</span><span class="pill">V=1.5</span>
+    </div>
+    <div class="score-bar-wrap">
+      <div class="score-bar-bg"><div class="score-bar" style="width:21%"></div></div>
+      <span class="score-num">951</span>
+    </div>
+    <div class="action-line"><strong>첫 번째 행동:</strong> 임상에서 eGFR/CrCl 괴리가 가장 컸던 약물 5개 리스트업 → 원인 가설 설정 → RxODE 기반 PBPK 모델링 착수</div>
+  </div>
+
+  <!-- #7 -->
+  <div class="card a-tier">
+    <div class="card-top">
+      <div class="rank-bubble">7</div>
+      <div style="flex:1;min-width:0">
+        <div class="card-title">소아 희귀질환 PBPK 용량 외삽 + 오픈소스화</div>
+        <div class="card-why">BIG IDEA 연결: 소아 × 희귀질환 = 이중 배제. 임상시험이 불가능한 집단에 대해 PBPK 외삽은 FDA·EMA가 공식 인정한 유일한 과학적 경로. A=9로 전체 목록 중 가장 높으나, 현재 PBPK 역량 갭이 B를 5로 낮춤. 학위 논문 연계 시 B 향상 가능</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-green">1–2년</span>
+        <span class="badge badge-gray">소외 집단</span>
+      </div>
+    </div>
+    <div class="pills">
+      <span class="pill">A=9</span><span class="pill">B=5</span><span class="pill">C=8</span>
+      <span class="pill">(1−D)=0.85</span><span class="pill">E=2.0</span><span class="pill">V=1.5</span>
+    </div>
+    <div class="score-bar-wrap">
+      <div class="score-bar-bg"><div class="score-bar" style="width:19%"></div></div>
+      <span class="score-num">866</span>
+    </div>
+    <div class="action-line"><strong>첫 번째 행동:</strong> RxODE/mrgsolve 소아 생리학 파라미터 공개 DB 수집 → 국내 발생 빈도 높은 소아 희귀질환 1개 선정 → 지도교수 학위 논문 연계 논의</div>
+    <div class="big-a-note">⬆ A=9 (글로벌 효용 최상위) — 역량 갭 해소 시 Score 급등 예정</div>
+  </div>
+
+  <div class="tier-label">B-Tier · 기반 구축 및 중기 설계 (Score 100–499)</div>
+
+  <!-- #8 -->
+  <div class="card b-tier">
+    <div class="card-top">
+      <div class="rank-bubble">8</div>
+      <div style="flex:1;min-width:0">
+        <div class="card-title">계량약리학 PKM 템플릿 (PIPET-Vault) 글로벌 배포</div>
+        <div class="card-why">번역 연구를 수행할 차세대 계량약리학자들의 학습 곡선을 단축하는 지식 인프라. 이미 구축된 자산의 제로 비용 배포. ISoP/PAGE 네트워크 효과로 향후 1·2번 항목의 국제 공동 저자 유치 채널이 됨</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-red">즉시</span>
+        <span class="badge badge-gray">네트워크</span>
+      </div>
+    </div>
+    <div class="pills">
+      <span class="pill">A=4</span><span class="pill">B=10</span><span class="pill">C=10</span>
+      <span class="pill">(1−D)=0.90</span><span class="pill">E=1.5</span><span class="pill">V=1.9</span>
+    </div>
+    <div class="score-bar-wrap">
+      <div class="score-bar-bg"><div class="score-bar" style="width:17%"></div></div>
+      <span class="score-num">788</span>
+    </div>
+    <div class="action-line"><strong>첫 번째 행동:</strong> PIPET-Vault 영문화·익명화 → GitHub 공개 → ISoP/PAGE/ASCPT 커뮤니티 배포 (깔때기: 다운로드 → 임상약사 커뮤니티 연결)</div>
+  </div>
+
+  <!-- #9 -->
+  <div class="card b-tier">
+    <div class="card-top">
+      <div class="rank-bubble">9</div>
+      <div style="flex:1;min-width:0">
+        <div class="card-title">반코마이신·타크로리무스 TDM 베이지안 예측 R Shiny 위젯 (한국인 코호트)</div>
+        <div class="card-why">BIG IDEA 연결: 치료 농도 범위가 좁은 약물에서 개인 최적 용량 결정 — 번역 문제의 임상 현장 버전. 기존 범용 툴은 한국인 코호트 파라미터 미반영. 즉각적인 현장 임팩트와 R Shiny MVP 개발 가능성</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-blue">6–12개월</span>
+        <span class="badge badge-gray">임상 현장</span>
+      </div>
+    </div>
+    <div class="pills">
+      <span class="pill">A=6</span><span class="pill">B=9</span><span class="pill">C=8</span>
+      <span class="pill">(1−D)=0.75</span><span class="pill">E=1.8</span><span class="pill">V=1.5</span>
+    </div>
+    <div class="score-bar-wrap">
+      <div class="score-bar-bg"><div class="score-bar" style="width:17%"></div></div>
+      <span class="score-num">781</span>
+    </div>
+    <div class="action-line"><strong>첫 번째 행동:</strong> 반코마이신 선택 → 한국인 코호트 포함 PopPK 파라미터 3세트 문헌 수집 → R Shiny MVP → 임상약사 동료 5명 베타 테스트</div>
+  </div>
+
+  <!-- #10 -->
+  <div class="card b-tier">
+    <div class="card-top">
+      <div class="rank-bubble">10</div>
+      <div style="flex:1;min-width:0">
+        <div class="card-title">면역항암제·표적항암제 모델기반 개인 최적 용량 결정(MIPD) 연구</div>
+        <div class="card-why">암 환자는 종양 부담, 장기 기능, 면역 상태에 따른 IIV가 극도로 큼. MIPD는 독성 감소 + 효능 극대화의 두 가지 번역 문제를 동시에 해결. CAR-T 경험이 면역항암 PK 이해의 기반이 됨</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-blue">6–12개월</span>
+        <span class="badge badge-gray">종양학</span>
+      </div>
+    </div>
+    <div class="pills">
+      <span class="pill">A=7</span><span class="pill">B=8</span><span class="pill">C=8</span>
+      <span class="pill">(1−D)=0.72</span><span class="pill">E=1.8</span><span class="pill">V=1.5</span>
+    </div>
+    <div class="score-bar-wrap">
+      <div class="score-bar-bg"><div class="score-bar" style="width:17%"></div></div>
+      <span class="score-num">778</span>
+    </div>
+    <div class="action-line"><strong>첫 번째 행동:</strong> 문헌에 공개된 pembrolizumab/nivolumab PK 데이터 수집 → 트로프 농도 예측 베이지안 모델 구현 → 한국 투여 패턴 데이터와 비교</div>
+  </div>
+
+  <!-- #11 -->
+  <div class="card b-tier">
+    <div class="card-top">
+      <div class="rank-bubble">11</div>
+      <div style="flex:1;min-width:0">
+        <div class="card-title">고령 다약제(Polypharmacy) 환자 PopPK 기반 처방 최적화 알고리즘</div>
+        <div class="card-why">고령 환자는 임상시험에서 배제되면서도 가장 많은 약을 복용하는 집단 — 번역 문제의 양적 정점. 한국 초고령화 사회의 사회적 맥락과 8년 임상 노인 환자 경험이 C를 높임</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-green">1–2년</span>
+        <span class="badge badge-gray">고령화</span>
+      </div>
+    </div>
+    <div class="pills">
+      <span class="pill">A=7</span><span class="pill">B=7</span><span class="pill">C=8</span>
+      <span class="pill">(1−D)=0.72</span><span class="pill">E=1.8</span><span class="pill">V=1.4</span>
+    </div>
+    <div class="score-bar-wrap">
+      <div class="score-bar-bg"><div class="score-bar" style="width:15%"></div></div>
+      <span class="score-num">666</span>
+    </div>
+    <div class="action-line"><strong>첫 번째 행동:</strong> 임상에서 낙상·섬망과 연관됐던 약물 조합 리스트업 → PK 상호작용 메커니즘 가설 설정 → 건보공단 노인 코호트 접근 타당성 검토</div>
+  </div>
+
+  <!-- #12 -->
+  <div class="card b-tier">
+    <div class="card-top">
+      <div class="rank-bubble">12</div>
+      <div style="flex:1;min-width:0">
+        <div class="card-title">희귀질환 모델기반 가상 임상시험(Virtual Trial) 규제 프레임워크</div>
+        <div class="card-why">BIG IDEA의 극한 사례: 환자 수 자체가 적어 임상시험이 불가능한 질환에서 가상 환자 집단 시뮬레이션으로 규제 근거 창출. FDA가 이미 승인 사례 보유. 현재 역량 갭(B=4)이 크나 성공 시 A=9의 대체 불가 효용</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-green">2년 이상</span>
+        <span class="badge badge-gray">희귀질환</span>
+      </div>
+    </div>
+    <div class="pills">
+      <span class="pill">A=9</span><span class="pill">B=4</span><span class="pill">C=7</span>
+      <span class="pill">(1−D)=0.82</span><span class="pill">E=2.0</span><span class="pill">V=1.5</span>
+    </div>
+    <div class="score-bar-wrap">
+      <div class="score-bar-bg"><div class="score-bar" style="width:13%"></div></div>
+      <span class="score-num">585</span>
+    </div>
+    <div class="action-line"><strong>첫 번째 행동:</strong> FDA의 가상 임상시험 활용 승인 사례 3건 문헌 분석 → 국내 적용 가능한 희귀질환 1개 선정 → mrgsolve 가상 집단 파이프라인 구현 시작</div>
+    <div class="big-a-note">⬆ A=9 — 역량 갭 해소 시 최상위권 도달 가능</div>
+  </div>
+
+  <!-- #13 -->
+  <div class="card b-tier">
+    <div class="card-top">
+      <div class="rank-bubble">13</div>
+      <div style="flex:1;min-width:0">
+        <div class="card-title">임산부·수유부 약물 PBPK 안전성 시뮬레이터</div>
+        <div class="card-why">BIG IDEA 연결: 윤리적 이유로 임상시험에서 완전히 배제되는 집단. PBPK가 사실상 유일한 과학적 접근. 글로벌 A=8이나 한국 데이터 접근권 + PBPK 역량이 수련 중이라 B=5</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-green">1–2년</span>
+        <span class="badge badge-gray">배제 집단</span>
+      </div>
+    </div>
+    <div class="pills">
+      <span class="pill">A=8</span><span class="pill">B=5</span><span class="pill">C=7</span>
+      <span class="pill">(1−D)=0.82</span><span class="pill">E=1.8</span><span class="pill">V=1.4</span>
+    </div>
+    <div class="score-bar-wrap">
+      <div class="score-bar-bg"><div class="score-bar" style="width:12%"></div></div>
+      <span class="score-num">542</span>
+    </div>
+    <div class="action-line"><strong>첫 번째 행동:</strong> 임산부 PK 변화(GFR 증가, CYP 변화, 체적분포 변화) 공개 파라미터 수집 → 자간전증 치료제 1개로 PBPK MVP 구현</div>
+  </div>
+
+  <!-- #14 -->
+  <div class="card b-tier">
+    <div class="card-top">
+      <div class="rank-bubble">14</div>
+      <div style="flex:1;min-width:0">
+        <div class="card-title">소아암 1상 모델기반 Dose Escalation 설계 (BOIN/CRM 방법론)</div>
+        <div class="card-why">소아 종양 환자 = 이중 배제(소아 + 암). 전통적 3+3 설계로 소아에게 독성 용량을 탐색하는 것은 BIG IDEA가 해결해야 하는 문제의 가장 명백한 사례. BOIN/CRM 방법론은 R 구현 가능</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-green">2년 이상</span>
+        <span class="badge badge-gray">소아 종양</span>
+      </div>
+    </div>
+    <div class="pills">
+      <span class="pill">A=8</span><span class="pill">B=5</span><span class="pill">C=7</span>
+      <span class="pill">(1−D)=0.78</span><span class="pill">E=1.8</span><span class="pill">V=1.4</span>
+    </div>
+    <div class="score-bar-wrap">
+      <div class="score-bar-bg"><div class="score-bar" style="width:11%"></div></div>
+      <span class="score-num">515</span>
+    </div>
+    <div class="action-line"><strong>첫 번째 행동:</strong> 3+3 설계와 BOIN/CRM의 시뮬레이션 비교 → 소아 독성 최소화 관점에서 성능 차이 정량화 → 소아과학회 또는 관련 학회 발표 기획</div>
+  </div>
+
+  <!-- #15 HONEST TENSION -->
+  <div class="card b-tier" style="border-color:#6b6b67;border-left-color:#6b6b67">
+    <div class="card-top">
+      <div class="rank-bubble" style="background:#e8e8e3;color:#3a3a38">15</div>
+      <div style="flex:1;min-width:0">
+        <div class="card-title">결핵(TB)/HIV 최적용량 PopPK 연구 — LMIC 집단 적용</div>
+        <div class="card-why"><strong style="color:#8b4513">정직한 평가:</strong> A=10 — 글로벌 효용은 이 목록에서 가장 높다. 결핵 연간 1,000만 명 이상, 리팜피신 저용량 투여는 계량약리학이 이미 규명한 문제다. 그러나 현재 포지셔닝(한국 임상 경력, MFDS 접근권, CAR-T 경험)의 비교우위(C=4)는 이 방향이 아니다. B=3. 이것은 포기가 아니라 현실의 정직한 기록이다 — 포지셔닝이 전환되는 시점에서 재평가해야 한다</div>
+      </div>
+      <div class="card-badges">
+        <span class="badge badge-green">장기</span>
+        <span class="badge badge-gray">LMIC</span>
+      </div>
+    </div>
+    <div class="pills">
+      <span class="pill">A=10</span><span class="pill">B=3</span><span class="pill">C=4</span>
+      <span class="pill">(1−D)=0.80</span><span class="pill">E=1.5</span><span class="pill">V=1.3</span>
+    </div>
+    <div class="score-bar-wrap">
+      <div class="score-bar-bg"><div class="score-bar" style="width:4%;background:#6b6b67"></div></div>
+      <span class="score-num" style="color:#6b6b67">165</span>
+    </div>
+    <div class="action-line"><strong>BIG IDEA와의 긴장:</strong> A=10이 Score=165로 추락하는 이유는 이 문제가 덜 중요해서가 아니다. 비교우위(C)가 현재 낮기 때문이다. 이 문제는 세상에서 가장 중요한 번역 문제 중 하나 — 다만 지금의 당신이 아닌, 더 넓은 포지셔닝을 확보한 미래의 당신이 도전해야 할 과제다.</div>
+  </div>
+
+</div>
+
+<div class="footer-note">
+  <p><strong>BIG IDEA 렌즈가 바꾼 것:</strong> 이전 프레임워크들이 "임팩트 있는 일"을 나열했다면, 이 목록은 모든 항목을 하나의 일관된 질문으로 평가한다 — "이것이 연구되지 못한 집단에 대한 번역 문제를 얼마나 직접적으로 해결하는가?" 그 결과, 규제 가이드라인(1번)과 소아 희귀질환(7번), 희귀질환 가상 임상시험(12번)이 이전보다 높은 가중치를 받았다.</p>
+  <br>
+  <p><strong>Score가 낮아도 중요한 항목:</strong> 7번(A=9), 12번(A=9), 15번(A=10)은 글로벌 효용이 가장 높지만 현재 역량 또는 포지셔닝의 갭으로 Score가 낮다. 이것들은 포기 목록이 아니라 <em>역량 투자 로드맵</em>이다.</p>
+  <br>
+  <p><strong>진짜 해자의 위치:</strong> D(t)가 안정적인 항목(1·2·3·5·6)이 장기적 비교우위의 원천이다. AI 기술 자체가 아니라, MFDS 규제 관계 자본과 배제 집단에 대한 임상 내부자 지식이 비대체성의 핵심이다.</p>
+</div>
+
+</body>
+</html>
