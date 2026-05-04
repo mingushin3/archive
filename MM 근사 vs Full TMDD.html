@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PK Profile: MM vs Full TMDD Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Pretendard', -apple-system, sans-serif; background-color: #f8fafc; }
+        input[type=range] { accent-color: #3b82f6; }
+    </style>
+</head>
+<body class="p-8">
+
+    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+        <div class="bg-slate-800 text-white p-4">
+            <h1 class="text-xl font-bold">PK Profile: MM Approximation vs Full TMDD</h1>
+            <p class="text-sm text-slate-300">Phase D Terminal Drop Simulation</p>
+        </div>
+
+        <div class="p-6 grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="md:col-span-1 space-y-6">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Dose (mg/kg)</label>
+                    <div class="flex items-center gap-3">
+                        <input type="range" id="doseSlider" min="1" max="10" step="1" value="1" class="w-full">
+                        <span id="doseVal" class="text-lg font-bold text-blue-600 w-8">1</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">고용량에서는 늪(타겟)이 덮여 차이가 숨겨집니다.</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Disease Severity (R0 Multiplier)</label>
+                    <div class="flex items-center gap-3">
+                        <input type="range" id="r0Slider" min="1" max="5" step="1" value="1" class="w-full">
+                        <span id="r0Val" class="text-lg font-bold text-red-600 w-8">1x</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">타겟 수용체(R0)가 폭증할수록 절벽이 일찍 찾아옵니다.</p>
+                </div>
+
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                    <h3 class="font-bold text-blue-800 mb-2">분석 결과</h3>
+                    <p id="divergenceText" class="text-sm text-blue-900 leading-relaxed">
+                        At Dose <span id="txtDose" class="font-bold">1</span> and R0 <span id="txtR0" class="font-bold">1x</span>, the models diverge at Time <span id="txtTime" class="font-bold text-red-600">--</span>h. <br>MM overpredicts exposure.
+                    </p>
+                </div>
+            </div>
+
+            <div class="md:col-span-3 relative h-[500px]">
+                <canvas id="pkChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. 수학적 모델 세팅 (상미분방정식 - 오일러 적분) ---
+        function runSimulation(dose, r0_mult) {
+            let dt = 1; // Time step (hours)
+            let maxTime = 1200;
+            
+            // 초기 농도 (단순화: Vc 반영)
+            let C_A = dose * 15; 
+            let C_B = dose * 15; 
+            let k_el = 0.002; // 공통 선형 소실(Linear clearance)
+
+            // Modeler A: MM Approximation
+            let Vmax_A = 0.12; 
+            let Km_A = 2.0; // 의도적으로 팽창된 가짜 파라미터
+
+            // Modeler B: Full TMDD (Quasi-steady-state)
+            let k_int = 0.12; // 수용체 내부화 속도
+            let K_ss = 0.02;  // 실제 강력한 결합력 (Steep drop 유발)
+            let Rtot = 1.0 * r0_mult; // 기저 질환에 비례하는 수용체 총량
+
+            let dataA = [];
+            let dataB = [];
+            let labels = [];
+            let divergenceTime = null;
+
+            for (let t = 0; t <= maxTime; t += dt) {
+                // 기록 지점 (10시간 간격)
+                if (t % 10 === 0) {
+                    labels.push(t);
+                    // 로그 스케일을 위해 0.001로 바닥 고정
+                    dataA.push(C_A > 0.001 ? C_A : 0.001);
+                    dataB.push(C_B > 0.001 ? C_B : 0.001);
+
+                    // 다이버전스 판정: 농도가 유효 구간(>0.01)이면서, MM이 TMDD보다 30% 이상 과대예측할 때
+                    if (divergenceTime === null && C_A > 0.01 && ((C_A - C_B) / C_A) > 0.30) {
+                        divergenceTime = t;
+                    }
+                }
+
+                // 미분방정식 업데이트 (오일러 메서드)
+                // dC/dt = -kel*C - (Vmax*C)/(Km+C)
+                let dC_A = -k_el * C_A - (Vmax_A * C_A) / (Km_A + C_A);
+                C_A += dC_A * dt;
+
+                let Vmax_B = k_int * Rtot;
+                let dC_B = -k_el * C_B - (Vmax_B * C_B) / (K_ss + C_B);
+                C_B += dC_B * dt;
+
+                // 음수 방지
+                if(C_A < 1e-5) C_A = 1e-5;
+                if(C_B < 1e-5) C_B = 1e-5;
+            }
+
+            return { labels, dataA, dataB, divergenceTime };
+        }
+
+        // --- 2. Chart.js 시각화 세팅 ---
+        const ctx = document.getElementById('pkChart').getContext('2d');
+        let pkChart = new Chart(ctx, {
+            type: 'line',
+            data: { labels: [], datasets: [] },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: { duration: 300 }, // 부드러운 슬라이더 전환
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.parsed.y.toFixed(3) + ' ug/mL';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Time (hours)', font: {weight: 'bold'} },
+                        grid: { color: '#f1f5f9' }
+                    },
+                    y: {
+                        type: 'logarithmic', // PK 분석의 핵심: 로그 스케일
+                        min: 0.001,
+                        max: 100,
+                        title: { display: true, text: 'Concentration (ug/mL) [Log Scale]', font: {weight: 'bold'} },
+                        grid: { color: '#e2e8f0' },
+                        ticks: {
+                            callback: function(value) {
+                                // 로그 틱 깔끔하게 포매팅
+                                if (value === 0.001 || value === 0.01 || value === 0.1 || value === 1 || value === 10 || value === 100) {
+                                    return value;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // --- 3. UI 인터랙션 연결 ---
+        const doseSlider = document.getElementById('doseSlider');
+        const r0Slider = document.getElementById('r0Slider');
+        const doseVal = document.getElementById('doseVal');
+        const r0Val = document.getElementById('r0Val');
+        
+        function updateChart() {
+            const dose = parseFloat(doseSlider.value);
+            const r0 = parseFloat(r0Slider.value);
+            
+            doseVal.textContent = dose;
+            r0Val.textContent = r0 + 'x';
+            
+            const sim = runSimulation(dose, r0);
+
+            pkChart.data.labels = sim.labels;
+            pkChart.data.datasets = [
+                {
+                    label: 'Modeler A (MM Model)',
+                    data: sim.dataA,
+                    borderColor: '#94a3b8', // Gray
+                    borderDash: [5, 5],
+                    borderWidth: 3,
+                    pointRadius: 0,
+                    tension: 0.1
+                },
+                {
+                    label: 'Modeler B (Full TMDD)',
+                    data: sim.dataB,
+                    borderColor: '#ef4444', // Red
+                    borderWidth: 3,
+                    pointRadius: 0,
+                    tension: 0.1
+                }
+            ];
+            pkChart.update();
+
+            // 텍스트 업데이트
+            document.getElementById('txtDose').textContent = dose;
+            document.getElementById('txtR0').textContent = r0 + 'x';
+            
+            const timeEl = document.getElementById('txtTime');
+            if (sim.divergenceTime !== null && sim.divergenceTime < 1200) {
+                timeEl.textContent = sim.divergenceTime;
+                timeEl.parentElement.classList.remove('hidden');
+            } else {
+                timeEl.textContent = '>1200';
+            }
+        }
+
+        // 이벤트 리스너 부착 및 초기 실행
+        doseSlider.addEventListener('input', updateChart);
+        r0Slider.addEventListener('input', updateChart);
+        updateChart();
+    </script>
+</body>
+</html>
